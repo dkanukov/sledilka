@@ -1,0 +1,9 @@
+.container {
+	border-bottom: 1px solid black;
+}
+
+.buttonGroup {
+	padding: 10px;
+	display: flex;
+	gap: 20px;
+}
