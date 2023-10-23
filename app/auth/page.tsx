@@ -1,22 +1,9 @@
-"use client"
-import * as React from 'react';
-import {Box, Grid, Link, Checkbox, FormControlLabel, TextField, CssBaseline, Button, Avatar, Typography, Container} from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import {useState} from "react";
-import {useRouter} from 'next/navigation';
-
-function Copyright(props: any) {
-	return (
-		<Typography variant="body2" color="text.secondary" align="center" {...props}>
-			{'Copyright © '}
-			<Link color="inherit" href="https://mui.com/">
-				Your Website
-			</Link>{' '}
-			{new Date().getFullYear()}
-			{'.'}
-		</Typography>
-	);
-}
+'use client'
+import * as React from 'react'
+import { Box, Grid, Link, Checkbox, FormControlLabel, TextField, CssBaseline, Button, Avatar, Typography, Container } from '@mui/material'
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function SignIn() {
 	const router = useRouter()
@@ -50,13 +37,16 @@ export default function SignIn() {
 					alignItems: 'center',
 				}}
 			>
-				<Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
+				<Avatar
+					sx={{ m: 1,
+						bgcolor: 'secondary.main' }}
+				>
 					<LockOutlinedIcon/>
 				</Avatar>
 				<Typography component="h1" variant="h5">
 					Sign in
 				</Typography>
-				<Box sx={{mt: 1}}>
+				<Box sx={{ mt: 1 }}>
 					<TextField
 						margin="normal"
 						required
@@ -87,7 +77,8 @@ export default function SignIn() {
 						type="submit"
 						fullWidth
 						variant="contained"
-						sx={{mt: 3, mb: 2}}
+						sx={{ mt: 3,
+							mb: 2 }}
 						onClick={handleFormSubmit}
 					>
 						Sign In
@@ -100,13 +91,23 @@ export default function SignIn() {
 						</Grid>
 						<Grid item>
 							<Link href="#" variant="body2">
-								{"Don't have an account? Sign Up"}
+								{'Don\'t have an account? Sign Up'}
 							</Link>
 						</Grid>
 					</Grid>
 				</Box>
 			</Box>
-			<Copyright sx={{mt: 8, mb: 4}}/>
+			<Typography
+				variant="body2" color="text.secondary"
+				align="center"
+			>
+				{'Copyright © '}
+				<Link color="inherit" href="https://mui.com/">
+					Your Website
+				</Link>{' '}
+				{new Date().getFullYear()}
+				{'.'}
+			</Typography>
 		</Container>
-	);
+	)
 }

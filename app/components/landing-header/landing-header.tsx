@@ -1,8 +1,11 @@
-"use client"
-import { MenuItem } from "@/types/menu-items"
-import { Link } from "@mui/joy"
-import { usePathname } from "next/navigation"
+'use client'
+import { Link } from '@mui/joy'
+import { usePathname } from 'next/navigation'
+import { Paper } from '@mui/material'
+
 import styles from './landing-header.module.css'
+
+import { MenuItem } from '@/types/menu-items'
 
 export default function LandingHeader() {
 	const path = usePathname()
@@ -16,11 +19,15 @@ export default function LandingHeader() {
 		{
 			label: 'Контакты',
 			link: '/contacts',
-			isActive: path.includes('/contacts')
-		}
+			isActive: path.includes('/contacts'),
+		},
 	]
+
 	return (
-		<div className={styles.header}>
+		<Paper
+			className={styles.header}
+			elevation={3}
+		>
 			{
 				menuItems.map((item) => (
 					<Link
@@ -30,9 +37,9 @@ export default function LandingHeader() {
 						underline={item.isActive ? 'always' : 'hover'}
 					>
 						{item.label}
-					</Link>	
+					</Link>
 				))
 			}
-		</div>
+		</Paper>
 	)
 }

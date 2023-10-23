@@ -1,8 +1,10 @@
-"use client"
-import { MenuItem } from '@/types/menu-items';
+'use client'
+import { Button } from '@mui/material'
+import { usePathname, useRouter } from 'next/navigation'
+
 import styles from './layout-header.module.css'
-import {Button} from "@mui/material";
-import {usePathname, useRouter} from "next/navigation";
+
+import { MenuItem } from '@/types/menu-items'
 
 export default function LayoutHeader() {
 	const path = usePathname()
@@ -11,13 +13,13 @@ export default function LayoutHeader() {
 		{
 			label: 'Просмотр устройств',
 			link: '/devices-overview',
-			isActive: path.includes('/devices-overview')
+			isActive: path.includes('/devices-overview'),
 		},
 		{
 			label: 'Test',
 			link: '/create-device',
-			isActive: path.includes('/create-device')
-		}
+			isActive: path.includes('/create-device'),
+		},
 	]
 
 	const handleNavButtonClick = (menuItem: MenuItem) => {

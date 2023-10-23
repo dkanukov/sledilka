@@ -1,5 +1,4 @@
-"use client"
-import styles from './index.module.css'
+'use client'
 
 export default function DevicesOverview() {
 	return (

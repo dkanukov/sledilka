@@ -1,6 +1,6 @@
-import LayoutHeader from "@/app/components/layout-header/layout-header";
+import LayoutHeader from '../components/layout-header/layout-header'
 
-export default function DashboardLayout({children}: { children: React.ReactNode }) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<div>
 			<LayoutHeader/>
