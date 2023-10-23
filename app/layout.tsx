@@ -1,7 +1,7 @@
 import './globals.css'
 import type {Metadata} from 'next'
 import {Inter} from 'next/font/google'
-import LayoutHeader from '@/app/components/layout-header/layout-header'
+import LandingHeader from './components/landing-header/landing-header'
 
 const inter = Inter({subsets: ['latin']})
 
@@ -14,13 +14,11 @@ export default function RootLayout({children,}: { children: React.ReactNode }) {
 	return (
 		<html lang="en">
 			<body className={inter.className}>
-			<LayoutHeader/>
-				<div className={'container'}>
-					{children}
-				</div>
+					<LandingHeader/>
+					<div className='container'>
+						{children}
+					</div>
 			</body>
 		</html>
 	)
 }
-
-//TODO: научиться делать второй лэйаут, чтобы в него засунуть хеддер итд, а некоторые оставлять пустыми

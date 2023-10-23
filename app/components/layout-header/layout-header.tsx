@@ -1,13 +1,8 @@
 "use client"
+import { MenuItem } from '@/types/menu-items';
 import styles from './layout-header.module.css'
 import {Button} from "@mui/material";
 import {usePathname, useRouter} from "next/navigation";
-import {useState} from "react";
-interface MenuItem {
-	label: string
-	link: string
-	isActive: boolean
-}
 
 export default function LayoutHeader() {
 	const path = usePathname()
