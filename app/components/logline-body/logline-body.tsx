@@ -7,7 +7,7 @@ import BannerImage from '../../../public/home-banner-image.png'
 
 const LoglineBody = () => {
 	return (
-		<div className="home-container" id="home">
+		<div className="home-container">
 			{/*<Navbar />*/}
 			<div className="logline-banner-container">
 				<div className="logline-bannerImage-container">

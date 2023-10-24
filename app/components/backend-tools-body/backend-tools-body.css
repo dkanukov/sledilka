@@ -1,0 +1,14 @@
+.tools-list-container {
+    display: flex;
+    justify-content: center;
+    /*gap : 20px*/
+}
+.tools-icon {
+    max-width: 3rem;
+}
+.backend-text {
+    font-size: clamp(1rem, 5vw, 2rem);
+    color: #4c4c4c;
+    /* line-height: 5rem; */
+    /*margin: 1.5rem 0rem;*/
+}

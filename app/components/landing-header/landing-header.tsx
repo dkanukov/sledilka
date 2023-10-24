@@ -21,6 +21,11 @@ export default function LandingHeader() {
 			link: '/contacts',
 			isActive: path.includes('/contacts'),
 		},
+		{
+			label: 'Backend',
+			link: '/how-it-works/backend',
+			isActive: path.includes('/how-it-works/backend'),
+		},
 	]
 
 	return (
