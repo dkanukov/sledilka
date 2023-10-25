@@ -22,10 +22,20 @@ export default function LandingHeader() {
 			isActive: path.includes('/contacts'),
 		},
 		{
-			label: 'Обратная связь',
-			link: '/feedback',
-			isActive: path.includes('/feedback'),
+			label: 'Backend',
+			link: '/how-it-works/backend',
+			isActive: path.includes('/how-it-works/backend'),
 		},
+		{
+			label: 'Frontend',
+			link: '/how-it-works/frontend',
+			isActive: path.includes('/how-it-works/frontend'),
+		},
+    {
+   			label: 'Обратная связь',
+	  		link: '/feedback',
+  			isActive: path.includes('/feedback'),
+    }
 	]
 
 	return (

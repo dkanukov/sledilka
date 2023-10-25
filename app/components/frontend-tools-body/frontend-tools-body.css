@@ -1,0 +1,15 @@
+.frontend-text {
+    font-size: clamp(1rem, 5vw, 2rem);
+    color: #4c4c4c;
+    /* line-height: 5rem; */
+    /*margin: 1.5rem 0rem;*/
+}
+.frontend-primary-text {
+    display: flex;
+    justify-content: center;
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    max-width: 500px;
+    color: #5a5a5a;
+    margin: 1.5rem 0rem;
+    /*align-content: center;*/
+}
