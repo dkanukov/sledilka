@@ -21,6 +21,11 @@ export default function LandingHeader() {
 			link: '/contacts',
 			isActive: path.includes('/contacts'),
 		},
+		{
+			label: 'Обратная связь',
+			link: '/feedback',
+			isActive: path.includes('/feedback'),
+		},
 	]
 
 	return (
@@ -28,6 +33,11 @@ export default function LandingHeader() {
 			className={styles.header}
 			elevation={3}
 		>
+			<img
+				width={'80px'}
+				height={'80px'}
+				src="/logo.png"
+			/>
 			{
 				menuItems.map((item) => (
 					<Link
