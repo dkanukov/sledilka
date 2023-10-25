@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import '../backend-summary-body/backend-summary-body.css'
 import './backend-tools-body.css'

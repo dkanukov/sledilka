@@ -1,5 +1,4 @@
 import React from 'react'
-import Image from 'next/image'
 
 import BackendSummaryBody from '../../components/backend-summary-body/backend-summary-body'
 import BackendToolsBody from '../../components/backend-tools-body/backend-tools-body'
@@ -8,7 +7,7 @@ const Backend = () => {
 	return (
 		<div>
 			<h1 className="heading">
-			Backend
+				Backend
 			</h1>
 			<BackendSummaryBody />
 			<BackendToolsBody />
