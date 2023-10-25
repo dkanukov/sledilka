@@ -31,6 +31,11 @@ export default function LandingHeader() {
 			link: '/how-it-works/frontend',
 			isActive: path.includes('/how-it-works/frontend'),
 		},
+    {
+   			label: 'Обратная связь',
+	  		link: '/feedback',
+  			isActive: path.includes('/feedback'),
+    }
 	]
 
 	return (
@@ -38,6 +43,11 @@ export default function LandingHeader() {
 			className={styles.header}
 			elevation={3}
 		>
+			<img
+				width={'80px'}
+				height={'80px'}
+				src="/logo.png"
+			/>
 			{
 				menuItems.map((item) => (
 					<Link
