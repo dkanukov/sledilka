@@ -2,8 +2,8 @@ import React from 'react'
 import Image from 'next/image'
 
 import './functionality-body.css'
-import AboutBackgroundImage from '../../../public/about-background-image.png'
-import AboutBackground from '../../../public/about-background.png'
+import AboutBackgroundImage from '@/public/about-background-image.png'
+import AboutBackground from '@/public/about-background.png'
 const FunctionalityBody = () => {
 	return (
 		<div className="functionality-section-container" id="about">

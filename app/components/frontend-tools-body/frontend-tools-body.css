@@ -1,10 +1,10 @@
-.backend-text {
+.frontend-text {
     font-size: clamp(1rem, 5vw, 2rem);
     color: #4c4c4c;
     /* line-height: 5rem; */
     /*margin: 1.5rem 0rem;*/
 }
-.backend-primary-text {
+.frontend-primary-text {
     display: flex;
     justify-content: center;
     font-size: clamp(1rem, 3vw, 1.5rem);

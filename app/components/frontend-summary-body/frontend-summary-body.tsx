@@ -1,28 +1,27 @@
 'use client'
+import './frontend-summary-body.css'
 import Image from 'next/image'
 import React from 'react'
 
-import './backend-summary-body.css'
 import BannerBackground from '@/public/about-background.png'
-import BackEnd from '@/public/backend-image.png'
+import FrontEndImg from '@/public/frontend-image.png'
 
-const BackendSummaryBody = () => {
+const FrontendSummaryBody = () => {
 	return (
-		<div className="backend-section-container">
-			<div className="backend-background-image-container">
+		<div className="frontend-section-container">
+			<div className="frontend-background-image-container">
 				<Image src={BannerBackground} alt="" />
 			</div>
-			<div className="backend-section-image-container">
-				<Image src={BackEnd} alt=""/>
+			<div className="frontend-section-image-container">
+				<Image src={FrontEndImg} alt=""/>
 			</div>
-			<div className="backend-section-text-container">
+			<div className="frontend-section-text-container">
 				<h1 className="primary-heading">
-					Сеть. Потоки
+					Интерактивная карта с объектами
 				</h1>
-				<div className="backend-primary-text">
-					Работа бэкенда заключается в хранении списка устройств в базе данных,
-					получении статуса устройств в сети, обработке,
-					анализе и передаче видеоизображения с камер
+				<div className="primary-text">
+					Страница-карта с возможностью перемещения по этажам,
+					добавлением новых объектов/устройств.
 				</div>
 				{/*<ol className="primary-text" >*/}
 				{/*	/!* <li>ПО для сбора устройств в сети и сохранения их в базу данных</li> *!/*/}
@@ -37,5 +36,4 @@ const BackendSummaryBody = () => {
 		</div>
 	)
 }
-
-export default BackendSummaryBody
+export default FrontendSummaryBody

@@ -2,8 +2,8 @@ import React from 'react'
 import Image from 'next/image'
 
 import './logline-body.css'
-import BannerBackground from '../../../public/home-banner-background.png'
-import BannerImage from '../../../public/home-banner-image.png'
+import BannerBackground from '@/public/home-banner-background.png'
+import BannerImage from '@/public/home-banner-image.png'
 
 const LoglineBody = () => {
 	return (

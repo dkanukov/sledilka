@@ -30,7 +30,7 @@ const BackendToolsBody = () => {
 							/>
 							<div className="backend-text">Golang</div>
 						</div>
-						<div className="primary-text">
+						<div className="backend-primary-text">
 							Сервер будет написан на языке Go.
 							Это достаточно легковесный и &quot;быстрый&quot; язык,
 							чьи даже базовые инструменты позволяют просто создать HTTP-сервер,
@@ -46,7 +46,7 @@ const BackendToolsBody = () => {
 							/>
 							<div className="backend-text">PostgreSQL</div>
 						</div>
-						<div className="primary-text">
+						<div className="backend-primary-text">
 							База данных будет на СУБД Postgres.
 							Там будет хранится информация об устройствах (их тип, mac-адреса),
 							пользователях (логин, хэш пароля, права доступа, ФИО), а также
@@ -61,7 +61,7 @@ const BackendToolsBody = () => {
 							/>
 							<div className="backend-text">Linux net-tools</div>
 						</div>
-						<div className="primary-text">
+						<div className="backend-primary-text">
 							Для получении информации о статусах устройств в сети
 							будут использованы встроенные утилиты дистрибутивов Linux
 							и также другие консольные программы, анализирующие сеть, например arp-scan
@@ -75,7 +75,7 @@ const BackendToolsBody = () => {
 							/>
 							<div className="backend-text">gstreamer/ffmpeg</div>
 						</div>
-						<div className="primary-text">
+						<div className="backend-primary-text">
 							Связка ffmpeg/gstreamer будут использоваться для подключения к камере,
 							считывания видеоизображения, преобразования его в нужный формат для
 							передачи по сети

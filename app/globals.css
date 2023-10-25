@@ -42,11 +42,26 @@ img {
 	color: #4c4c4c;
 	/* line-height: 5rem; */
 }
+.subheading {
+	max-width: 900px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	font-size: clamp(2rem, 5vw, 4rem);
+	color: #4c4c4c;
+}
 .primary-text {
 	font-size: clamp(1rem, 3vw, 1.5rem);
 	max-width: 500px;
 	color: #5a5a5a;
 	margin: 1.5rem 0rem;
+}
+.tools-list-container {
+	display: flex;
+	justify-content: center;
+	/*gap : 20px*/
+}
+.tools-icon {
+	max-width: 3rem;
 }
 :root {
 	--foreground-rgb: 0, 0, 0;
