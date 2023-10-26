@@ -5,12 +5,13 @@
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
-	/*font-family: "Reem Kufi", sans-serif !important;*/
 }
+
 img {
 	max-width: 100%;
 	height: auto;
 }
+
 .primary-button {
 	padding: 0.9rem 1.75rem;
 	background-color: white;
@@ -26,22 +27,24 @@ img {
 .primary-button:hover {
 	background-color: rgb(234, 234, 234);
 }
+
 .primary-heading {
 	font-size: clamp(2rem, 5vw, 3rem);
 	color: #4c4c4c;
-	/* line-height: 5rem; */
 	max-width: 600px;
 }
+
 .primary-subheading {
 	font-weight: 700;
 	color: #4c4c4c;
 	font-size: 1.15rem;
 }
+
 .heading {
 	font-size: clamp(2rem, 5vw, 4rem);
 	color: #4c4c4c;
-	/* line-height: 5rem; */
 }
+
 .subheading {
 	max-width: 900px;
 	margin-top: 20px;
@@ -49,20 +52,24 @@ img {
 	font-size: clamp(2rem, 5vw, 4rem);
 	color: #4c4c4c;
 }
+
 .primary-text {
 	font-size: clamp(1rem, 3vw, 1.5rem);
 	max-width: 500px;
 	color: #5a5a5a;
 	margin: 1.5rem 0rem;
 }
+
 .tools-list-container {
 	display: flex;
-	justify-content: center;
-	/*gap : 20px*/
+	justify-content: flex-start;
+	gap : 6px
 }
+
 .tools-icon {
 	max-width: 3rem;
 }
+
 :root {
 	--foreground-rgb: 0, 0, 0;
 	--background-start-rgb: 214, 219, 220;
@@ -82,32 +89,38 @@ img {
 		font-size: 1rem;
 	}
 }
+
 @media (max-width: 800px) {
 	.primary-heading {
 		text-align: center;
 		max-width: 90%;
 	}
+
 	.primary-text {
 		text-align: center;
 		max-width: 80%;
 	}
+
 	.secondary-button {
 		font-size: 1rem;
 		padding: 0.8rem 2rem;
 		cursor: pointer;
 	}
+
 	.primary-subheading {
 		text-align: center;
 	}
 }
 
 body {
+	display: flex;
+	flex-direction: column;
 	margin: 0;
 	color: rgb(var(--foreground-rgb));
-	background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
 	min-height: 100vh;
 }
 
 .container {
+	flex: 1 0 auto;
 	padding: 20px;
 }

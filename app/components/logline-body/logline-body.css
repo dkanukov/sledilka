@@ -29,6 +29,9 @@
 }
 
 @media (max-width: 800px) {
+	.primary-heading {
+		margin-top: 20px;
+	}
     .logline-bannerImage-container {
         max-width: 450px;
     }
@@ -44,7 +47,6 @@
     .logline-text-section {
         justify-content: center;
         align-items: center;
-        /*margin-top: 4rem;*/
     }
 }
 @media (max-width: 600px) {

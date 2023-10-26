@@ -18,7 +18,8 @@ const FrontendToolsBody = () => {
 			</div>
 			<div style={{ marginTop: 80 }}>
 				<Grid
-					container spacing={2}
+					container
+					spacing={2}
 					sx={{ flexGrow: 1 }}
 				>
 					<Grid xs={12} md={6}>

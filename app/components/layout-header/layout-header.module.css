@@ -7,3 +7,9 @@
 	display: flex;
 	gap: 20px;
 }
+
+.tooltip {
+	background-color: red;
+	display: flex;
+	flex-direction: column;
+}

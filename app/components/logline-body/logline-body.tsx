@@ -9,24 +9,20 @@ import BannerImage from '@/public/home-banner-image.png'
 const LoglineBody = () => {
 	return (
 		<div className="home-container">
-			{/*<Navbar />*/}
 			<div className="logline-banner-container">
 				<div className="logline-bannerImage-container">
-					<Image src={BannerBackground} alt="" />
+					<Image src={BannerBackground} alt=""/>
 				</div>
 				<div className="logline-text-section">
 					<h1 className="primary-heading">
-            Инфосистема отслеживания состояний устройств
+						Инфосистема отслеживания состояний устройств
 					</h1>
 					<p className="primary-text">
-            Интерфейсы для визуализации устройств и их режима работы в сети
+						Интерфейсы для визуализации устройств и их режима работы в сети
 					</p>
-					{/* <button className="secondary-button">
-            Order Now <FiArrowRight />{" "}
-          </button> */}
 				</div>
 				<div className="logline-image-section">
-					<Image src={BannerImage} alt="" />
+					<Image src={BannerImage} alt=""/>
 				</div>
 			</div>
 		</div>

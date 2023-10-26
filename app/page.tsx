@@ -6,12 +6,12 @@ import FunctionalityBody from './components/functionality-body/functionality-bod
 
 export default function Landing() {
 	return (
-		<Container>
+		<div>
 			<h1 className="heading">
 				Следилка это who?
 			</h1>
 			<LoglineBody />
 			<FunctionalityBody />
-		</Container>
+		</div>
 	)
 }
