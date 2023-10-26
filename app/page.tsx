@@ -1,4 +1,4 @@
-import { Container } from '@mui/material'
+import {Box, Container} from '@mui/material'
 import React from 'react'
 
 import LoglineBody from './components/logline-body/logline-body'
@@ -6,12 +6,12 @@ import FunctionalityBody from './components/functionality-body/functionality-bod
 
 export default function Landing() {
 	return (
-		<div>
+		<Box>
 			<h1 className="heading">
 				Следилка это who?
 			</h1>
 			<LoglineBody />
 			<FunctionalityBody />
-		</div>
+		</Box>
 	)
 }

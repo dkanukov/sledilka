@@ -3,10 +3,11 @@ import { Typography } from '@mui/joy'
 
 export default function LandingFooter() {
 	return (
-		<AppBar
-			position="static"
+		<Box
 			sx={{
 				display: 'flex',
+				justifyContent: 'center',
+				bgcolor: 'info.main',
 			}}
 		>
 			<Typography
@@ -19,6 +20,6 @@ export default function LandingFooter() {
 			>
 				© Разработали Цатурян Геворг и Кануков Денис
 			</Typography>
-		</AppBar>
+		</Box>
 	)
 }

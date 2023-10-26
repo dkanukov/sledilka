@@ -87,6 +87,9 @@ export default function Changelog() {
 						</Typography>
 						<Typography
 							level={'body-lg'}
+							sx={{
+								wordBreak: "break-word"
+							}}
 						>
 							{item.description}
 						</Typography>
@@ -138,9 +141,11 @@ export default function Changelog() {
 						minRows={3}
 						maxRows={5}
 					/>
-					<Stack
-						direction={'row'}
-						space={2}
+					<div
+						style={{
+							display: 'flex',
+							gap: '6px',
+						}}
 					>
 						<Button
 							onClick={handleSendForm}
@@ -153,7 +158,7 @@ export default function Changelog() {
 						>
                             Отменить
 						</Button>
-					</Stack>
+					</div>
 				</Box>
 			</Drawer>
 		</Box>

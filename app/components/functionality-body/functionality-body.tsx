@@ -8,9 +8,6 @@ import AboutBackground from '@/public/about-background.png'
 const FunctionalityBody = () => {
 	return (
 		<div className="functionality-section-container" id="about">
-			<div className="functionality-background-image-container">
-				<Image src={AboutBackground} alt="" />
-			</div>
 			<div className="functionality-section-image-container">
 				<Image src={AboutBackgroundImage} alt=""/>
 			</div>
@@ -27,6 +24,17 @@ const FunctionalityBody = () => {
 					<li style={{ padding: 5 }}>Просмотр видео с камер</li>
 				</ol>
 
+			</div>
+			<div
+				className="functionality-background-image-container"
+			>
+				<Image
+					style={{
+						height: '100%',
+						width: '100%',
+						objectFit: 'contain',
+					}}
+					src={AboutBackground} alt="" />
 			</div>
 		</div>
 	)
