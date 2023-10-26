@@ -117,6 +117,7 @@ body {
 	flex-direction: column;
 	margin: 0;
 	color: rgb(var(--foreground-rgb));
+	min-height: 100vh;
 }
 
 .container {
