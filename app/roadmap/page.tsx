@@ -86,6 +86,7 @@ export default function Roadmap() {
 					variant="plain"
 					sx={{
 						marginTop: '20px',
+						height: '300px',
 					}}
 				>
 					{STEPS[activeStep].description}
