@@ -1,14 +1,14 @@
 package handlers
 
 import (
+	"backend/internal/announcement"
 	"backend/internal/entity"
+	"backend/internal/review"
 	"encoding/json"
 	gmux "github.com/gorilla/mux"
 	"io"
 	"net/http"
-	"os"
 	"sync"
-	"time"
 )
 
 func GetHandlers() *gmux.Router {
@@ -57,65 +57,34 @@ func GetHandlers() *gmux.Router {
 		switch r.Method {
 		case http.MethodGet:
 			sLock.Lock()
-			file, err := os.OpenFile("fake_db.json", os.O_RDONLY|os.O_CREATE, 777)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			b, err := io.ReadAll(file)
-			file.Close()
+			announcement.GetAnnouncements(w, r)
 			sLock.Unlock()
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			_, _ = w.Write(b)
 		case http.MethodPost:
 			sLock.Lock()
-
-			file, err := os.Open("fake_db.json")
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			b, err := io.ReadAll(file)
-			file.Close()
-			var announcements []entity.Announcement
-			if err = json.Unmarshal(b, &announcements); err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			b, err = io.ReadAll(r.Body)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			reqData := entity.NewAnnouncement{}
-			err = json.Unmarshal(b, &reqData)
-			newAnnounc := entity.Announcement{
-				Title:       reqData.Title,
-				Description: reqData.Description,
-			}
-			newAnnounc.CreatedAt = time.Now().Unix()
-			newAnnounc.Id = int64(len(announcements))
-			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte(err.Error()))
-				return
-			}
-			announcements = append(announcements, newAnnounc)
-			b, err = json.Marshal(newAnnounc)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			w.Write(b)
-			b, err = json.Marshal(announcements)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			os.WriteFile("fake_db.json", b, 0644)
+			announcement.PostAnnouncement(w, r)
+			sLock.Unlock()
+		case http.MethodDelete:
+			sLock.Lock()
+			announcement.DeleteAnnouncement(w, r)
+			sLock.Unlock()
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	})
+	mux.HandleFunc("/review", func(w http.ResponseWriter, r *http.Request) {
+		sLock := sync.Mutex{}
+		switch r.Method {
+		case http.MethodGet:
+			sLock.Lock()
+			review.GetReviews(w, r)
+			sLock.Unlock()
+		case http.MethodPost:
+			sLock.Lock()
+			review.PostReview(w, r)
+			sLock.Unlock()
+		case http.MethodDelete:
+			sLock.Lock()
+			review.DeleteReview(w, r)
 			sLock.Unlock()
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
