@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func GetAnnouncements(w http.ResponseWriter, r *http.Request) {
+func GetAnnouncements(w http.ResponseWriter, _ *http.Request) {
 	file, err := os.OpenFile("announcement.json", os.O_RDONLY|os.O_CREATE, 777)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
