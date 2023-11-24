@@ -4,8 +4,19 @@ type WithID interface {
 	ID() int64
 }
 
-type NewMessage struct {
-	Message string `json:"message"`
+type UserInfo struct {
+	Id       int64  `json:"id"`
+	Username string `json:"username"`
+}
+
+type User struct {
+	Id           int64  `json:"id"`
+	Username     string `json:"username"`
+	PasswordHash string `json:"password_hash"`
+}
+
+func (u User) ID() int64 {
+	return u.Id
 }
 
 type NewAnnouncement struct {

@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func GetReviews(w http.ResponseWriter, _ *http.Request) {
+func Get(w http.ResponseWriter, _ *http.Request) {
 	file, err := os.OpenFile("review.json", os.O_RDONLY|os.O_CREATE, 777)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -25,7 +25,7 @@ func GetReviews(w http.ResponseWriter, _ *http.Request) {
 	file.Close()
 	_, _ = w.Write(b)
 }
-func PostReview(w http.ResponseWriter, r *http.Request) {
+func Post(w http.ResponseWriter, r *http.Request) {
 	file, err := os.Open("review.json")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -45,17 +45,17 @@ func PostReview(w http.ResponseWriter, r *http.Request) {
 	}
 	reqData := entity.NewReview{}
 	err = json.Unmarshal(b, &reqData)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return
+	}
 	newReview := entity.Review{
 		Name:      reqData.Name,
 		Comment:   reqData.Comment,
 		Rating:    reqData.Rating,
 		CreatedAt: time.Now().Unix(),
 		Id:        utils.NewId(reviews),
-	}
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return
 	}
 	reviews = append(reviews, newReview)
 	b, err = json.Marshal(newReview)
@@ -72,7 +72,7 @@ func PostReview(w http.ResponseWriter, r *http.Request) {
 	os.WriteFile("review.json", b, 0644)
 }
 
-func DeleteReview(w http.ResponseWriter, r *http.Request) {
+func Delete(w http.ResponseWriter, r *http.Request) {
 	file, err := os.Open("review.json")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
