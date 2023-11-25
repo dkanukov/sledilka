@@ -1,14 +1,16 @@
 package utils
 
 import (
-	"backend/internal/entity"
 	"crypto/rand"
 	"encoding/hex"
-	"github.com/alicebob/miniredis/v2"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 	"strconv"
 	"time"
+
+	"github.com/alicebob/miniredis/v2"
+	"golang.org/x/crypto/bcrypt"
+
+	"backend/internal/entity"
 )
 
 const TOKEN_LEN = 32
@@ -30,7 +32,7 @@ func IndexOfID[T entity.WithID](id int64, data []T) int {
 			return k
 		}
 	}
-	return -1 //not found.
+	return -1 // not found.
 }
 
 func GenerateSecureToken(length int) string {

@@ -1,14 +1,16 @@
 package user
 
 import (
-	"backend/internal/entity"
-	"backend/internal/utils"
 	"encoding/json"
-	"golang.org/x/crypto/bcrypt"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
+
+	"golang.org/x/crypto/bcrypt"
+
+	"backend/internal/entity"
+	"backend/internal/utils"
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +36,6 @@ func Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id, err := strconv.Atoi(query.Get("id"))
-
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -89,6 +90,7 @@ func Post(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

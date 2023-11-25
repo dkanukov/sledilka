@@ -1,14 +1,16 @@
 package review
 
 import (
-	"backend/internal/entity"
-	"backend/internal/utils"
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"backend/internal/entity"
+	"backend/internal/utils"
 )
 
 func Get(w http.ResponseWriter, _ *http.Request) {
@@ -25,6 +27,7 @@ func Get(w http.ResponseWriter, _ *http.Request) {
 	file.Close()
 	_, _ = w.Write(b)
 }
+
 func Post(w http.ResponseWriter, r *http.Request) {
 	file, err := os.Open("review.json")
 	if err != nil {
@@ -39,6 +42,7 @@ func Post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	b, err = io.ReadAll(r.Body)
+	log.Println(string(b))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
