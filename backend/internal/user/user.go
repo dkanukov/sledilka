@@ -82,6 +82,13 @@ func Post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	password := arr[0]
+	for _, user := range users {
+		if user.Username == username {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Username should be unique"))
+			return
+		}
+	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
