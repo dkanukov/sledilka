@@ -5,38 +5,67 @@ import { Stack } from '@mui/system'
 import AddIcon from '@mui/icons-material/Add'
 import { useState } from 'react'
 import { format } from 'date-fns'
+import useSWR from 'swr'
+import axios from 'axios'
+
+import { API_ROUTE } from '../api/path'
 
 import { useLocalStorage } from '@/hooks/use-local-storage'
 
 interface Content {
+	id?: number
     title: string
     description: string
-    date: string
+    date: number
 }
 
 export default function Changelog() {
+	const test = useSWR(`${API_ROUTE}/announcement`, async () => {
+		const { data } = await axios.get(`${API_ROUTE}/announcement`)
+		setContent(data.map((item) => {
+			return {
+				id: item.id,
+				title: item.title,
+				description: item.description,
+				date: item.createdAt,
+			}
+		}))
+	})
+
+	const createChangelog = async (title: string, description: string) => {
+		const response = await fetch(`${API_ROUTE}/announcement`, {
+			method: 'POST',
+			body: JSON.stringify({
+				title,
+				description,
+			})
+		})
+	}
+
 	const [content, setContent] = useState<Content[]>([])
 	const [isAdmin, setIsAdmin] = useLocalStorage<boolean>('isAdmin', false)
 	const [isShowForm, setIsShowForm] = useState(false)
 	const [formValue, setFormValue] = useState<Content>({
 		title: '',
 		description: '',
-		date: '',
+		date: 0,
 	})
 
 	const handleCloseForm = () => {
 		setFormValue({
 			title: '',
 			description: '',
-			date: '',
+			date: 0,
 		})
 		setIsShowForm(false)
 	}
 
-	const handleSendForm = () => {
+	const handleSendForm = async () => {
+		await createChangelog(formValue.title, formValue.description)
+
 		setContent([...content, {
 			...formValue,
-			date: format(new Date(), 'yyyy-MM-dd'),
+			date: Date.now(),
 		}])
 		handleCloseForm()
 	}
@@ -83,12 +112,12 @@ export default function Changelog() {
 							level={'h4'}
 							gutterBottom
 						>
-							{item.title} {item.date}
+							{item.title} {format(new Date(item.date * 1000), 'yyyy-MM-dd')}
 						</Typography>
 						<Typography
 							level={'body-lg'}
 							sx={{
-								wordBreak: "break-word"
+								wordBreak: 'break-word',
 							}}
 						>
 							{item.description}

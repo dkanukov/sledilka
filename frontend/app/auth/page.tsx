@@ -5,10 +5,26 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+import { API_ROUTE } from '../api/path'
+
 export default function SignIn() {
 	const router = useRouter()
 	const [userName, setUserName] = useState('')
 	const [userPassword, setUserPassword] = useState('')
+	const [isShowError, setIsShowError] = useState(false)
+
+	const authUser = async (userName: string, userPassword: string) => {
+		const form = new FormData()
+		form.append('username', userName)
+		form.append('password', userPassword)
+
+		const response = await fetch(`${API_ROUTE}/token`, {
+			method: 'POST',
+			body: form,
+		})
+
+		return response.status === 200
+	}
 
 	const handleUserNameInput = (value: string) => {
 		setUserName(value)
@@ -18,12 +34,17 @@ export default function SignIn() {
 		setUserPassword(value)
 	}
 
-	const handleFormSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
+	const handleFormSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.preventDefault()
-		if (userPassword === 'root' && userPassword === 'root') {
-			console.log(userPassword, userName)
+		const isOk = await authUser(userName, userPassword)
+
+		if (isOk) {
 			router.push('/devices-overview')
+			setIsShowError(false)
+			return
 		}
+
+		setIsShowError(true)
 	}
 
 	return (
@@ -69,6 +90,14 @@ export default function SignIn() {
 						value={userPassword}
 						onChange={(event) => handlePasswordInput(event.target.value)}
 					/>
+					{isShowError && (
+						<Typography
+							variant="body2" color="text.error"
+							align="center"
+						>
+							Неверный логин или пароль
+						</Typography>
+					)}
 					<FormControlLabel
 						control={<Checkbox value="remember" color="primary"/>}
 						label="Remember me"

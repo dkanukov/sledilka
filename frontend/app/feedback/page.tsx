@@ -1,18 +1,53 @@
 'use client'
 import Carousel from 'react-multi-carousel'
-
 import 'react-multi-carousel/lib/styles.css'
 import { Button, Card, CardContent, FormControl, IconButton, Input, Slider, Textarea, Typography } from '@mui/joy'
 import StarRateIcon from '@mui/icons-material/StarRate'
 import AddBoxIcon from '@mui/icons-material/AddBox'
 import { useEffect, useState } from 'react'
 import { Box, FormLabel } from '@mui/material'
+import useSWR from 'swr'
+import axios from 'axios'
+
+import { API_ROUTE } from '../api/path'
 
 import styles from './feedback.module.css'
 
 const MAX_RATE = 5
 
 export default function Feedback() {
+	const test = useSWR(`${API_ROUTE}/review`, async () => {
+		const { data } = await axios.get(`${API_ROUTE}/review`)
+		setCaroseulItem(data.map((item) => {
+			return {
+				name: item.name,
+				message: item.comment,
+				rate: item.rating,
+			}
+		}))
+	})
+
+	const createNewFeedback = async (name: string, message: string, rate: number) => {
+		/* const { data, error } = await axios.post(`${API_ROUTE}/review`, {
+			data: {
+				name: name,
+				comment: message,
+				rating: rate,
+			},
+		}) */
+
+		const response = await fetch(`${API_ROUTE}/review`, {
+			method: 'POST',
+			body: JSON.stringify({
+				name: name,
+				comment: message,
+				rating: rate,
+			}),
+		})
+
+		// return !error
+	}
+
 	const [carouselItems, setCaroseulItem] = useState([
 		{
 			name: 'Testname Testsurname 1',
@@ -72,7 +107,9 @@ export default function Feedback() {
 		})
 	}
 
-	const handleSendFeedbackButtonClick = () => {
+	const handleSendFeedbackButtonClick = async () => {
+		console.log(feedbackForm)
+		await createNewFeedback(feedbackForm.name, feedbackForm.message, feedbackForm.rate)
 		setCaroseulItem([...carouselItems, {
 			...feedbackForm,
 		}])
