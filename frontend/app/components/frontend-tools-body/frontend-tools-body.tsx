@@ -45,7 +45,7 @@ const FrontendToolsBody = () => {
 							<div className="frontend-text">MUI</div>
 						</div>
 						<div className="frontend-primary-text">
-							В качестве UIKit'а будет использована MUI. Она содержит
+							В качестве UIKitа будет использована MUI. Она содержит
 							в себе множество готовых решений и компонентов для
 							совершенно разных нужд
 						</div>

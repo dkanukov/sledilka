@@ -1,4 +1,4 @@
-import {Box, Container} from '@mui/material'
+import { Box, Container } from '@mui/material'
 import React from 'react'
 
 import LoglineBody from './components/logline-body/logline-body'

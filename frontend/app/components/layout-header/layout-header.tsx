@@ -4,12 +4,12 @@ import { usePathname, useRouter } from 'next/navigation'
 
 import styles from './layout-header.module.css'
 
-import { MenuItem } from '@/types/menu-items'
+import { MenuItemHeader } from '@/types/menu-items'
 
 export default function LayoutHeader() {
 	const path = usePathname()
 	const router = useRouter()
-	const menuItems: MenuItem[] = [
+	const menuItems: MenuItemHeader[] = [
 		{
 			label: 'Просмотр устройств',
 			link: '/devices-overview',
@@ -22,7 +22,7 @@ export default function LayoutHeader() {
 		},
 	]
 
-	const handleNavButtonClick = (menuItem: MenuItem) => {
+	const handleNavButtonClick = (menuItem: MenuItemHeader) => {
 		router.push(menuItem.link)
 	}
 

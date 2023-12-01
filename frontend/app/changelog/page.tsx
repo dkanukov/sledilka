@@ -8,9 +8,8 @@ import { format } from 'date-fns'
 import useSWR from 'swr'
 import axios from 'axios'
 
-import { API_ROUTE } from '../api/path'
-
 import { useLocalStorage } from '@/hooks/use-local-storage'
+import { API_ROUTE } from '@/app/api/path'
 
 interface Content {
 	id?: number
@@ -22,7 +21,7 @@ interface Content {
 export default function Changelog() {
 	const test = useSWR(`${API_ROUTE}/announcement`, async () => {
 		const { data } = await axios.get(`${API_ROUTE}/announcement`)
-		setContent(data.map((item) => {
+		setContent(data.map((item: any) => {
 			return {
 				id: item.id,
 				title: item.title,
@@ -33,12 +32,13 @@ export default function Changelog() {
 	})
 
 	const createChangelog = async (title: string, description: string) => {
+		// eslint-disable-next-line compat/compat
 		const response = await fetch(`${API_ROUTE}/announcement`, {
 			method: 'POST',
 			body: JSON.stringify({
 				title,
 				description,
-			})
+			}),
 		})
 	}
 

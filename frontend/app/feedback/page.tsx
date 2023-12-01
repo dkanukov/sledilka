@@ -18,7 +18,7 @@ const MAX_RATE = 5
 export default function Feedback() {
 	const test = useSWR(`${API_ROUTE}/review`, async () => {
 		const { data } = await axios.get(`${API_ROUTE}/review`)
-		setCaroseulItem(data.map((item) => {
+		setCaroseulItem(data.map((item: any) => {
 			return {
 				name: item.name,
 				message: item.comment,

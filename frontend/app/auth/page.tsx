@@ -18,12 +18,13 @@ export default function SignIn() {
 		form.append('username', userName)
 		form.append('password', userPassword)
 
+		// eslint-disable-next-line compat/compat
 		const response = await fetch(`${API_ROUTE}/token`, {
 			method: 'POST',
 			body: form,
 		})
 
-		return 
+		return true
 	}
 
 	const handleUserNameInput = (value: string) => {
