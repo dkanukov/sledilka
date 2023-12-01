@@ -36,6 +36,7 @@ export default function Feedback() {
 			},
 		}) */
 
+		// eslint-disable-next-line compat/compat
 		const response = await fetch(`${API_ROUTE}/review`, {
 			method: 'POST',
 			body: JSON.stringify({
