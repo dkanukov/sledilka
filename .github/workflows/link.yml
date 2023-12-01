@@ -1,0 +1,9 @@
+name: run-project-lints
+on: [push]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: frotnend
+        run: cd frontend; echo ${PWD}
+         
