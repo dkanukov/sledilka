@@ -2,13 +2,13 @@
 import React from 'react'
 import '../backend-summary-body/backend-summary-body.css'
 import './backend-tools-body.css'
-import Image from 'next/image'
+import Image, { StaticImageData } from 'next/image'
 import { Grid } from '@mui/joy'
 
-import GstreamerIcon from '../../../public/gstreamer icon.svg'
-import Gopher from '../../../public/gopher.png'
-import PostgresIcon from '../../../public/Postgresql.png'
-import LinuxLogo from '../../../public/linux.png'
+import GstreamerIcon from '@/public/gstreamericon.svg'
+import Gopher from '@/public/gopher.png'
+import PostgresIcon from '@/public/Postgresql.png'
+import LinuxLogo from '@/public/linux.png'
 const BackendToolsBody = () => {
 	return (
 		<div>
@@ -71,7 +71,7 @@ const BackendToolsBody = () => {
 					<Grid xs={12} md={6}>
 						<div className="tools-list-container">
 							<Image
-								src={GstreamerIcon} width={45}
+								src={GstreamerIcon as StaticImageData} width={45}
 								alt=""
 							/>
 							<div className="backend-text">gstreamer/ffmpeg</div>

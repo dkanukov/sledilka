@@ -1,6 +1,6 @@
 'use client'
 import { Grid } from '@mui/joy'
-import Image from 'next/image'
+import Image, { StaticImageData } from 'next/image'
 import React from 'react'
 
 import './frontend-tools-body.css'
@@ -25,7 +25,7 @@ const FrontendToolsBody = () => {
 					<Grid xs={12} md={6}>
 						<div className="tools-list-container">
 							<Image
-								src={ReactLogo} width={45}
+								src={ReactLogo as StaticImageData} width={45}
 								alt=""
 							/>
 							<div className="frontend-text">React/NextJS</div>
