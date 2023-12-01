@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/internal/authorization"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,7 +16,6 @@ import (
 	"backend/internal/entity"
 	"backend/internal/review"
 	"backend/internal/user"
-	"backend/internal/utils"
 )
 
 func GetHandlers(redis *miniredis.Miniredis) *gmux.Router {
@@ -103,12 +103,12 @@ func GetHandlers(redis *miniredis.Miniredis) *gmux.Router {
 				return
 			}
 			password := arr[0]
-			userId, ok := utils.Auth(username, password, users)
+			userId, ok := authorization.Auth(username, password, users)
 			if !ok {
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
-			token := utils.CreateToken(redis, userId)
+			token := authorization.CreateToken(redis, userId)
 			w.Write([]byte(fmt.Sprintf(`"token":"%s"`, token)))
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
@@ -123,7 +123,7 @@ func GetHandlers(redis *miniredis.Miniredis) *gmux.Router {
 				return
 			}
 			token := query.Get("token")
-			if ok := utils.RefreshToken(redis, token); !ok {
+			if ok := authorization.RefreshToken(redis, token); !ok {
 				writer.WriteHeader(http.StatusUnauthorized)
 				return
 			}

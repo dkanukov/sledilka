@@ -13,13 +13,14 @@ import (
 )
 
 // GetAnnouncements
-// @Summary      Возвращает анонсы
-// @Tags         announcements
-// @Accept       json
-// @Produce      json
-// @Success      200  {object}  []entity.Announcement
-// @Failure      500
-// @Router       /announcement [get]
+//
+//	@Summary	Возвращает анонсы
+//	@Tags		announcements
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	[]entity.Announcement
+//	@Failure	500
+//	@Router		/announcement [get]
 func GetAnnouncements(w http.ResponseWriter, _ *http.Request) {
 	file, err := os.OpenFile("announcement.json", os.O_RDONLY|os.O_CREATE, 777)
 	if err != nil {

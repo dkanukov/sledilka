@@ -13,6 +13,13 @@ import (
 	"backend/internal/utils"
 )
 
+// @Summary	Возвращает отзывы
+// @Tags		reviews
+// @Accept		json
+// @Produce	json
+// @Success	200	{object}	[]entity.Review
+// @Failure	500
+// @Router		/review [get]
 func Get(w http.ResponseWriter, _ *http.Request) {
 	file, err := os.OpenFile("review.json", os.O_RDONLY|os.O_CREATE, 777)
 	if err != nil {
@@ -28,6 +35,14 @@ func Get(w http.ResponseWriter, _ *http.Request) {
 	_, _ = w.Write(b)
 }
 
+// @Summary	Создать отзыв
+// @Tags		reviews
+// @Accept		json
+// @Produce	json
+// @Param		request	body		entity.NewReview true "Новый отзыв"
+// @Success	200		{object}	entity.Review
+// @Failure	500
+// @Router		/review [post]
 func Post(w http.ResponseWriter, r *http.Request) {
 	file, err := os.Open("review.json")
 	if err != nil {
@@ -76,6 +91,14 @@ func Post(w http.ResponseWriter, r *http.Request) {
 	os.WriteFile("review.json", b, 0644)
 }
 
+// @Summary	Удалить отзыв
+// @Tags		reviews
+// @Accept		json
+// @Produce	json
+// @Param		id query int true "Review ID"
+// @Success	200		{object}	string
+// @Failure	500
+// @Router		/review [delete]
 func Delete(w http.ResponseWriter, r *http.Request) {
 	file, err := os.Open("review.json")
 	if err != nil {
