@@ -6,10 +6,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
-      - name: CD in frontend
-        run: cd frontend
       - name: Install deps
+        working-directory: ./frontend
         run: npm ci
       - name: Lint frontend
+        working-directory: ./frontend
         run: npm run lint
          
