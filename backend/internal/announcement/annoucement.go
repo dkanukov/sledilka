@@ -12,15 +12,13 @@ import (
 	"backend/internal/utils"
 )
 
-// GetAnnouncements
-//
-//	@Summary	Возвращает анонсы
-//	@Tags		announcements
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	[]entity.Announcement
-//	@Failure	500
-//	@Router		/announcement [get]
+// @Summary	Возвращает анонсы
+// @Tags		announcements
+// @Accept		json
+// @Produce	json
+// @Success	200	{object}	[]entity.Announcement
+// @Failure	500
+// @Router		/announcement [get]
 func GetAnnouncements(w http.ResponseWriter, _ *http.Request) {
 	file, err := os.OpenFile("announcement.json", os.O_RDONLY|os.O_CREATE, 777)
 	if err != nil {
@@ -36,6 +34,14 @@ func GetAnnouncements(w http.ResponseWriter, _ *http.Request) {
 	_, _ = w.Write(b)
 }
 
+// @Summary	Создает анонс
+// @Tags		announcements
+// @Accept		json
+// @Produce	json
+// @Success	200	{object}	entity.Announcement
+// @Failure	500
+// @Router		/announcement [post]
+// @Param		request	body	entity.NewAnnouncement	true	"тело нового запроса"
 func PostAnnouncement(w http.ResponseWriter, r *http.Request) {
 	file, err := os.Open("announcement.json")
 	if err != nil {
@@ -82,6 +88,14 @@ func PostAnnouncement(w http.ResponseWriter, r *http.Request) {
 	os.WriteFile("announcement.json", b, 0644)
 }
 
+// @Summary	Удаляет анонс
+// @Tags		announcements
+// @Accept		json
+// @Produce	json
+// @Success	200	{object}	entity.Announcement
+// @Failure	500
+// @Router		/announcement [delete]
+// @Param		id	query	int	true	"ID анонса на удаление"
 func DeleteAnnouncement(w http.ResponseWriter, r *http.Request) {
 	file, err := os.Open("announcement.json")
 	if err != nil {

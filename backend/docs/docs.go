@@ -42,34 +42,6 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 }
-            }
-        },
-        "/review": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "reviews"
-                ],
-                "summary": "Возвращает отзывы",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Review"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
             },
             "post": {
                 "consumes": [
@@ -79,17 +51,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "reviews"
+                    "announcements"
                 ],
-                "summary": "Создать отзыв",
+                "summary": "Создает анонс",
                 "parameters": [
                     {
-                        "description": "Новый отзыв",
+                        "description": "тело нового запроса",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.NewReview"
+                            "$ref": "#/definitions/entity.NewAnnouncement"
                         }
                     }
                 ],
@@ -97,7 +69,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Review"
+                            "$ref": "#/definitions/entity.Announcement"
                         }
                     },
                     "500": {
@@ -113,13 +85,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "reviews"
+                    "announcements"
                 ],
-                "summary": "Удалить отзыв",
+                "summary": "Удаляет анонс",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Review ID",
+                        "description": "ID анонса на удаление",
                         "name": "id",
                         "in": "query",
                         "required": true
@@ -129,48 +101,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/user": {
-            "post": {
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Зарегистрировать",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "username",
-                        "name": "username",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "password",
-                        "name": "password",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/entity.UserInfo"
+                            "$ref": "#/definitions/entity.Announcement"
                         }
                     },
                     "500": {
@@ -198,47 +129,13 @@ const docTemplate = `{
                 }
             }
         },
-        "entity.NewReview": {
+        "entity.NewAnnouncement": {
             "type": "object",
             "properties": {
-                "comment": {
+                "description": {
                     "type": "string"
                 },
-                "name": {
-                    "type": "string"
-                },
-                "rating": {
-                    "type": "integer"
-                }
-            }
-        },
-        "entity.Review": {
-            "type": "object",
-            "properties": {
-                "comment": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "rating": {
-                    "type": "integer"
-                }
-            }
-        },
-        "entity.UserInfo": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "username": {
+                "title": {
                     "type": "string"
                 }
             }
