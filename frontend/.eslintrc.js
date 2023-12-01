@@ -20,7 +20,7 @@ module.exports = {
 	'parser': '@typescript-eslint/parser',
 	'parserOptions': {
 		'project': true,
-		'tsconfigRootDir': './tsconfig.json',
+		'tsconfigRootDir': __dirname,
 	},
 	'settings': {
 		'import/resolver': {
