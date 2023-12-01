@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        run: actions/checkout@v4.1.1
+        uses: actions/checkout@v4.1.1
       - name: CD in frontend
         run: cd frontend
       - name: Install deps
