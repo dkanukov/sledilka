@@ -1,0 +1,15 @@
+name: run-project-lints
+on: [push]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: get repo code
+        run: actions/checkout@v4.1.1
+      - name: in frontend
+        run: cd frontrnd
+      - name: instapp deps
+        run: npm ci
+      - name: lint frontend
+        run: npm run lint
+         
