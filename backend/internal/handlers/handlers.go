@@ -1,19 +1,21 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"sync"
+
+	"github.com/alicebob/miniredis/v2"
+	gmux "github.com/gorilla/mux"
+
 	"backend/internal/announcement"
 	"backend/internal/entity"
 	"backend/internal/review"
 	"backend/internal/user"
 	"backend/internal/utils"
-	"encoding/json"
-	"fmt"
-	"github.com/alicebob/miniredis/v2"
-	gmux "github.com/gorilla/mux"
-	"io"
-	"net/http"
-	"os"
-	"sync"
 )
 
 func GetHandlers(redis *miniredis.Miniredis) *gmux.Router {

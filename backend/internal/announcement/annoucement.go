@@ -1,16 +1,25 @@
 package announcement
 
 import (
-	"backend/internal/entity"
-	"backend/internal/utils"
 	"encoding/json"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"backend/internal/entity"
+	"backend/internal/utils"
 )
 
+// GetAnnouncements
+// @Summary      Возвращает анонсы
+// @Tags         announcements
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  entity.Announcement
+// @Failure      500
+// @Router       /announcement [get]
 func GetAnnouncements(w http.ResponseWriter, _ *http.Request) {
 	file, err := os.OpenFile("announcement.json", os.O_RDONLY|os.O_CREATE, 777)
 	if err != nil {
@@ -25,6 +34,7 @@ func GetAnnouncements(w http.ResponseWriter, _ *http.Request) {
 	file.Close()
 	_, _ = w.Write(b)
 }
+
 func PostAnnouncement(w http.ResponseWriter, r *http.Request) {
 	file, err := os.Open("announcement.json")
 	if err != nil {
@@ -70,6 +80,7 @@ func PostAnnouncement(w http.ResponseWriter, r *http.Request) {
 	}
 	os.WriteFile("announcement.json", b, 0644)
 }
+
 func DeleteAnnouncement(w http.ResponseWriter, r *http.Request) {
 	file, err := os.Open("announcement.json")
 	if err != nil {

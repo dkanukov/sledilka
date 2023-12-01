@@ -1,1 +1,1 @@
-export const API_ROUTE = 'http://0.0.0.0:8081'
+export const API_ROUTE = 'http://localhost:8081'

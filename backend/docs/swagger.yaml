@@ -1,0 +1,37 @@
+definitions:
+  entity.Announcement:
+    properties:
+      createdAt:
+        type: integer
+      description:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+host: localhost:8081
+info:
+  contact: {}
+  description: API for Sledilka service
+  termsOfService: http://swagger.io/terms/
+  title: Sledilka API
+  version: "1.0"
+paths:
+  /announcement:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Announcement'
+        "500":
+          description: Internal Server Error
+      summary: Возвращает анонсы
+      tags:
+      - announcements
+swagger: "2.0"

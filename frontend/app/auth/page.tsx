@@ -23,7 +23,7 @@ export default function SignIn() {
 			body: form,
 		})
 
-		return response.status === 200
+		return 
 	}
 
 	const handleUserNameInput = (value: string) => {
