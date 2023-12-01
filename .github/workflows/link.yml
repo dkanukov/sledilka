@@ -5,5 +5,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: frotnend
-        run: cd frontend; echo ${PWD}
+        run: cd..; cd frontend; echo ${PWD}
          
