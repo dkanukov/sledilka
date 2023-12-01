@@ -4,12 +4,12 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: get repo code
+      - name: Checkout
         run: actions/checkout@v4.1.1
-      - name: in frontend
-        run: cd frontrnd
-      - name: instapp deps
+      - name: CD in frontend
+        run: cd frontend
+      - name: Install deps
         run: npm ci
-      - name: lint frontend
+      - name: Lint frontend
         run: npm run lint
          
