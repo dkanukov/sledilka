@@ -13,12 +13,12 @@ import (
 	"backend/internal/handlers"
 )
 
-// @title           Sledilka API
-// @version         1.0
-// @description     API for Sledilka service
-// @termsOfService  http://swagger.io/terms/
+//	@title			Sledilka API
+//	@version		1.0
+//	@description	API for Sledilka service
+//	@termsOfService	http://swagger.io/terms/
 
-// @host      localhost:8081
+//	@host	localhost:8081
 func main() {
 	r, err := miniredis.Run()
 	if err != nil {
