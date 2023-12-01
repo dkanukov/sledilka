@@ -28,7 +28,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Announcement'
+            items:
+              $ref: '#/definitions/entity.Announcement'
+            type: array
         "500":
           description: Internal Server Error
       summary: Возвращает анонсы

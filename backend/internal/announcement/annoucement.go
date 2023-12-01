@@ -17,7 +17,7 @@ import (
 // @Tags         announcements
 // @Accept       json
 // @Produce      json
-// @Success      200  {object}  entity.Announcement
+// @Success      200  {object}  []entity.Announcement
 // @Failure      500
 // @Router       /announcement [get]
 func GetAnnouncements(w http.ResponseWriter, _ *http.Request) {
