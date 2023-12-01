@@ -3,17 +3,13 @@ package handlers
 import (
 	"backend/internal/authorization"
 	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
-	"os"
 	"sync"
 
 	"github.com/alicebob/miniredis/v2"
 	gmux "github.com/gorilla/mux"
 
 	"backend/internal/announcement"
-	"backend/internal/entity"
 	"backend/internal/review"
 	"backend/internal/user"
 )
@@ -74,42 +70,7 @@ func GetHandlers(redis *miniredis.Miniredis) *gmux.Router {
 	mux.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
-			file, err := os.Open("user.json")
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			b, err := io.ReadAll(file)
-			file.Close()
-			var users []entity.User
-			if err = json.Unmarshal(b, &users); err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			if err = r.ParseMultipartForm(512); err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
-			form := r.MultipartForm.Value
-			arr, ok := form["username"]
-			if !ok {
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
-			username := arr[0]
-			arr, ok = form["password"]
-			if !ok {
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
-			password := arr[0]
-			userId, ok := authorization.Auth(username, password, users)
-			if !ok {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			token := authorization.CreateToken(redis, userId)
-			w.Write([]byte(fmt.Sprintf(`"token":"%s"`, token)))
+			authorization.Token(w, r, redis)
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
@@ -117,17 +78,7 @@ func GetHandlers(redis *miniredis.Miniredis) *gmux.Router {
 	mux.HandleFunc("/refresh", func(writer http.ResponseWriter, request *http.Request) {
 		switch request.Method {
 		case http.MethodPut:
-			query := request.URL.Query()
-			if !query.Has("token") {
-				writer.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			token := query.Get("token")
-			if ok := authorization.RefreshToken(redis, token); !ok {
-				writer.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			writer.Write([]byte(`"refreshed": true`))
+			authorization.Refresh(writer, request, redis)
 		default:
 			writer.WriteHeader(http.StatusMethodNotAllowed)
 		}

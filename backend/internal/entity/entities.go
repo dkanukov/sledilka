@@ -49,6 +49,11 @@ type Review struct {
 	CreatedAt int64  `json:"createdAt"`
 }
 
+type UserToken struct {
+	Token     string `json:"token"`
+	ExpiresIn int64  `json:"expires_in"`
+}
+
 func (r Review) ID() int64 {
 	return r.Id
 }
