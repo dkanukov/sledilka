@@ -33,15 +33,10 @@ jobs:
         working-directory: ./frontend
         run: npm ci
 
-#      - name: Lint frontend
-#        working-directory: ./frontend
-#        run: npm run lint
-#        env:
-#          CI: false
-
       - name: Lint Code Base
         uses: super-linter/super-linter@v5
         env:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
