@@ -7,6 +7,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.1
 
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4.0.0
+        with:
+          node-version: 16
+
       - name: clean cache
         run: npm cache clean --force
 
@@ -15,7 +20,6 @@ jobs:
         run: npm ci
         env:
           CI: false
-
 
       - name: Lint frontend
         working-directory: ./frontend
