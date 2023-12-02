@@ -11,7 +11,7 @@ jobs:
         run: npm i
       - name: Check file existence
         working-directory: ./frontend
-        run: ls
+        run: ls -la
       - name: Lint frontend
         working-directory: ./frontend
         run: npm run lint
