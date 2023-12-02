@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/internal/db"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,7 +10,6 @@ import (
 	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 
-	db "backend/db"
 	_ "backend/docs"
 	"backend/internal/handlers"
 )
