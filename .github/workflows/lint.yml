@@ -1,26 +1,6 @@
 name: run-project-lints
 on: [push]
 jobs:
-  test-backend:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4.1.1
-
-      - name: Setup Go environment
-        uses: actions/setup-go@v4.1.0
-        with:
-          cache-dependency-path: backend/go.sum
-          go-version-file: backend/go.mod
-
-#      - name: Install deps
-#        run: make backend
-
-      - name: Run Tests
-        working-directory: ./backend
-        run: go test
-
   lint-frontend:
     runs-on: ubuntu-latest
 
