@@ -10,6 +10,9 @@ jobs:
 
       - name: Setup Go environment
         uses: actions/setup-go@v4.1.0
+        with:
+          cache-dependency-path: backend/go.sum
+          go-version-file: backend/go.mod
 
 #      - name: Install deps
 #        run: make backend
