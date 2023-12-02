@@ -8,8 +8,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.1
 
-      - name: Install deps
-        run: make backend
+      - name: Setup Go environment
+        uses: actions/setup-go@v4.1.0
+
+#      - name: Install deps
+#        run: make backend
 
       - name: Run Tests
         working-directory: ./backend
