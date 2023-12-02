@@ -9,6 +9,7 @@ import (
 	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 
+	db "backend/db"
 	_ "backend/docs"
 	"backend/internal/handlers"
 )
@@ -21,9 +22,11 @@ import (
 // @host      localhost:8081
 func main() {
 	r, err := miniredis.Run()
+	db.StartupDB()
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	router := handlers.GetHandlers(r)
 	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 	router.HandleFunc("/swagger", func(w http.ResponseWriter, r *http.Request) {
