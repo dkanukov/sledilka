@@ -2,15 +2,56 @@ package announcement
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"io"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 
 	"backend/internal/entity"
-	"backend/internal/utils"
+	"backend/internal/errors"
 )
+
+func ValidateNewAnnouncement(r *http.Request) (entity.NewAnnouncement, *errors.ResponseError) {
+	b, err := io.ReadAll(r.Body)
+	var newAnn entity.NewAnnouncement
+	if err != nil {
+		return newAnn, &errors.ResponseError{StatusCode: http.StatusBadRequest, Message: err.Error()}
+	}
+	if err = json.Unmarshal(b, &newAnn); err != nil {
+		return newAnn, &errors.ResponseError{StatusCode: http.StatusBadRequest, Message: err.Error()}
+	}
+	return newAnn, nil
+}
+
+func CreateNewAnnouncement(r *http.Request, db *gorm.DB) (entity.Announcement, *errors.ResponseError) {
+	reqData, err := ValidateNewAnnouncement(r)
+	if err != nil {
+		return entity.Announcement{}, err
+	}
+	announcToSave := entity.Announcement{
+		Title:       reqData.Title,
+		Description: reqData.Description,
+		CreatedAt:   time.Now().String(),
+	}
+	res := db.Create(&announcToSave)
+	if res.Error != nil {
+		return announcToSave, &errors.ResponseError{StatusCode: http.StatusInternalServerError, Message: res.Error.Error()}
+	}
+	return announcToSave, nil
+}
+
+func DeleteAnnouncement(id string, db *gorm.DB) *errors.ResponseError {
+	uuidId, err := uuid.FromBytes([]byte(id))
+	if err != nil {
+		return &errors.ResponseError{StatusCode: http.StatusBadRequest, Message: err.Error()}
+	}
+	result := db.Delete(entity.Announcement{Id: uuidId})
+	if result.RowsAffected == 0 {
+		return &errors.ResponseError{StatusCode: http.StatusNotFound, Message: "Resource with this Id is not Found"}
+	}
+	return nil
+}
 
 // @Summary	Возвращает анонсы
 // @Tags		announcements
@@ -19,19 +60,15 @@ import (
 // @Success	200	{object}	[]entity.Announcement
 // @Failure	500
 // @Router		/announcement [get]
-func GetAnnouncements(w http.ResponseWriter, _ *http.Request) {
-	file, err := os.OpenFile("announcement.json", os.O_RDONLY|os.O_CREATE, 777)
+func Get(w http.ResponseWriter, _ *http.Request, db *gorm.DB) {
+	var announcements []entity.Announcement
+	db.Find(&announcements)
+	b, err := json.Marshal(announcements)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	b, err := io.ReadAll(file)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	file.Close()
-	_, _ = w.Write(b)
+	w.Write(b)
 }
 
 // @Summary	Создает анонс
@@ -42,50 +79,13 @@ func GetAnnouncements(w http.ResponseWriter, _ *http.Request) {
 // @Failure	500
 // @Router		/announcement [post]
 // @Param		request	body	entity.NewAnnouncement	true	"тело нового запроса"
-func PostAnnouncement(w http.ResponseWriter, r *http.Request) {
-	file, err := os.Open("announcement.json")
+func Post(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+	newAnnouncement, err := CreateNewAnnouncement(r, db)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		err.WriteResponse(w)
 	}
-	b, err := io.ReadAll(file)
-	file.Close()
-	var announcements []entity.Announcement
-	if err = json.Unmarshal(b, &announcements); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	b, err = io.ReadAll(r.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	reqData := entity.NewAnnouncement{}
-	err = json.Unmarshal(b, &reqData)
-	newAnnounc := entity.Announcement{
-		Title:       reqData.Title,
-		Description: reqData.Description,
-		CreatedAt:   time.Now().Unix(),
-		Id:          utils.NewId(announcements),
-	}
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return
-	}
-	announcements = append(announcements, newAnnounc)
-	b, err = json.Marshal(newAnnounc)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	b, _ := json.Marshal(newAnnouncement)
 	w.Write(b)
-	b, err = json.Marshal(announcements)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	os.WriteFile("announcement.json", b, 0644)
 }
 
 // @Summary	Удаляет анонс
@@ -96,38 +96,11 @@ func PostAnnouncement(w http.ResponseWriter, r *http.Request) {
 // @Failure	500
 // @Router		/announcement [delete]
 // @Param		id	query	int	true	"ID анонса на удаление"
-func DeleteAnnouncement(w http.ResponseWriter, r *http.Request) {
-	file, err := os.Open("announcement.json")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	b, err := io.ReadAll(file)
-	file.Close()
-	var announcements []entity.Announcement
-	if err = json.Unmarshal(b, &announcements); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+func Delete(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	query := r.URL.Query()
-	id, err := strconv.Atoi(query.Get("id"))
+	id := query.Get("id")
+	err := DeleteAnnouncement(id, db)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		err.WriteResponse(w)
 	}
-	index := utils.IndexOfID(int64(id), announcements)
-	if index == -1 {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-	announcements[index] = announcements[len(announcements)-1]
-	announcements[len(announcements)-1] = entity.Announcement{}
-	announcements = announcements[:len(announcements)-1]
-	b, err = json.Marshal(announcements)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	os.WriteFile("announcement.json", b, 0644)
-	w.Write([]byte("success"))
 }

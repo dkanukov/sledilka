@@ -22,12 +22,14 @@ import (
 // @host      localhost:8081
 func main() {
 	r, err := miniredis.Run()
-	db.StartupDB()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	router := handlers.GetHandlers(r)
+	DBConnection, err := db.StartupDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	router := handlers.GetHandlers(r, DBConnection)
 	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 	router.HandleFunc("/swagger", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/swagger/", http.StatusSeeOther)

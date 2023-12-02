@@ -15,16 +15,18 @@ const (
 	dbname   = "postgres"
 )
 
-func StartupDB() {
+func StartupDB() (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=disable",
 		host, user, password, dbname, port)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		return nil, err
 	}
-
-	db.AutoMigrate(&entity.User{})
-	db.Create(entity.User{})
-
+	db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
+	// TODO migrate other entities
+	if err := db.AutoMigrate(&entity.User{}, &entity.Review{}, &entity.Announcement{}); err != nil {
+		return nil, err
+	}
 	fmt.Println("Successfully connected!")
+	return db, nil
 }

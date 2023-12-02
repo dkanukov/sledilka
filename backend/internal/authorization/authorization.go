@@ -2,7 +2,6 @@ package authorization
 
 import (
 	"backend/internal/entity"
-	"backend/internal/utils"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
@@ -15,6 +14,8 @@ import (
 	"strconv"
 	"time"
 )
+
+const TokenLen = 32
 
 func generateSecureToken(length int) string {
 	b := make([]byte, length)
@@ -33,9 +34,9 @@ func refreshToken(r *miniredis.Miniredis, token string) (ok bool) {
 }
 
 func createToken(r *miniredis.Miniredis, UserId int64) string {
-	newToken := generateSecureToken(utils.TOKEN_LEN)
+	newToken := generateSecureToken(TokenLen)
 	for exists := r.Exists(newToken); exists; exists = r.Exists(newToken) {
-		newToken = generateSecureToken(utils.TOKEN_LEN)
+		newToken = generateSecureToken(TokenLen)
 	}
 
 	r.Set(newToken, strconv.Itoa(int(UserId)))

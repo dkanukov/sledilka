@@ -3,6 +3,7 @@ package handlers
 import (
 	"backend/internal/authorization"
 	"encoding/json"
+	"gorm.io/gorm"
 	"net/http"
 	"sync"
 
@@ -10,11 +11,9 @@ import (
 	gmux "github.com/gorilla/mux"
 
 	"backend/internal/announcement"
-	"backend/internal/review"
-	"backend/internal/user"
 )
 
-func GetHandlers(redis *miniredis.Miniredis) *gmux.Router {
+func GetHandlers(redis *miniredis.Miniredis, db *gorm.DB) *gmux.Router {
 	mux := gmux.NewRouter()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -34,39 +33,39 @@ func GetHandlers(redis *miniredis.Miniredis) *gmux.Router {
 		switch r.Method {
 		case http.MethodGet:
 			sLock.Lock()
-			announcement.GetAnnouncements(w, r)
+			announcement.Get(w, r, db)
 			sLock.Unlock()
 		case http.MethodPost:
 			sLock.Lock()
-			announcement.PostAnnouncement(w, r)
+			announcement.Post(w, r, db)
 			sLock.Unlock()
 		case http.MethodDelete:
 			sLock.Lock()
-			announcement.DeleteAnnouncement(w, r)
+			announcement.Delete(w, r, db)
 			sLock.Unlock()
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
 	})
-	mux.HandleFunc("/review", func(w http.ResponseWriter, r *http.Request) {
-		sLock := sync.Mutex{}
-		switch r.Method {
-		case http.MethodGet:
-			sLock.Lock()
-			review.Get(w, r)
-			sLock.Unlock()
-		case http.MethodPost:
-			sLock.Lock()
-			review.Post(w, r)
-			sLock.Unlock()
-		case http.MethodDelete:
-			sLock.Lock()
-			review.Delete(w, r)
-			sLock.Unlock()
-		default:
-			w.WriteHeader(http.StatusMethodNotAllowed)
-		}
-	})
+	//mux.HandleFunc("/review", func(w http.ResponseWriter, r *http.Request) {
+	//	sLock := sync.Mutex{}
+	//	switch r.Method {
+	//	case http.MethodGet:
+	//		sLock.Lock()
+	//		review.Get(w, r)
+	//		sLock.Unlock()
+	//	case http.MethodPost:
+	//		sLock.Lock()
+	//		review.Post(w, r)
+	//		sLock.Unlock()
+	//	case http.MethodDelete:
+	//		sLock.Lock()
+	//		review.Delete(w, r)
+	//		sLock.Unlock()
+	//	default:
+	//		w.WriteHeader(http.StatusMethodNotAllowed)
+	//	}
+	//})
 	mux.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
@@ -83,14 +82,14 @@ func GetHandlers(redis *miniredis.Miniredis) *gmux.Router {
 			writer.WriteHeader(http.StatusMethodNotAllowed)
 		}
 	})
-	mux.HandleFunc("/user", func(writer http.ResponseWriter, request *http.Request) {
-		switch request.Method {
-		case http.MethodGet:
-			user.Get(writer, request)
-		case http.MethodPost:
-			user.Post(writer, request)
-
-		}
-	})
+	//mux.HandleFunc("/user", func(writer http.ResponseWriter, request *http.Request) {
+	//	switch request.Method {
+	//	case http.MethodGet:
+	//		user.Get(writer, request)
+	//	case http.MethodPost:
+	//		user.Post(writer, request)
+	//
+	//	}
+	//})
 	return mux
 }

@@ -1,7 +1,9 @@
 package entity
 
+import "github.com/google/uuid"
+
 type WithID interface {
-	ID() int64
+	ID() uuid.UUID
 }
 
 type UserInfo struct {
@@ -25,13 +27,13 @@ type NewAnnouncement struct {
 }
 
 type Announcement struct {
-	Id          int64  `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	CreatedAt   int64  `json:"createdAt"`
+	Id          uuid.UUID `json:"id" gorm:"type:uuid;default:uuid_generate_v4()"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	CreatedAt   string    `json:"createdAt"`
 }
 
-func (an Announcement) ID() int64 {
+func (an Announcement) ID() uuid.UUID {
 	return an.Id
 }
 
@@ -42,11 +44,11 @@ type NewReview struct {
 }
 
 type Review struct {
-	Id        int64  `json:"id"`
-	Name      string `json:"name"`
-	Rating    int64  `json:"rating"`
-	Comment   string `json:"comment"`
-	CreatedAt int64  `json:"createdAt"`
+	Id        uuid.UUID `json:"id" gorm:"type:uuid;default:uuid_generate_v4()"`
+	Name      string    `json:"name"`
+	Rating    int64     `json:"rating"`
+	Comment   string    `json:"comment"`
+	CreatedAt string    `json:"createdAt"`
 }
 
 type UserToken struct {
@@ -54,6 +56,6 @@ type UserToken struct {
 	ExpiresIn int64  `json:"expires_in"`
 }
 
-func (r Review) ID() int64 {
+func (r Review) ID() uuid.UUID {
 	return r.Id
 }
