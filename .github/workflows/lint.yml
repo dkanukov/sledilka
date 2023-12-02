@@ -1,8 +1,20 @@
 name: run-project-lints
 on: [push]
 jobs:
-  lint:
+  test-backend:
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+
+      - name: Run Tests
+        working-directory: ./backend
+        run: go test
+
+  lint-frontend:
+    runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
@@ -18,10 +30,10 @@ jobs:
       - name: Install deps
         working-directory: ./frontend
         run: npm ci
-        env:
-          CI: false
 
       - name: Lint frontend
         working-directory: ./frontend
         run: npm run lint
+        env:
+          CI: false
 
