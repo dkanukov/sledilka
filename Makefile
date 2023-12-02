@@ -10,6 +10,5 @@ frontend:
 backend:
 	cd backend; go get .; cd ..
 
-start:	
+start:
 	go run -C backend ./cmd/app/main.go & npm run --prefix frontend dev
-
