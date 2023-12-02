@@ -53,15 +53,15 @@ func Get(w http.ResponseWriter, r *http.Request) {
 	w.Write(b)
 }
 
-// @Summary	Зарегистрировать
-// @Tags		user
-// @Accept		mpfd
-// @Produce	json
-// @Param username formData string true "username"
-// @Param password formData string true "password"
-// @Success	200		{object}	entity.UserInfo
-// @Failure	500
-// @Router		/user [post]
+//	@Summary	Зарегистрировать
+//	@Tags		user
+//	@Accept		mpfd
+//	@Produce	json
+//	@Param		username	formData	string	true	"username"
+//	@Param		password	formData	string	true	"password"
+//	@Success	200			{object}	entity.UserInfo
+//	@Failure	500
+//	@Router		/user [post]
 func Post(w http.ResponseWriter, r *http.Request) {
 	file, err := os.Open("user.json")
 	if err != nil {

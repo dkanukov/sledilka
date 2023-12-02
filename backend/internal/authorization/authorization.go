@@ -66,15 +66,15 @@ func Auth(username string, password string, users []entity.User) (UserID int64, 
 	return -1, false
 }
 
-// @Summary	Авторизоваться
-// @Tags		token
-// @Accept		mpfd
-// @Produce	json
-// @Param username formData string true "username"
-// @Param password formData string true "password"
-// @Success	200		{object}	entity.UserToken
-// @Failure	500
-// @Router		/token [post]
+//	@Summary	Авторизоваться
+//	@Tags		token
+//	@Accept		mpfd
+//	@Produce	json
+//	@Param		username	formData	string	true	"username"
+//	@Param		password	formData	string	true	"password"
+//	@Success	200			{object}	entity.UserToken
+//	@Failure	500
+//	@Router		/token [post]
 func Token(w http.ResponseWriter, r *http.Request, redis *miniredis.Miniredis) {
 	file, err := os.Open("user.json")
 	if err != nil {
@@ -115,14 +115,14 @@ func Token(w http.ResponseWriter, r *http.Request, redis *miniredis.Miniredis) {
 	w.Write(b)
 }
 
-// @Summary	Обновить токен
-// @Tags		token
-// @Accept		mpfd
-// @Produce	json
-// @Param token query string true "token"
-// @Success	200		{object}	entity.UserToken
-// @Failure	500
-// @Router		/refresh [post]
+//	@Summary	Обновить токен
+//	@Tags		token
+//	@Accept		mpfd
+//	@Produce	json
+//	@Param		token	query		string	true	"token"
+//	@Success	200		{object}	entity.UserToken
+//	@Failure	500
+//	@Router		/refresh [post]
 func Refresh(writer http.ResponseWriter, request *http.Request, redis *miniredis.Miniredis) {
 	query := request.URL.Query()
 	if !query.Has("token") {
