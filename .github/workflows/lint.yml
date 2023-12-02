@@ -10,10 +10,8 @@ jobs:
         working-directory: ./frontend
         run: npm i
       - name: Check file existence
-        id: check_files
-        uses: andstor/file-existence-action@v2
-        with:
-          files: "node_modules"
+        working-directory: ./frontend
+        run: ls
       - name: Lint frontend
         working-directory: ./frontend
         run: npm run lint
