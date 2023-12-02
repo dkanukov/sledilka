@@ -7,7 +7,7 @@ module.exports = {
 	'extends': [
 		'eslint:recommended',
 		'eslint:recommended',
-		'plugin:@typescript-eslint/recommended',
+		'plugin:@typescript-eslint/recommended-type-checked',
 		'plugin:@typescript-eslint/eslint-recommended',
 		'plugin:react/recommended',
 		'plugin:import/typescript',
@@ -15,34 +15,21 @@ module.exports = {
 		'plugin:import/warnings',
 		'plugin:import/errors',
 		'plugin:compat/recommended',
-	],
-	'overrides': [
-		{
-			'env': {
-				'node': true,
-			},
-			'files': [
-				'.eslintrc.{js,cjs}',
-			],
-			'parserOptions': {
-				'sourceType': 'script',
-			},
-		},
+		'next/core-web-vitals',
 	],
 	'parser': '@typescript-eslint/parser',
 	'parserOptions': {
-		'ecmaVersion': 'latest',
-		'sourceType': 'module',
+		'project': true,
+		'tsconfigRootDir': __dirname,
 	},
-	'plugins': [
-		'@typescript-eslint',
-		'react',
-	],
 	'settings': {
 		'import/resolver': {
-			'alias': [
-				['@/*', './*'],
-			],
+			'eslint-import-resolver-custom-alias': {
+				'alias': {
+					'components': './app/components',
+				},
+				'extensions': ['.ts', '.tsx'],
+			},
 		},
 	},
 	'rules': {
@@ -62,32 +49,36 @@ module.exports = {
 			'error',
 			'never',
 		],
-		'comma-dangle': ['error', 'always-multiline'],
-		'arrow-parens': ['error', 'always'],
-
+		'comma-dangle': [
+			'error',
+			'always-multiline',
+		],
+		'arrow-parens': [
+			'error',
+			'always',
+		],
 		// typescript
 		'@typescript-eslint/explicit-member-accessibility': 'off',
 		'@typescript-eslint/explicit-function-return-type': 'off',
 		'@typescript-eslint/ban-ts-ignore': 'off',
 		'@typescript-eslint/prefer-ts-expect-error': 'error',
 		'@typescript-eslint/ban-ts-comment': 'warn',
+		'@typescript-eslint/no-unsafe-return': 'off',
+		'@typescript-eslint/no-unsafe-assignment': 'warn',
+		'@typescript-eslint/no-unsafe-argument': 'warn',
+		'@typescript-eslint/no-unsafe-member-access': 'warn',
+		'@typescript-eslint/no-unsafe-call': 'warn',
+		'@typescript-eslint/no-misused-promises': 'off',
 		'@typescript-eslint/explicit-module-boundary-types': 'off',
 		'@typescript-eslint/semi': ['error', 'never'],
+		'@typescript-eslint/no-explicit-any': 'warn',
 		'@typescript-eslint/member-delimiter-style': ['error', {
-			multiline: {
-				delimiter: 'none',
+			'multiline': {
+				'delimiter': 'none',
 			},
 		}],
 		'@typescript-eslint/no-empty-function': 'off',
 		'@typescript-eslint/no-unused-vars': 'warn',
-		'@typescript-eslint/ban-types': [
-			'warn',
-			{
-				types: {
-					Omit: 'Prefer use \'OmitStrict\' from @fe/types',
-				},
-			},
-		],
 		// import
 		'import/order': ['error', {
 			'newlines-between': 'always',
@@ -100,43 +91,30 @@ module.exports = {
 				'index',
 			],
 		}],
-
-		// jsx
 		'react/prop-types': 'off',
 		'react/react-in-jsx-scope': 'off',
 		'react/display-name': 'off',
 		'react/no-string-refs': 'off',
 		'react/no-unknown-property': 'off',
 		'react/jsx-wrap-multilines': ['error', {
-			declaration: 'parens-new-line',
-			assignment: 'parens-new-line',
-			return: 'parens-new-line',
-			arrow: 'parens-new-line',
-			condition: 'parens-new-line',
-			logical: 'parens-new-line',
-			prop: 'parens-new-line',
+			'declaration': 'parens-new-line',
+			'assignment': 'parens-new-line',
+			'return': 'parens-new-line',
+			'arrow': 'parens-new-line',
+			'condition': 'parens-new-line',
+			'logical': 'parens-new-line',
+			'prop': 'parens-new-line',
 		}],
 		'react/jsx-max-props-per-line': ['error', {
-			maximum: 2,
+			'maximum': 2,
 		}],
 		'react/jsx-first-prop-new-line': ['error', 'multiline'],
 		'react/jsx-closing-tag-location': 'error',
 		'react/jsx-closing-bracket-location': 'error',
-
-		// TODO: (historycal case) нужно вернуть ошибку в мажорном релизе
-		'react/jsx-one-expression-per-line': 'off',
-		// 'react/jsx-one-expression-per-line': ['off', {
-		// 	allow: 'literal',
-		// }],
-
-		// TODO: (historycal case) `warn` нужно обратно заменить на `error` в мажорном релизе
-		'react/jsx-max-depth': ['warn', {
-			max: 5,
-		}],
 		'react/jsx-curly-spacing': ['warn', 'never'],
 		'react/jsx-equals-spacing': ['error', 'never'],
 		'react/sort-comp': ['warn', {
-			order: [
+			'order': [
 				'static-methods',
 				'instance-variables',
 				'lifecycle',
@@ -145,31 +123,18 @@ module.exports = {
 				'everything-else',
 				'render',
 			],
-			groups: {
-				lifecycle: [
-					'name',
-					'beforeCreate',
-					'created',
-					'beforeMount',
-					'mounted',
-					'beforeUpdate',
-					'updated',
-					'beforeDestroy',
-					'destroyed',
-				],
-			},
 		}],
 		'jsx-quotes': ['error', 'prefer-double'],
 		// whitespace
 		'no-whitespace-before-property': 'error',
 		'key-spacing': ['error', {
-			beforeColon: false,
-			afterColon: true,
+			'beforeColon': false,
+			'afterColon': true,
 		}],
 		'space-before-blocks': 'error',
 		'arrow-spacing': 'error',
 		'space-infix-ops': ['error', {
-			int32Hint: false,
+			'int32Hint': false,
 		}],
 		'comma-spacing': 'error',
 		'object-curly-spacing': ['error', 'always'],
@@ -184,7 +149,7 @@ module.exports = {
 			'consistent': true,
 		}],
 		'object-property-newline': ['error', {
-			allowAllPropertiesOnSameLine: false,
+			'allowAllPropertiesOnSameLine': false,
 		}],
 
 		'no-unneeded-ternary': 'error',

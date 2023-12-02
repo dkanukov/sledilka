@@ -18,7 +18,7 @@ const MAX_RATE = 5
 export default function Feedback() {
 	const test = useSWR(`${API_ROUTE}/review`, async () => {
 		const { data } = await axios.get(`${API_ROUTE}/review`)
-		setCaroseulItem(data.map((item) => {
+		setCaroseulItem(data.map((item: any) => {
 			return {
 				name: item.name,
 				message: item.comment,
@@ -36,6 +36,7 @@ export default function Feedback() {
 			},
 		}) */
 
+		// eslint-disable-next-line compat/compat
 		const response = await fetch(`${API_ROUTE}/review`, {
 			method: 'POST',
 			body: JSON.stringify({

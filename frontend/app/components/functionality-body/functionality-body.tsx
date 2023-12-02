@@ -34,7 +34,8 @@ const FunctionalityBody = () => {
 						width: '100%',
 						objectFit: 'contain',
 					}}
-					src={AboutBackground} alt="" />
+					src={AboutBackground} alt=""
+				/>
 			</div>
 		</div>
 	)

@@ -1,0 +1,19 @@
+name: run-backend-tests
+on: [push]
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v4.1.0
+        with:
+          cache-dependency-path: backend/go.sum
+          go-version-file: backend/go.mod
+
+      - name: Run Tests
+        working-directory: ./backend
+        run: go test
