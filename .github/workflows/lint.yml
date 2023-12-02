@@ -13,6 +13,8 @@ jobs:
       - name: Install deps
         working-directory: ./frontend
         run: npm ci
+        env:
+          CI: false
 
 
       - name: Lint frontend
