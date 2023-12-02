@@ -9,8 +9,6 @@ jobs:
       - name: Install deps
         working-directory: ./frontend
         run: npm i
-      - name: Checkout
-        uses: actions/checkout@v4.1.1
       - name: Lint frontend
         working-directory: ./frontend
         run: npm run lint
