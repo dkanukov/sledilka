@@ -6,12 +6,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4.0.0
+        with:
+          node-version: 16
+
       - name: Install deps
         working-directory: ./frontend
-        run: npm i
-      - name: Check file existence
-        working-directory: ./frontend
-        run: ls -la
+        run: npm ci
+
+
       - name: Lint frontend
         working-directory: ./frontend
         run: npm run lint
