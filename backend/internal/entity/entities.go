@@ -11,10 +11,17 @@ type UserInfo struct {
 	Username string `json:"username"`
 }
 
+type UserInfoList []UserInfo
+
 type User struct {
-	Id           int64  `json:"id"`
-	Username     string `json:"username"`
+	Id           int64  `json:"user_id"`
+	Username     string `json:"username"  gorm:"unique"`
 	PasswordHash string `json:"password_hash"`
+}
+
+type NewUser struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 func (u User) ID() int64 {

@@ -1,10 +1,10 @@
 package announcement
 
 import (
+	"backend/internal/utils"
 	"encoding/json"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"io"
 	"net/http"
 	"time"
 
@@ -12,20 +12,8 @@ import (
 	"backend/internal/errors"
 )
 
-func ValidateNewAnnouncement(r *http.Request) (entity.NewAnnouncement, *errors.ResponseError) {
-	b, err := io.ReadAll(r.Body)
-	var newAnn entity.NewAnnouncement
-	if err != nil {
-		return newAnn, &errors.ResponseError{StatusCode: http.StatusBadRequest, Message: err.Error()}
-	}
-	if err = json.Unmarshal(b, &newAnn); err != nil {
-		return newAnn, &errors.ResponseError{StatusCode: http.StatusBadRequest, Message: err.Error()}
-	}
-	return newAnn, nil
-}
-
 func CreateNewAnnouncement(r *http.Request, db *gorm.DB) (entity.Announcement, *errors.ResponseError) {
-	reqData, err := ValidateNewAnnouncement(r)
+	reqData, err := utils.ValidateBody[entity.NewAnnouncement](r)
 	if err != nil {
 		return entity.Announcement{}, err
 	}

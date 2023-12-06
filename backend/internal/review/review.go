@@ -1,16 +1,13 @@
 package review
 
 import (
-	"encoding/json"
-	"io"
-	"log"
-	"net/http"
-	"os"
-	"strconv"
-	"time"
-
 	"backend/internal/entity"
+	"backend/internal/errors"
 	"backend/internal/utils"
+	"encoding/json"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+	"net/http"
 )
 
 // @Summary	Возвращает отзывы
@@ -20,19 +17,11 @@ import (
 // @Success	200	{object}	[]entity.Review
 // @Failure	500
 // @Router		/review [get]
-func Get(w http.ResponseWriter, _ *http.Request) {
-	file, err := os.OpenFile("review.json", os.O_RDONLY|os.O_CREATE, 777)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	b, err := io.ReadAll(file)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	file.Close()
-	_, _ = w.Write(b)
+func Get(w http.ResponseWriter, _ *http.Request, db *gorm.DB) {
+	var reviews []entity.Review
+	db.Find(&reviews)
+	b, _ := json.Marshal(reviews)
+	w.Write(b)
 }
 
 // @Summary	Создать отзыв
@@ -43,94 +32,40 @@ func Get(w http.ResponseWriter, _ *http.Request) {
 // @Success	200		{object}	entity.Review
 // @Failure	500
 // @Router		/review [post]
-func Post(w http.ResponseWriter, r *http.Request) {
-	file, err := os.Open("review.json")
+func Post(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+	newReq, err := utils.ValidateBody[entity.NewReview](r)
 	if err != nil {
+		err.WriteResponse(w)
+	}
+	review := entity.Review{Name: newReq.Name, Rating: newReq.Rating, Comment: newReq.Comment}
+	if res := db.Create(&review); res.RowsAffected == 0 {
 		w.WriteHeader(http.StatusInternalServerError)
-		return
 	}
-	b, err := io.ReadAll(file)
-	file.Close()
-	var reviews []entity.Review
-	if err = json.Unmarshal(b, &reviews); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	b, err = io.ReadAll(r.Body)
-	log.Println(string(b))
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	reqData := entity.NewReview{}
-	err = json.Unmarshal(b, &reqData)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return
-	}
-	newReview := entity.Review{
-		Name:      reqData.Name,
-		Comment:   reqData.Comment,
-		Rating:    reqData.Rating,
-		CreatedAt: time.Now().Unix(),
-		Id:        utils.NewId(reviews),
-	}
-	reviews = append(reviews, newReview)
-	b, err = json.Marshal(newReview)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	b, _ := json.Marshal(review)
 	w.Write(b)
-	b, err = json.Marshal(reviews)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	os.WriteFile("review.json", b, 0644)
 }
 
 // @Summary	Удалить отзыв
 // @Tags		reviews
 // @Accept		json
 // @Produce	json
-// @Param		id query int true "Review ID"
+// @Param		id query uuid true "Review ID"
 // @Success	200		{object}	string
 // @Failure	500
 // @Router		/review [delete]
-func Delete(w http.ResponseWriter, r *http.Request) {
-	file, err := os.Open("review.json")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	b, err := io.ReadAll(file)
-	file.Close()
-	var reviews []entity.Review
-	if err = json.Unmarshal(b, &reviews); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+func Delete(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	query := r.URL.Query()
-	id, err := strconv.Atoi(query.Get("id"))
-	if err != nil {
+	if !query.Has("id") {
 		w.WriteHeader(http.StatusBadRequest)
+	}
+	id, err := uuid.FromBytes([]byte(query.Get("id")))
+	if err != nil {
+		errorMessage := errors.ResponseError{StatusCode: http.StatusBadRequest, Message: err.Error()}
+		errorMessage.WriteResponse(w)
 		return
 	}
-	index := utils.IndexOfID(int64(id), reviews)
-	if index == -1 {
+	if res := db.Delete(&entity.Review{Id: id}); res.RowsAffected == 0 {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	reviews[index] = reviews[len(reviews)-1]
-	reviews[len(reviews)-1] = entity.Review{}
-	reviews = reviews[:len(reviews)-1]
-	b, err = json.Marshal(reviews)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	os.WriteFile("review.json", b, 0644)
-	w.Write([]byte("success"))
 }

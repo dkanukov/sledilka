@@ -1,122 +1,86 @@
 package user
 
 import (
-	"encoding/json"
-	"io"
-	"net/http"
-	"os"
-	"strconv"
-
-	"golang.org/x/crypto/bcrypt"
-
 	"backend/internal/entity"
+	"backend/internal/errors"
 	"backend/internal/utils"
+	"encoding/json"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+	"net/http"
 )
 
-func Get(w http.ResponseWriter, r *http.Request) {
-	file, err := os.Open("user.json")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	b, err := io.ReadAll(file)
-	file.Close()
-	var users []entity.User
-	if err = json.Unmarshal(b, &users); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if len(users) == 0 {
+// @Summary	Получить информацию о пользователе по id
+// @Tags		user
+// @Produce	json
+// @Param id query integer
+// @Success	200		{object}	entity.UserInfo
+// @Failure	500
+// @Router		/user [get]
+func GetByID(w http.ResponseWriter, r *http.Request, db *gorm.DB, id int64) {
+	var user = entity.User{Id: id}
+	res := db.Find(&user)
+	if res.RowsAffected == 0 {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	query := r.URL.Query()
-	if !query.Has("id") {
-		_, _ = w.Write(b)
-		return
-	}
-	id, err := strconv.Atoi(query.Get("id"))
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	ind := utils.IndexOfID(int64(id), users)
-	if ind == -1 {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	response := entity.UserInfo{
-		Id:       users[ind].Id,
-		Username: users[ind].Username,
-	}
-	b, _ = json.Marshal(response)
+	b, _ := json.Marshal(entity.UserInfo{Id: id, Username: user.Username})
 	w.Write(b)
+}
+
+// @Summary	Получить список пользователей
+// @Tags		user
+// @Produce	json
+// @Success	200		{object}	entity.UserInfoList
+// @Failure	500
+// @Router		/user [get]
+func GetList(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+	var users []entity.User
+	db.Find(&users)
+	result := userListToUserInfo(users)
+	b, _ := json.Marshal(result)
+	w.Write(b)
+}
+
+func userListToUserInfo(users []entity.User) []entity.UserInfo {
+	result := make([]entity.UserInfo, len(users))
+	for i := range users {
+		result[i].Id = users[i].Id
+		result[i].Username = users[i].Username
+	}
+	return result
 }
 
 // @Summary	Зарегистрировать
 // @Tags		user
-// @Accept		mpfd
+// @Accept		json
 // @Produce	json
-// @Param username formData string true "username"
-// @Param password formData string true "password"
+// @Param		request	body	entity.NewUser	true	"Регистрационная информация"
 // @Success	200		{object}	entity.UserInfo
 // @Failure	500
 // @Router		/user [post]
-func Post(w http.ResponseWriter, r *http.Request) {
-	file, err := os.Open("user.json")
+func Post(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+	newUser, err := utils.ValidateBody[entity.NewUser](r)
 	if err != nil {
+		err.WriteResponse(w)
+		return
+	}
+	hashedPassword, er := bcrypt.GenerateFromPassword([]byte(newUser.Password), 12)
+	if er != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	b, err := io.ReadAll(file)
-	file.Close()
-	var users []entity.User
-	if err = json.Unmarshal(b, &users); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if err = r.ParseMultipartForm(512); err != nil {
+	user := entity.User{Username: newUser.Username, PasswordHash: string(hashedPassword)}
+	res := db.Create(&user)
+	if res.Error != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	form := r.MultipartForm.Value
-	arr, ok := form["username"]
-	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	username := arr[0]
-	arr, ok = form["password"]
-	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	password := arr[0]
-	for _, user := range users {
-		if user.Username == username {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("Username should be unique"))
-			return
+		err = &errors.ResponseError{
+			StatusCode: http.StatusBadRequest,
+			Message:    res.Error.Error(),
 		}
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		err.WriteResponse(w)
 		return
 	}
-	users = append(users,
-		entity.User{
-			Id:           utils.NewId(users),
-			Username:     username,
-			PasswordHash: string(hashedPassword),
-		})
-	response, _ := json.Marshal(entity.UserInfo{Id: users[len(users)-1].Id, Username: username})
-	w.Write(response)
-	b, err = json.Marshal(users)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	os.WriteFile("user.json", b, 0644)
+	b, _ := json.Marshal(entity.UserInfo{Id: user.Id, Username: user.Username})
+	w.Write(b)
 }
