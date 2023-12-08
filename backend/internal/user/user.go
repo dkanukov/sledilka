@@ -5,26 +5,35 @@ import (
 	"backend/internal/errors"
 	"backend/internal/utils"
 	"encoding/json"
+	gmux "github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"net/http"
+	"strconv"
 )
 
 // @Summary	Получить информацию о пользователе по id
 // @Tags		user
 // @Produce	json
-// @Param id query integer
+// @Param id path int true "user id"
 // @Success	200		{object}	entity.UserInfo
 // @Failure	500
-// @Router		/user [get]
-func GetByID(w http.ResponseWriter, r *http.Request, db *gorm.DB, id int64) {
-	var user = entity.User{Id: id}
+// @Router		/user/{id} [get]
+func GetByID(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+	var idParam = gmux.Vars(r)["id"]
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		requestErr := errors.ResponseError{StatusCode: http.StatusBadRequest, Message: err.Error()}
+		requestErr.WriteResponse(w)
+		return
+	}
+	var user = entity.User{Id: int64(id)}
 	res := db.Find(&user)
 	if res.RowsAffected == 0 {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	b, _ := json.Marshal(entity.UserInfo{Id: id, Username: user.Username})
+	b, _ := json.Marshal(entity.UserInfo{Id: user.Id, Username: user.Username})
 	w.Write(b)
 }
 

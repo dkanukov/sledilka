@@ -6,12 +6,11 @@ import (
 	"log"
 	"net/http"
 
+	_ "backend/docs"
+	"backend/internal/handlers"
 	"github.com/alicebob/miniredis/v2"
 	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
-
-	_ "backend/docs"
-	"backend/internal/handlers"
 )
 
 //	@title			Sledilka API
@@ -20,6 +19,14 @@ import (
 //	@termsOfService	http://swagger.io/terms/
 
 // @host      localhost:8081
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name X-Auth-Token
+// @tokenUrl https://localhost:8081/token
+// @scope.write Grants write access
+// @scope.admin Grants read and write access to administrative information
+
 func main() {
 	r, err := miniredis.Run()
 	if err != nil {

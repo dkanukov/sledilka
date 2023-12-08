@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"backend/internal/announcement"
-	"backend/internal/authorization"
 	"backend/internal/review"
 	"backend/internal/user"
 	"encoding/json"
@@ -10,12 +9,11 @@ import (
 	gmux "github.com/gorilla/mux"
 	"gorm.io/gorm"
 	"net/http"
-	"strconv"
 )
 
 func GetHandlers(redis *miniredis.Miniredis, db *gorm.DB) *gmux.Router {
-	mux := gmux.NewRouter()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	router := gmux.NewRouter()
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			b, err := json.Marshal("Hello world")
@@ -28,64 +26,96 @@ func GetHandlers(redis *miniredis.Miniredis, db *gorm.DB) *gmux.Router {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
 	}).Methods(http.MethodGet)
-	mux.HandleFunc("/announcement", func(w http.ResponseWriter, r *http.Request) {
+
+	router.HandleFunc("/announcement", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			announcement.Get(w, r, db)
 		case http.MethodPost:
 			announcement.Post(w, r, db)
-		case http.MethodDelete:
-			announcement.Delete(w, r, db)
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
-	}).Methods(http.MethodGet, http.MethodPost, http.MethodDelete)
-	mux.HandleFunc("/review", func(w http.ResponseWriter, r *http.Request) {
+	}).Methods(http.MethodGet, http.MethodPost)
+
+	router.HandleFunc("/announcement/{id}", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			announcement.GetById(w, r, db)
+		case http.MethodDelete:
+			announcement.Delete(w, r, db)
+		case http.MethodPatch:
+			announcement.Patch(w, r, db)
+		case http.MethodPut:
+			announcement.Put(w, r, db)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}).Methods(http.MethodGet, http.MethodDelete, http.MethodPatch, http.MethodPut)
+
+	router.HandleFunc("/review", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			review.Get(w, r, db)
 		case http.MethodPost:
 			review.Post(w, r, db)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}).Methods(http.MethodPost, http.MethodGet)
+
+	router.HandleFunc("/review/{id}", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			review.GetById(w, r, db)
+		case http.MethodPut:
+			review.Put(w, r, db)
 		case http.MethodDelete:
 			review.Delete(w, r, db)
+		case http.MethodPatch:
+			review.Patch(w, r, db)
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
-	})
-	mux.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodPost:
-			authorization.Token(w, r, redis)
-		default:
-			w.WriteHeader(http.StatusMethodNotAllowed)
-		}
-	}).Methods(http.MethodPost)
+	}).Methods(http.MethodGet, http.MethodDelete, http.MethodPatch, http.MethodPut)
 
-	mux.HandleFunc("/refresh", func(writer http.ResponseWriter, request *http.Request) {
+	router.HandleFunc("/user", func(writer http.ResponseWriter, request *http.Request) {
 		switch request.Method {
-		case http.MethodPut:
-			authorization.Refresh(writer, request, redis)
+		case http.MethodGet:
+			user.GetList(writer, request, db)
+		case http.MethodPost:
+			user.Post(writer, request, db)
 		default:
 			writer.WriteHeader(http.StatusMethodNotAllowed)
 		}
-	})
-	mux.HandleFunc("/user", func(writer http.ResponseWriter, request *http.Request) {
-		query := request.URL.Query()
-		switch request.Method {
-		case http.MethodGet:
-			if query.Has("id") {
-				id, err := strconv.Atoi(query.Get("id"))
-				if err != nil {
-					writer.WriteHeader(http.StatusBadRequest)
-					return
-				}
-				user.GetByID(writer, request, db, int64(id))
-			} else {
-				user.GetList(writer, request, db)
-			}
-		case http.MethodPost:
-			user.Post(writer, request, db)
-		}
 	}).Methods(http.MethodGet, http.MethodPost)
-	return mux
+
+	router.HandleFunc("/user/{id}", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			user.GetByID(w, r, db)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}).Methods(http.MethodGet)
+
+	//router.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
+	//	switch r.Method {
+	//	case http.MethodPost:
+	//		authorization.Token(w, r, redis)
+	//	default:
+	//		w.WriteHeader(http.StatusMethodNotAllowed)
+	//	}
+	//}).Methods(http.MethodPost)
+	//
+	//router.HandleFunc("/refresh", func(writer http.ResponseWriter, request *http.Request) {
+	//	switch request.Method {
+	//	case http.MethodPut:
+	//		authorization.Refresh(writer, request, redis)
+	//	default:
+	//		writer.WriteHeader(http.StatusMethodNotAllowed)
+	//	}
+	//})
+
+	return router
 }

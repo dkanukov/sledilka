@@ -2,10 +2,6 @@ package entity
 
 import "github.com/google/uuid"
 
-type WithID interface {
-	ID() uuid.UUID
-}
-
 type UserInfo struct {
 	Id       int64  `json:"id"`
 	Username string `json:"username"`
@@ -24,8 +20,9 @@ type NewUser struct {
 	Password string `json:"password"`
 }
 
-func (u User) ID() int64 {
-	return u.Id
+type LoginInfo struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type NewAnnouncement struct {
@@ -38,10 +35,6 @@ type Announcement struct {
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
 	CreatedAt   string    `json:"createdAt"`
-}
-
-func (an Announcement) ID() uuid.UUID {
-	return an.Id
 }
 
 type NewReview struct {
@@ -61,8 +54,4 @@ type Review struct {
 type UserToken struct {
 	Token     string `json:"token"`
 	ExpiresIn int64  `json:"expires_in"`
-}
-
-func (r Review) ID() uuid.UUID {
-	return r.Id
 }
