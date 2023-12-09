@@ -11,6 +11,10 @@ frontend:
 backend:
 	cd backend; go get .; cd ..
 
+token-service:
+	cd token-service; go get .; cd ..
+
+# TODO: add token service
 start:
 	go run -C backend ./cmd/app/main.go & npm run --prefix frontend dev
 
