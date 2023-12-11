@@ -1,4 +1,4 @@
-package router_handler
+package token
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	gmux "github.com/gorilla/mux"
 	"github.com/redis/go-redis/v9"
 
-	tokens "token-service/internal/tokens"
+	"token-service/internal/token"
 )
 
 func GetHandlers(ctx *context.Context, redisClient *redis.Client) *gmux.Router {
@@ -16,21 +16,23 @@ func GetHandlers(ctx *context.Context, redisClient *redis.Client) *gmux.Router {
 	mux.HandleFunc("/create-token", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
-			tokens.CreateToken(w, r, ctx, redisClient)
+			token.Create(w, r, ctx, redisClient)
+		default:
+			w.WriteHeader(http.StatusForbidden)
 		}
 	})
 
 	mux.HandleFunc("/validate-token", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
-			tokens.ValidateToken(w, r, ctx, redisClient)
+			token.Validate(w, r, ctx, redisClient)
 		}
 	})
 
 	mux.HandleFunc("/refresh-token", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
-			tokens.RefreshToken(w, r, ctx, redisClient)
+			token.Refresh(w, r, ctx, redisClient)
 		}
 	})
 	return mux

@@ -1,4 +1,4 @@
-package tokens
+package token
 
 import (
 	"context"
@@ -18,7 +18,7 @@ type RefreshTokenResponse struct {
 	AccessToken string `json:"access_token"`
 }
 
-func RefreshToken(
+func Refresh(
 	w http.ResponseWriter,
 	r *http.Request,
 	ctx *context.Context,

@@ -1,4 +1,4 @@
-package tokens
+package token
 
 import (
 	"context"
@@ -24,7 +24,7 @@ const (
 	JwtSecretKey = "super-secret-key"
 )
 
-func CreateToken(
+func Create(
 	w http.ResponseWriter,
 	r *http.Request,
 	ctx *context.Context,
