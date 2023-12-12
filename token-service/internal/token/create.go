@@ -38,13 +38,13 @@ func Create(
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(10 * time.Minute).Unix(),
+		ExpiresAt: TokenLiveTimeShort,
 		IssuedAt:  time.Now().Unix(),
 		Id:        strconv.Itoa(requestBody.UserId),
 	})
 
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(12 * time.Hour).Unix(),
+		ExpiresAt: TokenLiveTimeLong,
 		IssuedAt:  time.Now().Unix(),
 		Id:        strconv.Itoa(requestBody.UserId),
 	})

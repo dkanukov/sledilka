@@ -40,7 +40,7 @@ func Refresh(
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(10 * time.Minute).Unix(),
+		ExpiresAt: TokenLiveTimeShort,
 		IssuedAt:  time.Now().Unix(),
 		Id:        userId,
 	})

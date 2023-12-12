@@ -8,7 +8,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/cors"
 
-	"token-service/internal/router_handler"
+	"token-service/internal/router"
 )
 
 const (
@@ -31,7 +31,7 @@ func main() {
 		log.Fatal("Can't connect to redis client")
 	}
 
-	router := router_handler.GetHandlers(&ctx, redisClient)
+	router := router.GetHandlers(&ctx, redisClient)
 
 	cors := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
