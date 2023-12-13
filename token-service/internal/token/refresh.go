@@ -8,6 +8,8 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/redis/go-redis/v9"
+
+	"token-service/internal/utils"
 )
 
 type RefreshTokenRequest struct {
@@ -40,7 +42,7 @@ func Refresh(
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
-		ExpiresAt: TokenLiveTimeShort,
+		ExpiresAt: utils.TokenExpire(TokenLiveTimeShort),
 		IssuedAt:  time.Now().Unix(),
 		Id:        userId,
 	})
