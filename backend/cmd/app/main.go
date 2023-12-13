@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -18,7 +17,7 @@ import (
 //	@description	API for Sledilka service
 //	@termsOfService	http://swagger.io/terms/
 
-//	@host	localhost:8081
+// @host	localhost:8081
 func main() {
 	r, err := miniredis.Run()
 	if err != nil {
@@ -43,8 +42,6 @@ func main() {
 		Addr:    "0.0.0.0:8081",
 		Handler: cors.Handler(router),
 	}
-
-	fmt.Println("swagger")
 
 	log.Fatal(app.ListenAndServe())
 }
