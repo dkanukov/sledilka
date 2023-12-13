@@ -52,6 +52,7 @@ func Post(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 // @Produce	json
 // @Param		id path string true "Review ID"
 // @Success	200
+// @Security ApiKeyAuth
 // @Failure	500
 // @Router		/review/{id} [delete]
 func Delete(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
@@ -75,6 +76,7 @@ func Delete(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 // @Param		request	body	entity.NewReview	true	"Измененный отзыв"
 // @Param		id path string true "Review ID"
 // @Success	200	{object}	entity.Review
+// @Security ApiKeyAuth
 // @Failure	500
 // @Router		/review/{id} [put]
 func Put(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
@@ -112,6 +114,7 @@ func Put(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 // @Param		id path string true "Review ID"
 // @Success	200	{object}	entity.Review
 // @Failure	500
+// @Security ApiKeyAuth
 // @Router		/review/{id} [patch]
 func Patch(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	idParam := gmux.Vars(r)["id"]
@@ -142,6 +145,7 @@ func Patch(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 // @Success	200	{object}	entity.Review
 // @Failure	500
 // @Router		/review/{id} [get]
+// @Security ApiKeyAuth
 // @Param		id	path  string	true	"uuid"
 func GetById(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	idParam := gmux.Vars(r)["id"]

@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { API_ROUTE } from '../api/path'
+import { api } from '../api/Api'
 
 export default function SignIn() {
 	const router = useRouter()
@@ -18,11 +19,22 @@ export default function SignIn() {
 		form.append('username', userName)
 		form.append('password', userPassword)
 
-		// eslint-disable-next-line compat/compat
-		const response = await fetch(`${API_ROUTE}/token`, {
-			method: 'POST',
-			body: form,
-		})
+		console.log(form)
+
+		try {
+			// eslint-disable-next-line compat/compat
+			const response = await fetch(`${API_ROUTE}/token`, {
+				method: 'POST',
+				body: form,
+			})
+
+			if (response.status !== 200) {
+				return false
+			}
+			return true
+		} catch (e) {
+			console.log(e)
+		}
 
 		return true
 	}

@@ -85,6 +85,7 @@ func Post(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 // @Success	200
 // @Failure	500
 // @Router		/announcement/{id} [delete]
+// @Security ApiKeyAuth
 // @Param		id	path  string	true	"uuid"
 func Delete(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	idParam := gmux.Vars(r)["id"]
@@ -102,6 +103,7 @@ func Delete(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 // @Success	200	{object}	entity.Announcement
 // @Failure	500
 // @Router		/announcement/{id} [get]
+// @Security ApiKeyAuth
 // @Param		id	path  string	true	"uuid"
 func GetById(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	idParam := gmux.Vars(r)["id"]
@@ -128,6 +130,7 @@ func GetById(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 // @Success	200	{object}	entity.Announcement
 // @Failure	500
 // @Router		/announcement/{id} [put]
+// @Security ApiKeyAuth
 // @Param		request	body	entity.NewAnnouncement	true	"Измененный анонс"
 // @Param		id	path  string	true	"uuid"
 func Put(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
@@ -160,6 +163,7 @@ func Put(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 // @Tags		announcements
 // @Accept		json
 // @Produce	json
+// @Security ApiKeyAuth
 // @Success	200	{object}	entity.Announcement
 // @Failure	500
 // @Router		/announcement/{id} [patch]

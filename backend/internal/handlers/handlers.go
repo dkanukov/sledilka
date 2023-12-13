@@ -2,16 +2,16 @@ package handlers
 
 import (
 	"backend/internal/announcement"
+	"backend/internal/authorization"
 	"backend/internal/review"
 	"backend/internal/user"
 	"encoding/json"
-	"github.com/alicebob/miniredis/v2"
 	gmux "github.com/gorilla/mux"
 	"gorm.io/gorm"
 	"net/http"
 )
 
-func GetHandlers(redis *miniredis.Miniredis, db *gorm.DB) *gmux.Router {
+func GetHandlers(db *gorm.DB) *gmux.Router {
 	router := gmux.NewRouter()
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -38,7 +38,7 @@ func GetHandlers(redis *miniredis.Miniredis, db *gorm.DB) *gmux.Router {
 		}
 	}).Methods(http.MethodGet, http.MethodPost)
 
-	router.HandleFunc("/announcement/{id}", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/announcement/{id}", authorization.JwtAuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			announcement.GetById(w, r, db)
@@ -51,7 +51,7 @@ func GetHandlers(redis *miniredis.Miniredis, db *gorm.DB) *gmux.Router {
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
-	}).Methods(http.MethodGet, http.MethodDelete, http.MethodPatch, http.MethodPut)
+	})).Methods(http.MethodGet, http.MethodDelete, http.MethodPatch, http.MethodPut)
 
 	router.HandleFunc("/review", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -64,7 +64,7 @@ func GetHandlers(redis *miniredis.Miniredis, db *gorm.DB) *gmux.Router {
 		}
 	}).Methods(http.MethodPost, http.MethodGet)
 
-	router.HandleFunc("/review/{id}", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/review/{id}", authorization.JwtAuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			review.GetById(w, r, db)
@@ -77,7 +77,7 @@ func GetHandlers(redis *miniredis.Miniredis, db *gorm.DB) *gmux.Router {
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
-	}).Methods(http.MethodGet, http.MethodDelete, http.MethodPatch, http.MethodPut)
+	})).Methods(http.MethodGet, http.MethodDelete, http.MethodPatch, http.MethodPut)
 
 	router.HandleFunc("/user", func(writer http.ResponseWriter, request *http.Request) {
 		switch request.Method {
@@ -98,20 +98,19 @@ func GetHandlers(redis *miniredis.Miniredis, db *gorm.DB) *gmux.Router {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
 	}).Methods(http.MethodGet)
+	router.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			authorization.Token(w, r, db)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}).Methods(http.MethodPost)
 
-	//router.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
-	//	switch r.Method {
-	//	case http.MethodPost:
-	//		authorization.Token(w, r, redis)
-	//	default:
-	//		w.WriteHeader(http.StatusMethodNotAllowed)
-	//	}
-	//}).Methods(http.MethodPost)
-	//
 	//router.HandleFunc("/refresh", func(writer http.ResponseWriter, request *http.Request) {
 	//	switch request.Method {
 	//	case http.MethodPut:
-	//		authorization.Refresh(writer, request, redis)
+	//		authorization.Refresh(writer, request)
 	//	default:
 	//		writer.WriteHeader(http.StatusMethodNotAllowed)
 	//	}

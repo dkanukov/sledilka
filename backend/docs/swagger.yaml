@@ -26,6 +26,13 @@ definitions:
       rating:
         type: integer
     type: object
+  entity.NewUser:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   entity.Review:
     properties:
       comment:
@@ -148,12 +155,6 @@ paths:
     delete:
       consumes:
       - application/json
-      parameters:
-      - description: Review ID
-        in: query
-        name: id
-        required: true
-        type: integer
       produces:
       - application/json
       responses:
@@ -233,20 +234,31 @@ paths:
       tags:
       - token
   /user:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.UserInfo'
+            type: array
+        "500":
+          description: Internal Server Error
+      summary: Получить список пользователей
+      tags:
+      - user
     post:
       consumes:
-      - multipart/form-data
+      - application/json
       parameters:
-      - description: username
-        in: formData
-        name: username
+      - description: Регистрационная информация
+        in: body
+        name: request
         required: true
-        type: string
-      - description: password
-        in: formData
-        name: password
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/entity.NewUser'
       produces:
       - application/json
       responses:

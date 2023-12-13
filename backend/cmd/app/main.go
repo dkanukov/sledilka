@@ -2,13 +2,11 @@ package main
 
 import (
 	"backend/internal/db"
-	"fmt"
 	"log"
 	"net/http"
 
 	_ "backend/docs"
 	"backend/internal/handlers"
-	"github.com/alicebob/miniredis/v2"
 	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -28,15 +26,11 @@ import (
 // @scope.admin Grants read and write access to administrative information
 
 func main() {
-	r, err := miniredis.Run()
-	if err != nil {
-		log.Fatal(err)
-	}
 	DBConnection, err := db.StartupDB()
 	if err != nil {
 		log.Fatal(err)
 	}
-	router := handlers.GetHandlers(r, DBConnection)
+	router := handlers.GetHandlers(DBConnection)
 	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 	router.HandleFunc("/swagger", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/swagger/", http.StatusSeeOther)
@@ -55,8 +49,6 @@ func main() {
 		Addr:    "0.0.0.0:8081",
 		Handler: cors.Handler(router),
 	}
-
-	fmt.Println("swagger")
 
 	log.Fatal(app.ListenAndServe())
 }
