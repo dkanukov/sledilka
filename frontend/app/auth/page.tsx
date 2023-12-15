@@ -5,39 +5,11 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-import { API_ROUTE } from '../api/path'
-import { api } from '../api/Api'
-
 export default function SignIn() {
 	const router = useRouter()
 	const [userName, setUserName] = useState('')
 	const [userPassword, setUserPassword] = useState('')
 	const [isShowError, setIsShowError] = useState(false)
-
-	const authUser = async (userName: string, userPassword: string) => {
-		const form = new FormData()
-		form.append('username', userName)
-		form.append('password', userPassword)
-
-		console.log(form)
-
-		try {
-			// eslint-disable-next-line compat/compat
-			const response = await fetch(`${API_ROUTE}/token`, {
-				method: 'POST',
-				body: form,
-			})
-
-			if (response.status !== 200) {
-				return false
-			}
-			return true
-		} catch (e) {
-			console.log(e)
-		}
-
-		return true
-	}
 
 	const handleUserNameInput = (value: string) => {
 		setUserName(value)
@@ -48,7 +20,7 @@ export default function SignIn() {
 	}
 
 	const handleFormSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
-		event.preventDefault()
+		/* event.preventDefault()
 		const isOk = await authUser(userName, userPassword)
 
 		if (isOk) {
@@ -57,7 +29,7 @@ export default function SignIn() {
 			return
 		}
 
-		setIsShowError(true)
+		setIsShowError(true) */
 	}
 
 	return (

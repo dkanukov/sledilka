@@ -5,6 +5,7 @@ module.exports = {
 		'node': true,
 	},
 	'extends': [
+		'next/core-web-vitals',
 		'eslint:recommended',
 		'eslint:recommended',
 		'plugin:@typescript-eslint/recommended-type-checked',
@@ -15,20 +16,20 @@ module.exports = {
 		'plugin:import/warnings',
 		'plugin:import/errors',
 		'plugin:compat/recommended',
-		'next/core-web-vitals',
 	],
 	'parser': '@typescript-eslint/parser',
 	'parserOptions': {
 		'project': true,
-		'tsconfigRootDir': __dirname,
+		'tsconfigRootDir': './',
 	},
+	'plugins': [
+		'import',
+	],
 	'settings': {
 		'import/resolver': {
-			'eslint-import-resolver-custom-alias': {
-				'alias': {
-					'components': './app/components',
-				},
-				'extensions': ['.ts', '.tsx'],
+			'typescript': {},
+			'node': {
+				'extensions': ['.js', '.jsx', '.ts', '.tsx'],
 			},
 		},
 	},
