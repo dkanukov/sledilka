@@ -1,15 +1,14 @@
 package main
 
 import (
+	"backend/internal/db"
 	"log"
 	"net/http"
 
-	"github.com/alicebob/miniredis/v2"
-	"github.com/rs/cors"
-	httpSwagger "github.com/swaggo/http-swagger"
-
 	_ "backend/docs"
 	"backend/internal/handlers"
+	"github.com/rs/cors"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 //	@title			Sledilka API
@@ -17,13 +16,21 @@ import (
 //	@description	API for Sledilka service
 //	@termsOfService	http://swagger.io/terms/
 
-// @host	localhost:8081
+// @host      localhost:8081
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name X-Auth-Token
+// @tokenUrl https://localhost:8081/token
+// @scope.write Grants write access
+// @scope.admin Grants read and write access to administrative information
+
 func main() {
-	r, err := miniredis.Run()
+	DBConnection, err := db.StartupDB()
 	if err != nil {
 		log.Fatal(err)
 	}
-	router := handlers.GetHandlers(r)
+	router := handlers.GetHandlers(DBConnection)
 	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 	router.HandleFunc("/swagger", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/swagger/", http.StatusSeeOther)

@@ -1,22 +1,28 @@
 package entity
 
-type WithID interface {
-	ID() int64
-}
+import "github.com/google/uuid"
 
 type UserInfo struct {
 	Id       int64  `json:"id"`
 	Username string `json:"username"`
 }
 
+type UserInfoList []UserInfo
+
 type User struct {
-	Id           int64  `json:"id"`
-	Username     string `json:"username"`
+	Id           int64  `json:"user_id"`
+	Username     string `json:"username"  gorm:"unique"`
 	PasswordHash string `json:"password_hash"`
 }
 
-func (u User) ID() int64 {
-	return u.Id
+type NewUser struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type LoginInfo struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type NewAnnouncement struct {
@@ -25,14 +31,10 @@ type NewAnnouncement struct {
 }
 
 type Announcement struct {
-	Id          int64  `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	CreatedAt   int64  `json:"createdAt"`
-}
-
-func (an Announcement) ID() int64 {
-	return an.Id
+	Id          uuid.UUID `json:"id" gorm:"type:uuid;default:uuid_generate_v4()"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	CreatedAt   string    `json:"createdAt"`
 }
 
 type NewReview struct {
@@ -42,18 +44,14 @@ type NewReview struct {
 }
 
 type Review struct {
-	Id        int64  `json:"id"`
-	Name      string `json:"name"`
-	Rating    int64  `json:"rating"`
-	Comment   string `json:"comment"`
-	CreatedAt int64  `json:"createdAt"`
+	Id        uuid.UUID `json:"id" gorm:"type:uuid;default:uuid_generate_v4()"`
+	Name      string    `json:"name"`
+	Rating    int64     `json:"rating"`
+	Comment   string    `json:"comment"`
+	CreatedAt string    `json:"createdAt"`
 }
 
 type UserToken struct {
 	Token     string `json:"token"`
 	ExpiresIn int64  `json:"expires_in"`
-}
-
-func (r Review) ID() int64 {
-	return r.Id
 }

@@ -3,137 +3,186 @@ package authorization
 import (
 	"backend/internal/entity"
 	"backend/internal/utils"
-	"crypto/rand"
-	"encoding/hex"
+	"bytes"
 	"encoding/json"
-	"github.com/alicebob/miniredis/v2"
+	"github.com/gorilla/context"
 	"golang.org/x/crypto/bcrypt"
-	"io"
+	"gorm.io/gorm"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 )
 
-func generateSecureToken(length int) string {
-	b := make([]byte, length)
-	if _, err := rand.Read(b); err != nil {
-		return ""
-	}
-	return hex.EncodeToString(b)
+const (
+	TokenServiceURL = "http://token-service:8082"
+)
+
+type ValidateTokenRequest struct {
+	Token string `json:"token"`
 }
 
-func refreshToken(r *miniredis.Miniredis, token string) (ok bool) {
-	if !r.Exists(token) {
-		return false
-	}
-	r.SetTTL(token, 1*time.Hour)
-	return true
+type ValidateTokenResponse struct {
+	UserId string `json:"user_id"`
 }
 
-func createToken(r *miniredis.Miniredis, UserId int64) string {
-	newToken := generateSecureToken(utils.TOKEN_LEN)
-	for exists := r.Exists(newToken); exists; exists = r.Exists(newToken) {
-		newToken = generateSecureToken(utils.TOKEN_LEN)
-	}
-
-	r.Set(newToken, strconv.Itoa(int(UserId)))
-	r.SetTTL(newToken, time.Hour)
-	return newToken
+type TokenRequest struct {
+	UserId int `json:"user_id"`
+}
+type RefreshTokenRequest struct {
+	Token string `json:"token"`
 }
 
-func VerifyUser(token string, r *miniredis.Miniredis) int64 {
-	if !r.Exists(token) {
-		return -1
-	}
-	strId, err := r.Get(token)
+type RefreshTokenResponse struct {
+	AccessToken string `json:"access_token"`
+}
+
+type CreateTokenResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
+func refreshToken(token string) error {
+	// TODO
+	return nil
+}
+
+func createToken(UserId int64) (*CreateTokenResponse, error) {
+	body := TokenRequest{UserId: int(UserId)}
+	var buf bytes.Buffer
+	err := json.NewEncoder(&buf).Encode(body)
 	if err != nil {
 		log.Println(err)
-		return -1
+		return nil, err
 	}
-	id, _ := strconv.Atoi(strId)
-	return int64(id)
-}
-
-func Auth(username string, password string, users []entity.User) (UserID int64, ok bool) {
-	for _, user := range users {
-		if user.Username == username &&
-			bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)) == nil {
-			return user.Id, true
-		}
-	}
-	return -1, false
-}
-
-//	@Summary	Авторизоваться
-//	@Tags		token
-//	@Accept		mpfd
-//	@Produce	json
-//	@Param		username	formData	string	true	"username"
-//	@Param		password	formData	string	true	"password"
-//	@Success	200			{object}	entity.UserToken
-//	@Failure	500
-//	@Router		/token [post]
-func Token(w http.ResponseWriter, r *http.Request, redis *miniredis.Miniredis) {
-	file, err := os.Open("user.json")
+	request, err := http.NewRequest(http.MethodPost, TokenServiceURL+"/create-token", &buf)
+	client := &http.Client{}
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		return nil, err
+	}
+	resp, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	var token CreateTokenResponse
+	decoder := json.NewDecoder(resp.Body)
+	err = decoder.Decode(&token)
+	if err != nil {
+		return nil, err
+	}
+	return &token, nil
+}
+
+func VerifyUser(token string) (UserId int64, statusCode int) {
+	body := ValidateTokenRequest{Token: token}
+	var buf bytes.Buffer
+	err := json.NewEncoder(&buf).Encode(body)
+	if err != nil {
+		log.Println(err)
+		return 0, http.StatusInternalServerError
+	}
+	request, err := http.NewRequest(http.MethodPost, TokenServiceURL+"/create-token", &buf)
+	client := &http.Client{}
+	if err != nil {
+		return 0, http.StatusInternalServerError
+	}
+	resp, err := client.Do(request)
+	if err != nil {
+		return 0, http.StatusInternalServerError
+	}
+	if resp.StatusCode != 200 {
+		return 0, http.StatusUnauthorized
+	}
+	var val ValidateTokenResponse
+	decoder := json.NewDecoder(resp.Body)
+	err = decoder.Decode(&val)
+	if err != nil {
+		return 0, http.StatusInternalServerError
+	}
+	userId, _ := strconv.Atoi(val.UserId)
+	return int64(userId), http.StatusOK
+}
+
+func Auth(username string, password string, db *gorm.DB) (UserID int64, ok bool) {
+	user := entity.User{}
+
+	if res := db.Where(&entity.User{Username: username}).First(&user); res.RowsAffected == 0 {
+		return 0, false
+	}
+
+	if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)) != nil {
+		return user.Id, false
+	}
+	return user.Id, true
+}
+
+func JwtAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authToken := r.Header.Get("X-Auth-Token")
+		if len(authToken) == 0 {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		userID, status := VerifyUser(authToken)
+		if status != http.StatusOK {
+			w.WriteHeader(status)
+			return
+		}
+		context.Set(r, "x-user-id", userID)
+		next(w, r)
+	})
+}
+
+// @Summary	Авторизоваться
+// @Tags		token
+// @Accept		json
+// @Produce	json
+// @Param		request	body	entity.LoginInfo	true	"Регистрационная информация"
+// @Success	200		{object}	CreateTokenResponse
+// @Failure	500
+// @Router		/token [post]
+func Token(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+	loginData, respErr := utils.ValidateBody[entity.LoginInfo](r)
+	if respErr != nil {
+		respErr.WriteResponse(w)
 		return
 	}
-	b, err := io.ReadAll(file)
-	file.Close()
-	var users []entity.User
-	if err = json.Unmarshal(b, &users); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if err = r.ParseMultipartForm(512); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	form := r.MultipartForm.Value
-	arr, ok := form["username"]
-	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	username := arr[0]
-	arr, ok = form["password"]
-	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	password := arr[0]
-	userId, ok := Auth(username, password, users)
+	userId, ok := Auth(loginData.Username, loginData.Password, db)
 	if !ok {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	token := createToken(redis, userId)
-	b, _ = json.Marshal(entity.UserToken{Token: token, ExpiresIn: int64(time.Hour.Seconds())})
+	if userId == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	token, err := createToken(userId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	b, _ := json.Marshal(token)
 	w.Write(b)
 }
 
-//	@Summary	Обновить токен
-//	@Tags		token
-//	@Accept		mpfd
-//	@Produce	json
-//	@Param		token	query		string	true	"token"
-//	@Success	200		{object}	entity.UserToken
-//	@Failure	500
-//	@Router		/refresh [post]
-func Refresh(writer http.ResponseWriter, request *http.Request, redis *miniredis.Miniredis) {
-	query := request.URL.Query()
-	if !query.Has("token") {
+// @Summary	Обновить токен
+// @Tags		token
+// @Accept		mpfd
+// @Produce	json
+// @Param token query string true "token"
+// @Success	200		{object}	entity.UserToken
+// @Failure	500
+// @Router		/refresh [post]
+func Refresh(writer http.ResponseWriter, request *http.Request) {
+	token := request.Header.Get("X-Auth-Token")
+	if token == "" {
 		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	token := query.Get("token")
-	if ok := refreshToken(redis, token); !ok {
-		writer.WriteHeader(http.StatusUnauthorized)
-		return
-	}
+	//if err := refreshToken(redis, token); !ok {
+	//	writer.WriteHeader(http.StatusUnauthorized)
+	//	return
+	//}
 	b, _ := json.Marshal(entity.UserToken{Token: token, ExpiresIn: int64(time.Hour.Seconds())})
 	writer.Write(b)
 }

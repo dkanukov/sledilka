@@ -216,15 +216,6 @@ const docTemplate = `{
                     "reviews"
                 ],
                 "summary": "Удалить отзыв",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Review ID",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -280,9 +271,32 @@ const docTemplate = `{
             }
         },
         "/user": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Получить список пользователей",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.UserInfo"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
             "post": {
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -293,18 +307,13 @@ const docTemplate = `{
                 "summary": "Зарегистрировать",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "username",
-                        "name": "username",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "password",
-                        "name": "password",
-                        "in": "formData",
-                        "required": true
+                        "description": "Регистрационная информация",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.NewUser"
+                        }
                     }
                 ],
                 "responses": {
@@ -326,13 +335,13 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "createdAt": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "description": {
                     "type": "string"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"
@@ -364,6 +373,17 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.NewUser": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.Review": {
             "type": "object",
             "properties": {
@@ -371,10 +391,10 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "createdAt": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"

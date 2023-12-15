@@ -26,6 +26,8 @@ services:
     build: backend/.
     ports:
     - "8081:8081"
+    depends_on: 
+    - db
   token-service:
     build: token-service/.
     depends_on: 
