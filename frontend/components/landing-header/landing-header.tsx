@@ -2,12 +2,14 @@
 import { Link, Tooltip, Typography } from '@mui/joy'
 import { usePathname } from 'next/navigation'
 import { AppBar, Badge, Box, IconButton, Menu, MenuItem, Paper, Toolbar } from '@mui/material'
+
 import { useState } from 'react'
 import MenuIcon from '@mui/icons-material/Menu'
+import LoginIcon from '@mui/icons-material/Login'
 
 import styles from './landing-header.module.css'
 
-import { MenuItemHeader } from '@/types/menu-items'
+import { MenuItemHeader } from '@typos/menu-items-header'
 
 export const LandingHeader = () => {
 	const path = usePathname()
@@ -103,68 +105,77 @@ export const LandingHeader = () => {
 					elevation={3}
 				>
 					<img
+						alt="logo"
 						width={'80px'}
 						height={'80px'}
 						src="/logo.png"
 					/>
-					{
-						menuItems.map((item) => (
-							item.link === '/technology' ? (
-								<Tooltip
-									key={item.link}
-									variant={'outlined'}
-									title={(
-										<Box
-											sx={{
-												maxWidth: '100px',
-												display: 'flex',
-												alignItems: 'center',
-												flexDirection: 'column',
-												justifyContent: 'center',
-											}}
+					<div className={styles.headerActions}>
+						<div className={styles.headerLinks}>
+							{
+								menuItems.map((item) => (
+									item.link === '/technology' ? (
+										<Tooltip
+											key={item.link}
+											variant={'outlined'}
+											title={(
+												<Box
+													sx={{
+														maxWidth: '100px',
+														display: 'flex',
+														alignItems: 'center',
+														flexDirection: 'column',
+														justifyContent: 'center',
+													}}
+												>
+													<Link
+														level="title-lg"
+														href={'/how-it-works/frontend'}
+														underline={item.isActive ? 'always' : 'hover'}
+													>
+                                                Фронт
+													</Link>
+													<Link
+														level="title-lg"
+														href={'/how-it-works/backend'}
+														underline={item.isActive ? 'always' : 'hover'}
+													>
+                                                Бэк
+													</Link>
+												</Box>
+											)}
 										>
 											<Link
+												sx={{
+													height: '30px',
+												}}
 												level="title-lg"
-												href={'/how-it-works/frontend'}
 												underline={item.isActive ? 'always' : 'hover'}
 											>
-                                                Фронт
+												{item.label}
 											</Link>
-											<Link
-												level="title-lg"
-												href={'/how-it-works/backend'}
-												underline={item.isActive ? 'always' : 'hover'}
-											>
-                                                Бэк
-											</Link>
-										</Box>
-									)}
-								>
-									<Link
-										sx={{
-											height: '30px',
-										}}
-										level="title-lg"
-										underline={item.isActive ? 'always' : 'hover'}
-									>
-										{item.label}
-									</Link>
-								</Tooltip>
-							) : (
-								<Link
-									sx={{
-										height: '30px',
-									}}
-									level="title-lg"
-									href={item.link}
-									key={item.link}
-									underline={item.isActive ? 'always' : 'hover'}
-								>
-									{item.label}
-								</Link>
-							)
-						))
-					}
+										</Tooltip>
+									) : (
+										<Link
+											sx={{
+												height: '30px',
+											}}
+											level="title-lg"
+											href={item.link}
+											key={item.link}
+											underline={item.isActive ? 'always' : 'hover'}
+										>
+											{item.label}
+										</Link>
+									)
+								))
+							}
+						</div>
+						<Link className={styles.authLink} href="/auth">
+							<LoginIcon/>
+							Войти
+						</Link>
+					</div>
 				</Paper>
 			</Box>
 			<Box

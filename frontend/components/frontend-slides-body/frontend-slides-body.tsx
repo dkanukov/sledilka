@@ -6,10 +6,10 @@ import './frontend-slides-body.css'
 import React from 'react'
 import { AspectRatio, Card, CardContent } from '@mui/joy'
 
-import Png1 from '@/public/1.png'
-import Png2 from '@/public/2.png'
-import Png3 from '@/public/3.png'
-import Png4 from '@/public/4.png'
+import Png1 from '@public/1.png'
+import Png2 from '@public/2.png'
+import Png3 from '@public/3.png'
+import Png4 from '@public/4.png'
 export const FrontendSlidesBody = () => {
 	return (
 		<div>

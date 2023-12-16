@@ -1,77 +1,57 @@
 'use client'
 import { Typography, Input, Textarea } from '@mui/joy'
-import { Box, IconButton, Paper, Button, Drawer } from '@mui/material'
+import { Box, IconButton, Paper, Button, Drawer, NoSsr } from '@mui/material'
 import { Stack } from '@mui/system'
 import AddIcon from '@mui/icons-material/Add'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
-import useSWR from 'swr'
-import axios from 'axios'
 
-import { useLocalStorage } from '@/hooks/use-local-storage'
-import { API_ROUTE } from '@/app/api/path'
+import { EntityAnnouncement } from '../../../api/generated/api'
 
-interface Content {
-	id?: number
-    title: string
-    description: string
-    date: number
-}
+import { useLocalStorage } from '@hooks'
+import { changelogService } from '@api'
 
 export default function Changelog() {
-	const test = useSWR(`${API_ROUTE}/announcement`, async () => {
-		const { data } = await axios.get(`${API_ROUTE}/announcement`)
-		setContent(data.map((item: any) => {
-			return {
-				id: item.id,
-				title: item.title,
-				description: item.description,
-				date: item.createdAt,
-			}
-		}))
-	})
-
-	const createChangelog = async (title: string, description: string) => {
-		// eslint-disable-next-line compat/compat
-		const response = await fetch(`${API_ROUTE}/announcement`, {
-			method: 'POST',
-			body: JSON.stringify({
-				title,
-				description,
-			}),
-		})
-	}
-
-	const [content, setContent] = useState<Content[]>([])
+	const [content, setContent] = useState<EntityAnnouncement[]>([])
 	const [isAdmin, setIsAdmin] = useLocalStorage<boolean>('isAdmin', false)
 	const [isShowForm, setIsShowForm] = useState(false)
-	const [formValue, setFormValue] = useState<Content>({
+	const [formValue, setFormValue] = useState<EntityAnnouncement>({
 		title: '',
 		description: '',
-		date: 0,
 	})
+
+	useEffect(() => {
+		changelogService.getChangelogList().then((data) => setContent(data)).catch((e) => console.log(e))
+	}, [])
 
 	const handleCloseForm = () => {
 		setFormValue({
 			title: '',
 			description: '',
-			date: 0,
 		})
 		setIsShowForm(false)
 	}
 
 	const handleSendForm = async () => {
-		await createChangelog(formValue.title, formValue.description)
+		const isOk = await changelogService.createChangelog({
+			description: formValue.description,
+			title: formValue.title,
+		})
 
-		setContent([...content, {
-			...formValue,
-			date: Date.now(),
-		}])
-		handleCloseForm()
+		if (isOk) {
+			setContent([...content, {
+				...formValue,
+			}])
+			handleCloseForm()
+		}
 	}
 
 	return (
-		<Box>
+		<Box
+			sx={{
+				minHeight: 'calc(100vh - 80px - 61px)',
+			}}
+		>
 			<Stack
 				direction={'row'}
 				spacing={2}
@@ -88,16 +68,20 @@ export default function Changelog() {
 				>
                     Обновлениея проекта
 				</Typography>
-				{isAdmin && (
-					<IconButton
-						sx={{
-							marginTop: 'auto',
-						}}
-						onClick={() => setIsShowForm(true)}
-					>
-						<AddIcon/>
-					</IconButton>
-				)}
+				<div>
+					{isAdmin && (
+						<NoSsr>
+							<IconButton
+								sx={{
+									marginTop: 'auto',
+								}}
+								onClick={() => setIsShowForm(true)}
+							>
+								<AddIcon/>
+							</IconButton>
+						</NoSsr>
+					)}
+				</div>
 			</Stack>
 			{content.length ? (
 				content.map((item, idx) => (
@@ -112,7 +96,10 @@ export default function Changelog() {
 							level={'h4'}
 							gutterBottom
 						>
-							{item.title} {format(new Date(item.date * 1000), 'yyyy-MM-dd')}
+							{item.title}
+							{/*{''}*/}
+							{/*{format(new Date(item.createdAt * 1000), 'yyyy-MM-dd')}*/}
+							{/*{new Date(item.createdAt ?? '').toDateString()}*/}
 						</Typography>
 						<Typography
 							level={'body-lg'}

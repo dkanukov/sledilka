@@ -2,9 +2,9 @@
 import Image from 'next/image'
 import React from 'react'
 
+import BannerBackground from '@public/about-background.png'
+import Backend from '@public/backend-image.png'
 import './backend-summary-body.css'
-import BannerBackground from '@/public/about-background.png'
-import BackEnd from '@/public/backend-image.png'
 
 export const BackendSummaryBody = () => {
 	return (
@@ -13,7 +13,7 @@ export const BackendSummaryBody = () => {
 				<Image src={BannerBackground} alt="" />
 			</div>
 			<div className="backend-section-image-container">
-				<Image src={BackEnd} alt=""/>
+				<Image src={Backend} alt=""/>
 			</div>
 			<div className="backend-section-text-container">
 				<h1 className="primary-heading">
@@ -24,15 +24,6 @@ export const BackendSummaryBody = () => {
 					получении статуса устройств в сети, обработке,
 					анализе и передаче видеоизображения с камер
 				</div>
-				{/*<ol className="primary-text" >*/}
-				{/*	/!* <li>ПО для сбора устройств в сети и сохранения их в базу данных</li> *!/*/}
-				{/*	<li style={{ padding: 5 }}>Страница с текущим состоянием устройств</li>*/}
-				{/*	<li style={{ padding: 5 }}>Интерфейс расположения устройств на схеме</li>*/}
-				{/*	<li style={{ padding: 5 }}>Cоздание объектов и добавления слоев на карту</li>*/}
-				{/*	<li style={{ padding: 5 }}>Модель определяющая уровень света в помещении по камере</li>*/}
-				{/*	<li style={{ padding: 5 }}>Просмотр видео с камер</li>*/}
-				{/*</ol>*/}
-
 			</div>
 		</div>
 	)

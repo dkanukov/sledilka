@@ -54,7 +54,11 @@ export default function Roadmap() {
 	}
 
 	return (
-		<Box>
+		<Box
+			sx={{
+				minHeight: 'calc(100vh - 80px - 61px)',
+			}}
+		>
 			<Box
 				sx={{
 					display: {

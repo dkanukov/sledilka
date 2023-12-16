@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation'
 
 import styles from './layout-header.module.css'
 
-import { MenuItemHeader } from '@/types/menu-items'
+import { MenuItemHeader } from '@typos/menu-items-header'
 
 export const LayoutHeader = () => {
 	const path = usePathname()

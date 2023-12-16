@@ -2,13 +2,13 @@
 import React from 'react'
 import '../backend-summary-body/backend-summary-body.css'
 import './backend-tools-body.css'
-import Image, { StaticImageData } from 'next/image'
+import Image from 'next/image'
 import { Grid } from '@mui/joy'
 
-import GstreamerIcon from '@/public/gstreamericon.svg'
-import Gopher from '@/public/gopher.png'
-import PostgresIcon from '@/public/Postgresql.png'
-import LinuxLogo from '@/public/linux.png'
+import GstreamerIcon from '@public/gstreamericon.svg'
+import Gopher from '@public/gopher.png'
+import PostgresIcon from '@public/Postgresql.png'
+import LinuxLogo from '@public/linux.png'
 export const BackendToolsBody = () => {
 	return (
 		<div>
@@ -36,7 +36,6 @@ export const BackendToolsBody = () => {
 							Это достаточно легковесный и &quot;быстрый&quot; язык,
 							чьи даже базовые инструменты позволяют просто создать HTTP-сервер,
 							подключиться и взаимодействовать с базой данных
-							{/*Также он активно набирает популярность, так что проект будет классной строчкой в резюме)*/}
 						</div>
 					</Grid>
 					<Grid xs={12} md={6}>
@@ -71,7 +70,7 @@ export const BackendToolsBody = () => {
 					<Grid xs={12} md={6}>
 						<div className="tools-list-container">
 							<Image
-								src={GstreamerIcon as StaticImageData} width={45}
+								src={GstreamerIcon} width={45}
 								alt=""
 							/>
 							<div className="backend-text">gstreamer/ffmpeg</div>

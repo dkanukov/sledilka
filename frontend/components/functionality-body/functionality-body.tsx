@@ -3,9 +3,9 @@ import React from 'react'
 import Image from 'next/image'
 
 import './functionality-body.css'
-import AboutBackgroundImage from '@/public/about-background-image.png'
-import AboutBackground from '@/public/about-background.png'
-const FunctionalityBody = () => {
+import AboutBackgroundImage from '@public/about-background-image.png'
+import AboutBackground from '@public/about-background.png'
+export const FunctionalityBody = () => {
 	return (
 		<div className="functionality-section-container" id="about">
 			<div className="functionality-section-image-container">
@@ -16,7 +16,6 @@ const FunctionalityBody = () => {
                   ПК. Камеры. Кабинеты.
 				</h1>
 				<ol className="primary-text" >
-					{/* <li>ПО для сбора устройств в сети и сохранения их в базу данных</li> */}
 					<li style={{ padding: 5 }}>Страница с текущим состоянием устройств</li>
 					<li style={{ padding: 5 }}>Интерфейс расположения устройств на схеме</li>
 					<li style={{ padding: 5 }}>Cоздание объектов и добавления слоев на карту</li>
@@ -40,5 +39,3 @@ const FunctionalityBody = () => {
 		</div>
 	)
 }
-
-export default FunctionalityBody

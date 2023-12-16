@@ -1,8 +1,8 @@
+'use client'
 import { Box, Container } from '@mui/material'
 import React from 'react'
 
-import LoglineBody from './components/logline-body/logline-body'
-import FunctionalityBody from './components/functionality-body/functionality-body'
+import { FunctionalityBody, LoglineBody } from '@components'
 
 export default function Landing() {
 	return (

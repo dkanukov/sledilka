@@ -1,8 +1,7 @@
 import React from 'react'
 
-import BackendSummaryBody from '../../components/backend-summary-body/backend-summary-body'
-import BackendToolsBody from '../../components/backend-tools-body/backend-tools-body'
 import '../how-it-works-body.css'
+import { BackendSummaryBody, BackendToolsBody } from '@components'
 const Backend = () => {
 	return (
 		<div>

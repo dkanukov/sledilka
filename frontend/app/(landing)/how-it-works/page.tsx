@@ -2,9 +2,9 @@ import React from 'react'
 import Image from 'next/image'
 
 import './how-it-works-body.css'
-import Neuronet from '../../public/neuronet-image.png'
-import FrontEnd from '../../public/frontend-image.png'
-import BackEnd from '../../public/backend-image.png'
+import Neuronet from '@public/neuronet-image.png'
+import FrontEnd from '@public/frontend-image.png'
+import BackEnd from '@public/backend-image.png'
 
 const Page = () => {
 	const workInfoData = [

@@ -6,76 +6,18 @@ import StarRateIcon from '@mui/icons-material/StarRate'
 import AddBoxIcon from '@mui/icons-material/AddBox'
 import { useEffect, useState } from 'react'
 import { Box, FormLabel } from '@mui/material'
-import useSWR from 'swr'
-import axios from 'axios'
 
-import { API_ROUTE } from '../api/path'
+import { EntityReview } from '../../../api/generated/api'
 
 import styles from './feedback.module.css'
+
+import { feedbackService } from '@api'
 
 const MAX_RATE = 5
 
 export default function Feedback() {
-	const test = useSWR(`${API_ROUTE}/review`, async () => {
-		const { data } = await axios.get(`${API_ROUTE}/review`)
-		setCaroseulItem(data.map((item: any) => {
-			return {
-				name: item.name,
-				message: item.comment,
-				rate: item.rating,
-			}
-		}))
-	})
 
-	const createNewFeedback = async (name: string, message: string, rate: number) => {
-		/* const { data, error } = await axios.post(`${API_ROUTE}/review`, {
-			data: {
-				name: name,
-				comment: message,
-				rating: rate,
-			},
-		}) */
-
-		// eslint-disable-next-line compat/compat
-		const response = await fetch(`${API_ROUTE}/review`, {
-			method: 'POST',
-			body: JSON.stringify({
-				name: name,
-				comment: message,
-				rating: rate,
-			}),
-		})
-
-		// return !error
-	}
-
-	const [carouselItems, setCaroseulItem] = useState([
-		{
-			name: 'Testname Testsurname 1',
-			message: 'test texttest texttest texttest texttest texttest texttest texttest texttest text',
-			rate: 3,
-		},
-		{
-			name: 'Testname Testsurname 2',
-			message: '123',
-			rate: 2,
-		},
-		{
-			name: 'Testname Testsurname 3',
-			message: '123',
-			rate: 5,
-		},
-		{
-			name: 'Testname Testsurname 4',
-			message: '123',
-			rate: 4,
-		},
-		{
-			name: 'Testname Testsurname 5',
-			message: '123',
-			rate: 4,
-		},
-	])
+	const [carouselItems, setCaroseulItem] = useState<EntityReview[]>([])
 
 	const [isShowForm, setIsShowForm] = useState(false)
 	const [feedbackForm, setFeedbackForm] = useState({
@@ -84,6 +26,10 @@ export default function Feedback() {
 		message: '',
 	})
 	const [isSendFeedbackButtonDisabled, setIsSendButtonDisabled] = useState(true)
+
+	useEffect(() => {
+		feedbackService.getFeedbacks().then((data) => setCaroseulItem(data)).catch((e) => console.log(e))
+	}, [])
 
 	useEffect(() => {
 		if (feedbackForm.message && feedbackForm.name) {
@@ -108,17 +54,31 @@ export default function Feedback() {
 		})
 	}
 
+	const createNewFeedback = async (name: string, message: string, rate: number) => {
+		const isOk = await feedbackService.createFeedback({
+			name,
+			comment: message,
+			rating: rate,
+		})
+
+		return isOk
+	}
+
 	const handleSendFeedbackButtonClick = async () => {
-		console.log(feedbackForm)
-		await createNewFeedback(feedbackForm.name, feedbackForm.message, feedbackForm.rate)
-		setCaroseulItem([...carouselItems, {
-			...feedbackForm,
-		}])
-		handleFeedbackFormClose()
+		const isOk = await createNewFeedback(feedbackForm.name, feedbackForm.message, feedbackForm.rate)
+		if (isOk) {
+			setCaroseulItem([...carouselItems, {
+				...feedbackForm,
+				comment: feedbackForm.message,
+				name: feedbackForm.name,
+				rating: feedbackForm.rate,
+			}])
+			handleFeedbackFormClose()
+		}
 	}
 
 	return (
-		<div>
+		<div className={styles.feedbackPage}>
 			<Typography
 				level="h1"
 				sx={{
@@ -193,16 +153,16 @@ export default function Feedback() {
 								{item.name}
 							</Typography>
 							<Typography level="body-lg">
-								{item.message}
+								{item.comment}
 							</Typography>
 							<div className={styles.rating}>
-								{Array.from({ length: item.rate }).fill(null).map((_, idx) => (
+								{Array.from({ length: item.rating }).fill(null).map((_, idx) => (
 									<StarRateIcon
 										color="warning"
 										key={idx}
 									/>
 								))}
-								{Array.from({ length: MAX_RATE - item.rate }).fill(null).map((_, idx) => (
+								{Array.from({ length: MAX_RATE - item.rating }).fill(null).map((_, idx) => (
 									<StarRateIcon
 										key={idx}
 									/>

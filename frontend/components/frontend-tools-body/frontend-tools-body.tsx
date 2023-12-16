@@ -4,13 +4,13 @@ import Image, { StaticImageData } from 'next/image'
 import React from 'react'
 
 import './frontend-tools-body.css'
-import ReactLogo from '@/public/React Logo.svg'
-import MuiLogo from '@/public/mui-logo.png'
-import OpenLayersLogo from '@/public/openlayers.png'
-import CSSLogo from '@/public/csslogo.png'
-import HTMLLogo from '@/public/html-logo.png'
+import ReactLogo from '@public/React Logo.svg'
+import MuiLogo from '@public/mui-logo.png'
+import OpenLayersLogo from '@public/openlayers.png'
+import CSSLogo from '@public/csslogo.png'
+import HTMLLogo from '@public/html-logo.png'
 
-const FrontendToolsBody = () => {
+export const FrontendToolsBody = () => {
 	return (
 		<div>
 			<div className="subheading" style={{ marginTop: 100 }}>
@@ -85,5 +85,3 @@ const FrontendToolsBody = () => {
 		</div>
 	)
 }
-
-export default FrontendToolsBody
