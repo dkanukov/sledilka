@@ -1,11 +1,4 @@
 definitions:
-  authorization.CreateTokenResponse:
-    properties:
-      access_token:
-        type: string
-      refresh_token:
-        type: string
-    type: object
   entity.Announcement:
     properties:
       createdAt:
@@ -15,13 +8,6 @@ definitions:
       id:
         type: string
       title:
-        type: string
-    type: object
-  entity.LoginInfo:
-    properties:
-      password:
-        type: string
-      username:
         type: string
     type: object
   entity.NewAnnouncement:
@@ -83,6 +69,27 @@ info:
   version: "1.0"
 paths:
   /announcement:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID анонса на удаление
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Announcement'
+        "500":
+          description: Internal Server Error
+      summary: Удаляет анонс
+      tags:
+      - announcements
     get:
       consumes:
       - application/json
@@ -122,109 +129,6 @@ paths:
       summary: Создает анонс
       tags:
       - announcements
-  /announcement/{id}:
-    delete:
-      consumes:
-      - application/json
-      parameters:
-      - description: uuid
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Удаляет анонс
-      tags:
-      - announcements
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: uuid
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Announcement'
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Анонс по id
-      tags:
-      - announcements
-    patch:
-      consumes:
-      - application/json
-      parameters:
-      - description: Измененный анонс
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/entity.NewAnnouncement'
-      - description: uuid
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Announcement'
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Изменить анонс
-      tags:
-      - announcements
-    put:
-      consumes:
-      - application/json
-      parameters:
-      - description: Измененный анонс
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/entity.NewAnnouncement'
-      - description: uuid
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Announcement'
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Изменить анонс
-      tags:
-      - announcements
   /refresh:
     post:
       consumes:
@@ -248,6 +152,21 @@ paths:
       tags:
       - token
   /review:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+      summary: Удалить отзыв
+      tags:
+      - reviews
     get:
       consumes:
       - application/json
@@ -262,7 +181,7 @@ paths:
             type: array
         "500":
           description: Internal Server Error
-      summary: Возвращает все отзывы
+      summary: Возвращает отзывы
       tags:
       - reviews
     post:
@@ -287,127 +206,28 @@ paths:
       summary: Создать отзыв
       tags:
       - reviews
-  /review/{id}:
-    delete:
-      consumes:
-      - application/json
-      parameters:
-      - description: Review ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Удалить отзыв
-      tags:
-      - reviews
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: uuid
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Review'
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Отзыв по id
-      tags:
-      - reviews
-    patch:
-      consumes:
-      - application/json
-      parameters:
-      - description: Измененный отзыв
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/entity.NewReview'
-      - description: Review ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Review'
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Изменить отзыв
-      tags:
-      - reviews
-    put:
-      consumes:
-      - application/json
-      parameters:
-      - description: Измененный отзыв
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/entity.NewReview'
-      - description: Review ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Review'
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Изменить отзыв
-      tags:
-      - reviews
   /token:
     post:
       consumes:
-      - application/json
+      - multipart/form-data
       parameters:
-      - description: Регистрационная информация
-        in: body
-        name: request
+      - description: username
+        in: formData
+        name: username
         required: true
-        schema:
-          $ref: '#/definitions/entity.LoginInfo'
+        type: string
+      - description: password
+        in: formData
+        name: password
+        required: true
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/authorization.CreateTokenResponse'
+            $ref: '#/definitions/entity.UserToken'
         "500":
           description: Internal Server Error
       summary: Авторизоваться
@@ -451,32 +271,4 @@ paths:
       summary: Зарегистрировать
       tags:
       - user
-  /user/{id}:
-    get:
-      parameters:
-      - description: user id
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.UserInfo'
-        "500":
-          description: Internal Server Error
-      summary: Получить информацию о пользователе по id
-      tags:
-      - user
-securityDefinitions:
-  ApiKeyAuth:
-    in: header
-    name: X-Auth-Token
-    scopes:
-      admin: ' Grants read and write access to administrative information'
-      write: ' Grants write access'
-    type: apiKey
 swagger: "2.0"

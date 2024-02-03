@@ -5,7 +5,6 @@ module.exports = {
 		'node': true,
 	},
 	'extends': [
-		'next/core-web-vitals',
 		'eslint:recommended',
 		'eslint:recommended',
 		'plugin:@typescript-eslint/recommended-type-checked',
@@ -16,20 +15,20 @@ module.exports = {
 		'plugin:import/warnings',
 		'plugin:import/errors',
 		'plugin:compat/recommended',
+		'next/core-web-vitals',
 	],
 	'parser': '@typescript-eslint/parser',
 	'parserOptions': {
 		'project': true,
-		'tsconfigRootDir': './',
+		'tsconfigRootDir': __dirname,
 	},
-	'plugins': [
-		'import',
-	],
 	'settings': {
 		'import/resolver': {
-			'typescript': {},
-			'node': {
-				'extensions': ['.js', '.jsx', '.ts', '.tsx'],
+			'eslint-import-resolver-custom-alias': {
+				'alias': {
+					'components': './app/components',
+				},
+				'extensions': ['.ts', '.tsx'],
 			},
 		},
 	},
@@ -65,10 +64,10 @@ module.exports = {
 		'@typescript-eslint/prefer-ts-expect-error': 'error',
 		'@typescript-eslint/ban-ts-comment': 'warn',
 		'@typescript-eslint/no-unsafe-return': 'off',
-		'@typescript-eslint/no-unsafe-assignment': 'off',
-		'@typescript-eslint/no-unsafe-argument': 'off',
-		'@typescript-eslint/no-unsafe-member-access': 'off',
-		'@typescript-eslint/no-unsafe-call': 'off',
+		'@typescript-eslint/no-unsafe-assignment': 'warn',
+		'@typescript-eslint/no-unsafe-argument': 'warn',
+		'@typescript-eslint/no-unsafe-member-access': 'warn',
+		'@typescript-eslint/no-unsafe-call': 'warn',
 		'@typescript-eslint/no-misused-promises': 'off',
 		'@typescript-eslint/explicit-module-boundary-types': 'off',
 		'@typescript-eslint/semi': ['error', 'never'],

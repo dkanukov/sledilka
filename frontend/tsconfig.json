@@ -19,11 +19,8 @@
       }
     ],
     "paths": {
-      "@hooks": ["./hooks/index.ts"],
-      "@components": ["./components/index.ts"],
-	  "@api": ["./api/services/index.ts"],
-	  "@public/*": ["./public/*"],
-	  "@typos/*": ["./types/*"],
+      "@/*": ["./*"],
+      "components/*": ["./app/components/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".eslintrc.js", "next.config.js"],

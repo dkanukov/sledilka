@@ -1,5 +1,126 @@
+/*@tailwind base;*/
+/*@tailwind components;*/
+/*@tailwind utilities;*/
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+.primary-button {
+	padding: 0.9rem 1.75rem;
+	background-color: white;
+	outline: none;
+	border: none;
+	border-radius: 5rem;
+	font-size: 1.1rem;
+	cursor: pointer;
+	font-weight: 600;
+	transition: 0.2s;
+}
+
+.primary-button:hover {
+	background-color: rgb(234, 234, 234);
+}
+
+.primary-heading {
+	font-size: clamp(2rem, 5vw, 3rem);
+	color: #4c4c4c;
+	max-width: 600px;
+}
+
+.primary-subheading {
+	font-weight: 700;
+	color: #4c4c4c;
+	font-size: 1.15rem;
+}
+
+.heading {
+	font-size: clamp(2rem, 5vw, 4rem);
+	color: #4c4c4c;
+}
+
+.subheading {
+	max-width: 900px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	font-size: clamp(2rem, 5vw, 4rem);
+	color: #4c4c4c;
+}
+
+.primary-text {
+	font-size: clamp(1rem, 3vw, 1.5rem);
+	max-width: 500px;
+	color: #5a5a5a;
+	margin: 1.5rem 0rem;
+}
+
+.tools-list-container {
+	display: flex;
+	justify-content: flex-start;
+	gap : 6px
+}
+
+.tools-icon {
+	max-width: 3rem;
+}
+
+:root {
+	--foreground-rgb: 0, 0, 0;
+	--background-start-rgb: 214, 219, 220;
+	--background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+		--foreground-rgb: 255, 255, 255;
+		--background-start-rgb: 0, 0, 0;
+		--background-end-rgb: 0, 0, 0;
+	}
+}
+
+@media (max-width: 1000px) {
+	.primary-button {
+		font-size: 1rem;
+	}
+}
+
+@media (max-width: 800px) {
+	.primary-heading {
+		text-align: center;
+		max-width: 90%;
+	}
+
+	.primary-text {
+		text-align: center;
+		max-width: 80%;
+	}
+
+	.secondary-button {
+		font-size: 1rem;
+		padding: 0.8rem 2rem;
+		cursor: pointer;
+	}
+
+	.primary-subheading {
+		text-align: center;
+	}
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	color: rgb(var(--foreground-rgb));
+	min-height: 100vh;
+}
+
+.container {
+	flex: 1 0 auto;
+	padding: 20px;
 }
