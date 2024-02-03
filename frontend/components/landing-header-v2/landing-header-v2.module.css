@@ -1,0 +1,9 @@
+.overrideBgc {
+	background: #fafafa !important;
+}
+
+.controls {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
