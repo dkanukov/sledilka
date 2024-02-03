@@ -1,14 +1,6 @@
-.cards {
+.root {
 	display: flex;
+	flex-direction: column;
 	gap: 20px;
-}
-
-.likes {
-	display: flex;
-	gap: 20px;
-}
-
-.contacts {
-	display: flex;
-	gap: 6px;
+	padding: 20px 20px 0;
 }

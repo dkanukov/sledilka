@@ -1,17 +1,34 @@
 'use client'
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { ConfigProvider, Layout, theme } from 'antd'
+import { useState } from 'react'
 
-import { LandingFooter, LandingHeader } from '@components'
-
-const inter = Inter({ subsets: ['latin'] })
+import { LandingHeaderV2 } from '@components'
 
 export default function LandingLayout({ children }: { children: React.ReactNode }) {
+	const [currentTheme, setTheme] = useState<'dark' | 'light'>('dark')
+
+	const handleThemeToggle = () => {
+		setTheme(currentTheme === 'dark' ? 'light' : 'dark')
+	}
 	return (
 		<div>
-			<LandingHeader/>
-			{children}
-			<LandingFooter/>
+			<ConfigProvider
+				theme={{
+					algorithm: currentTheme === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm,
+				}}
+			>
+				<Layout
+					style={{
+						minHeight: '100vh',
+					}}
+				>
+					<LandingHeaderV2
+						currentTheme={currentTheme}
+						whenThemeToggle={handleThemeToggle}
+					/>
+					{children}
+				</Layout>
+			</ConfigProvider>
 		</div>
 	)
 }
