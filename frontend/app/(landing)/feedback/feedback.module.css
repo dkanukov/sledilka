@@ -1,0 +1,20 @@
+.feedbackPage {
+	min-height: calc(100vh - 80px - 61px);
+}
+
+.carousel {
+	max-height: 500px;
+}
+
+.rating {
+	margin-top: auto;
+}
+
+.form {
+	padding: 20px;
+}
+
+.buttonWrapper {
+	display: flex;
+	gap: 20px;
+}
