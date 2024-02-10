@@ -6,8 +6,8 @@ import { authService } from '@api'
 
 interface UserStore {
 	userCredential: EntityLoginInfo
-	handlelUserCredentialChange: (value: EntityLoginInfo) => void
-	handleUserLogin: (value: EntityLoginInfo) => Promise<void>
+	handleUserCredentialChange: (value: EntityLoginInfo) => void
+	handleUserLogin: (value: EntityLoginInfo) => Promise<boolean>
 }
 
 export const useUserStore = create<UserStore>()((set) => ({
@@ -16,7 +16,7 @@ export const useUserStore = create<UserStore>()((set) => ({
 		password: '',
 	},
 
-	handlelUserCredentialChange: (value) => set((state) => ({
+	handleUserCredentialChange: (value) => set((state) => ({
 		userCredential: {
 			...state.userCredential,
 			...value,
@@ -24,8 +24,7 @@ export const useUserStore = create<UserStore>()((set) => ({
 	})),
 
 	handleUserLogin: async (value: EntityLoginInfo) => {
-		const res = await authService.login(value)
-		console.log(res)
+		return await authService.login(value)
 	},
 }))
 

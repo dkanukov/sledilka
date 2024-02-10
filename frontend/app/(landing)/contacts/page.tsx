@@ -1,5 +1,4 @@
 'use client'
-import { useState } from 'react'
 import { Card, Col, Flex, Image, Row, Typography } from 'antd'
 
 import styles from './contacts.module.css'
@@ -16,11 +15,14 @@ export default function Contacts() {
 				<Col
 					span={12}
 				>
-					<Card title={'Цатурян Геворг - backend разработчик'}>
-						<Grid >
+					<Card
+						title={'Цатурян Геворг - backend разработчик'}
+					>
+						<Grid>
 							<Image
 								alt="Геворг"
 								src={'/gevorg.jpeg'}
+								className={styles.image}
 							/>
 						</Grid>
 						<Flex
@@ -39,11 +41,14 @@ export default function Contacts() {
 				<Col
 					span={12}
 				>
-					<Card title={'Кануков Денис - frontend разработчик'}>
+					<Card
+						title={'Кануков Денис - frontend разработчик'}
+					>
 						<Grid>
 							<Image
 								alt="Денис"
 								src={'/denis.jpeg'}
+								className={styles.image}
 							/>
 						</Grid>
 						<Flex
@@ -66,6 +71,7 @@ export default function Contacts() {
 						<Image
 							alt="Надежда"
 							src={'/nadejda.jpeg'}
+							className={styles.image}
 						/>
 					</Card>
 				</Col>

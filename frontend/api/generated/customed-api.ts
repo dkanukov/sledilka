@@ -1,11 +1,22 @@
+import { AxiosError } from 'axios'
+import { notification } from 'antd'
+
 import { Api } from './api'
 
 const CustomedApi = new Api()
 
 CustomedApi.instance.interceptors.response.use(
 	(response) => response,
-	(error) => {
-		console.log(error)
+	(error: AxiosError) => {
+		if (error.response?.status === 401) {
+			notification.error({
+				message: error.message,
+				description: 'Мы не смогли вас авторизовать',
+			})
+		}
+		return {
+			authError: error,
+		}
 	},
 )
 

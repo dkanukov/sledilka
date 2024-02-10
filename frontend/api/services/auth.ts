@@ -4,9 +4,15 @@ import CustomedApi from '../generated/customed-api'
 import { lsSetItem } from '@helpers'
 
 export const login = async (userCredential: EntityLoginInfo) => {
-	const { data, error } = await CustomedApi.token.tokenCreate(userCredential)
-
-	lsSetItem<AuthorizationCreateTokenResponse>('user-credential', data)
-
-	return data
+	try {
+		const { data } = await CustomedApi.token.tokenCreate(userCredential)
+		if (data.access_token && data.refresh_token) {
+			lsSetItem<AuthorizationCreateTokenResponse>('user-credential', data)
+			return true
+		}
+		return true
+	} catch (e) {
+		console.log(e)
+		return false
+	}
 }

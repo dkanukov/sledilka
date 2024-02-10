@@ -19,7 +19,11 @@ export default function SignIn() {
 	}, [userStore.userCredential])
 
 	const handleUserLogin = async () => {
-		await userStore.handleUserLogin(userStore.userCredential)
+		const isAuthed = await userStore.handleUserLogin(userStore.userCredential)
+
+		if (isAuthed) {
+			router.push('/admin')
+		}
 	}
 
 	return (
@@ -34,7 +38,7 @@ export default function SignIn() {
 					size={'large'}
 					className={styles.formInput}
 					value={userStore.userCredential.username}
-					onChange={(e) => userStore.handlelUserCredentialChange({
+					onChange={(e) => userStore.handleUserCredentialChange({
 						username: e.target.value,
 					})}
 				/>
@@ -45,7 +49,7 @@ export default function SignIn() {
 					value={userStore.userCredential.password}
 					visibilityToggle={{ visible: isPasswordVisible,
 						onVisibleChange: setIsPasswordVisible }}
-					onChange={(e) => userStore.handlelUserCredentialChange({
+					onChange={(e) => userStore.handleUserCredentialChange({
 						password: e.target.value,
 					})}
 				/>
@@ -61,6 +65,10 @@ export default function SignIn() {
 					</Button>
 					<Button
 						danger
+						onClick={() => userStore.handleUserCredentialChange({
+							username: '',
+							password: '',
+						})}
 					>
 						Сбросить
 					</Button>
