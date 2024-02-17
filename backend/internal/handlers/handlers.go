@@ -1,10 +1,14 @@
 package handlers
 
 import (
-	"backend/internal/announcement"
 	"backend/internal/authorization"
-	"backend/internal/review"
-	"backend/internal/user"
+	"backend/internal/handlers/announcement"
+	"backend/internal/handlers/devices"
+	"backend/internal/handlers/images"
+	"backend/internal/handlers/layer"
+	"backend/internal/handlers/object"
+	"backend/internal/handlers/review"
+	"backend/internal/handlers/user"
 	"encoding/json"
 	gmux "github.com/gorilla/mux"
 	"gorm.io/gorm"
@@ -106,6 +110,82 @@ func GetHandlers(db *gorm.DB) *gmux.Router {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
 	}).Methods(http.MethodPost)
+
+	router.HandleFunc("/images", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			images.UploadFile(w, r)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}).Methods(http.MethodPost)
+
+	router.HandleFunc("/images/{file}", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			images.Load(w, r)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}).Methods(http.MethodGet)
+
+	router.HandleFunc("/objects", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			object.Get(w, r, db)
+		case http.MethodPost:
+			object.Post(w, r, db)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}).Methods(http.MethodGet, http.MethodPost)
+
+	router.HandleFunc("/objects/{id}", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			object.GetById(w, r, db)
+		case http.MethodPatch:
+			object.Patch(w, r, db)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}).Methods(http.MethodGet, http.MethodPatch)
+
+	router.HandleFunc("/objects/{id}/layers", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			layer.Post(w, r, db)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}).Methods(http.MethodPost)
+
+	router.HandleFunc("/objects/{object_id}/layers/{layer_id}", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPatch:
+			layer.Patch(w, r, db)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}).Methods(http.MethodPatch)
+
+	router.HandleFunc("/devices", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			devices.Post(w, r, db)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}).Methods(http.MethodPost)
+
+	router.HandleFunc("/devices/{id}", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPatch:
+			devices.Patch(w, r, db)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}).Methods(http.MethodPatch)
 
 	//router.HandleFunc("/refresh", func(writer http.ResponseWriter, request *http.Request) {
 	//	switch request.Method {

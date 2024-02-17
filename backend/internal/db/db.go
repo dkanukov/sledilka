@@ -24,7 +24,15 @@ func StartupDB() (*gorm.DB, error) {
 	}
 	db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
 	// TODO migrate other entities
-	if err := db.AutoMigrate(&entity.User{}, &entity.Review{}, &entity.Announcement{}); err != nil {
+	err = db.AutoMigrate(
+		&entity.User{},
+		&entity.Review{},
+		&entity.Announcement{},
+		&entity.Object{},
+		&entity.Layer{},
+		&entity.Device{},
+	)
+	if err != nil {
 		return nil, err
 	}
 	fmt.Println("Successfully connected!")
