@@ -9,6 +9,7 @@ import (
 	"backend/internal/handlers/object"
 	"backend/internal/handlers/review"
 	"backend/internal/handlers/user"
+	"backend/internal/utils"
 	"encoding/json"
 	gmux "github.com/gorilla/mux"
 	"gorm.io/gorm"
@@ -187,6 +188,9 @@ func GetHandlers(db *gorm.DB) *gmux.Router {
 		}
 	}).Methods(http.MethodPatch)
 
+	router.HandleFunc("/new", func(w http.ResponseWriter, r *http.Request) {
+		utils.NewEntities()
+	}).Methods(http.MethodPost)
 	//router.HandleFunc("/refresh", func(writer http.ResponseWriter, request *http.Request) {
 	//	switch request.Method {
 	//	case http.MethodPut:
