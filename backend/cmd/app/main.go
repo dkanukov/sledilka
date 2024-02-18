@@ -16,12 +16,12 @@ import (
 //	@description	API for Sledilka service
 //	@termsOfService	http://swagger.io/terms/
 
-// @host      localhost:8081
+// @host      0.0.0.0:8081
 
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name X-Auth-Token
-// @tokenUrl https://localhost:8081/token
+// @tokenUrl https://0.0.0.0:8081/token
 // @scope.write Grants write access
 // @scope.admin Grants read and write access to administrative information
 
@@ -35,22 +35,11 @@ func main() {
 	router.HandleFunc("/swagger", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/swagger/", http.StatusSeeOther)
 	})
-
-	cors := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
-		AllowedMethods: []string{
-			http.MethodPost,
-			http.MethodPatch,
-			http.MethodDelete,
-			http.MethodGet,
-			http.MethodPut,
-		},
-		AllowedHeaders:   []string{"*"},
-		AllowCredentials: true,
-	})
+	cors.AllowAll()
+	corsOpt := cors.AllowAll()
 	app := http.Server{
 		Addr:    "0.0.0.0:8081",
-		Handler: cors.Handler(router),
+		Handler: corsOpt.Handler(router),
 	}
 
 	log.Fatal(app.ListenAndServe())

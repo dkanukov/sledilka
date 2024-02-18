@@ -7,7 +7,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8081",
+    "host": "0.0.0.0:8081",
     "paths": {
         "/announcement": {
             "get": {

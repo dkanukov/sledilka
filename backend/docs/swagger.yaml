@@ -196,7 +196,7 @@ definitions:
       token:
         type: string
     type: object
-host: localhost:8081
+host: 0.0.0.0:8081
 info:
   contact: {}
   description: API for Sledilka service
