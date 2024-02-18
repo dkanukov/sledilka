@@ -21,7 +21,7 @@ import (
 // @Produce	json
 // @Param		request	body		entity.NewLayer true "Новый слой"
 // @Param		id path string true "Object ID"
-// @Success	200		{layers}	entity.Layer
+// @Success	200		{object}	entity.Layer
 // @Failure	500
 // @Router		/objects/{id}/layers [post]
 func Post(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
@@ -72,7 +72,7 @@ func Post(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 // @Param		request	body	entity.NewLayer	true	"Измененный слой"
 // @Param		object_id path string true "Object ID"
 // @Param		layer_id path string true "Layer ID"
-// @Success	200	{layers}	entity.Layer
+// @Success	200	{object}	entity.Layer
 // @Failure	500
 // @Router		/objects/{object_id}/layers/{layer_id} [patch]
 func Patch(w http.ResponseWriter, r *http.Request, db *gorm.DB) {

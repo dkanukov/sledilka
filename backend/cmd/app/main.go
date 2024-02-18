@@ -37,10 +37,16 @@ func main() {
 	})
 
 	cors := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"*"},
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{
+			http.MethodPost,
+			http.MethodPatch,
+			http.MethodDelete,
+			http.MethodGet,
+			http.MethodPut,
+		},
 		AllowedHeaders:   []string{"*"},
-		AllowCredentials: false,
+		AllowCredentials: true,
 	})
 	app := http.Server{
 		Addr:    "0.0.0.0:8081",

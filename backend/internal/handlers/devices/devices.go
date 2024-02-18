@@ -18,7 +18,7 @@ import (
 // @Accept		json
 // @Produce	json
 // @Param		request	body		entity.NewDevice true "Новый девайс"
-// @Success	200		{layers}	entity.Device
+// @Success	200		{object}	entity.Device
 // @Failure	500
 // @Router		/devices [post]
 func Post(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
@@ -68,7 +68,7 @@ func Post(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 // @Produce	json
 // @Param		request	body	entity.NewDevice	true	"Измененный девайс"
 // @Param		id path string true "Device ID"
-// @Success	200	{device}	entity.Device
+// @Success	200	{object}	entity.Device
 // @Failure	500
 // @Router		/devices/{id} [patch]
 func Patch(w http.ResponseWriter, r *http.Request, db *gorm.DB) {

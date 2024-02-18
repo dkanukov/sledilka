@@ -1,4 +1,11 @@
 definitions:
+  authorization.CreateTokenResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
   entity.Announcement:
     properties:
       createdAt:
@@ -10,11 +17,121 @@ definitions:
       title:
         type: string
     type: object
+  entity.Device:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      ip:
+        description: для подключения к камерам и мб для других нужд, хз
+        type: string
+      is_active:
+        type: boolean
+      layer_id:
+        description: ??
+        type: string
+      location_x:
+        type: number
+      location_y:
+        type: number
+      mac_address:
+        type: string
+      name:
+        type: string
+      type:
+        $ref: '#/definitions/entity.DeviceType'
+      updated_at:
+        type: string
+    type: object
+  entity.DeviceType:
+    enum:
+    - computer
+    - camera
+    - printer
+    type: string
+    x-enum-varnames:
+    - Computer
+    - Camera
+    - Printer
+  entity.Layer:
+    properties:
+      angle:
+        type: number
+      coordinate_x:
+        type: number
+      coordinate_y:
+        type: number
+      created_at:
+        type: string
+      devices:
+        items:
+          $ref: '#/definitions/entity.Device'
+        type: array
+      floor_name:
+        type: string
+      id:
+        type: string
+      image:
+        type: string
+      object_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  entity.LoginInfo:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   entity.NewAnnouncement:
     properties:
       description:
         type: string
       title:
+        type: string
+    type: object
+  entity.NewDevice:
+    properties:
+      ip:
+        description: для подключения к камерам и мб для других нужд, хз
+        type: string
+      layer_id:
+        description: ??
+        type: string
+      location_x:
+        type: number
+      location_y:
+        type: number
+      mac_address:
+        type: string
+      name:
+        type: string
+      type:
+        $ref: '#/definitions/entity.DeviceType'
+    type: object
+  entity.NewLayer:
+    properties:
+      angle:
+        type: number
+      coordinate_x:
+        type: number
+      coordinate_y:
+        type: number
+      floor_name:
+        type: string
+      image:
+        type: string
+    type: object
+  entity.NewObject:
+    properties:
+      address:
+        type: string
+      description:
+        type: string
+      name:
         type: string
     type: object
   entity.NewReview:
@@ -31,6 +148,25 @@ definitions:
       password:
         type: string
       username:
+        type: string
+    type: object
+  entity.Object:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      layers:
+        items:
+          $ref: '#/definitions/entity.Layer'
+        type: array
+      name:
+        type: string
+      updated_at:
         type: string
     type: object
   entity.Review:
@@ -69,27 +205,6 @@ info:
   version: "1.0"
 paths:
   /announcement:
-    delete:
-      consumes:
-      - application/json
-      parameters:
-      - description: ID анонса на удаление
-        in: query
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Announcement'
-        "500":
-          description: Internal Server Error
-      summary: Удаляет анонс
-      tags:
-      - announcements
     get:
       consumes:
       - application/json
@@ -129,6 +244,354 @@ paths:
       summary: Создает анонс
       tags:
       - announcements
+  /announcement/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Удаляет анонс
+      tags:
+      - announcements
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Announcement'
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Анонс по id
+      tags:
+      - announcements
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Измененный анонс
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.NewAnnouncement'
+      - description: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Announcement'
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Изменить анонс
+      tags:
+      - announcements
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Измененный анонс
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.NewAnnouncement'
+      - description: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Announcement'
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Изменить анонс
+      tags:
+      - announcements
+  /devices:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Новый девайс
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.NewDevice'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Device'
+        "500":
+          description: Internal Server Error
+      summary: Создать девайс
+      tags:
+      - devices
+  /devices/{id}:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Измененный девайс
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.NewDevice'
+      - description: Device ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Device'
+        "500":
+          description: Internal Server Error
+      summary: Изменить девайс
+      tags:
+      - devices
+  /images:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: картинка слоя
+        in: formData
+        name: request
+        required: true
+        type: file
+      responses:
+        "200":
+          description: OK
+      summary: Upload File
+      tags:
+      - images
+  /images/{file}:
+    get:
+      parameters:
+      - description: file name with extension
+        in: path
+        name: file
+        required: true
+        type: string
+      produces:
+      - multipart/form-data
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      summary: Load File
+      tags:
+      - images
+  /new:
+    post:
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+      summary: Новые сущности
+      tags:
+      - new
+  /objects:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Object'
+            type: array
+        "500":
+          description: Internal Server Error
+      summary: Возвращает все объекты
+      tags:
+      - objects
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Новый отзыв
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.NewObject'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Object'
+        "500":
+          description: Internal Server Error
+      summary: Создать объект
+      tags:
+      - objects
+  /objects/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Object'
+        "500":
+          description: Internal Server Error
+      summary: Объект по id
+      tags:
+      - objects
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Измененный Объект
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.NewObject'
+      - description: Object ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Object'
+        "500":
+          description: Internal Server Error
+      summary: Изменить объект
+      tags:
+      - objects
+  /objects/{id}/layers:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Новый слой
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.NewLayer'
+      - description: Object ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Layer'
+        "500":
+          description: Internal Server Error
+      summary: Создать слой
+      tags:
+      - layers
+  /objects/{object_id}/layers/{layer_id}:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Измененный слой
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.NewLayer'
+      - description: Object ID
+        in: path
+        name: object_id
+        required: true
+        type: string
+      - description: Layer ID
+        in: path
+        name: layer_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Layer'
+        "500":
+          description: Internal Server Error
+      summary: Изменить объект
+      tags:
+      - layers
   /refresh:
     post:
       consumes:
@@ -152,21 +615,6 @@ paths:
       tags:
       - token
   /review:
-    delete:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-      summary: Удалить отзыв
-      tags:
-      - reviews
     get:
       consumes:
       - application/json
@@ -181,7 +629,7 @@ paths:
             type: array
         "500":
           description: Internal Server Error
-      summary: Возвращает отзывы
+      summary: Возвращает все отзывы
       tags:
       - reviews
     post:
@@ -206,19 +654,35 @@ paths:
       summary: Создать отзыв
       tags:
       - reviews
-  /token:
-    post:
+  /review/{id}:
+    delete:
       consumes:
-      - multipart/form-data
+      - application/json
       parameters:
-      - description: username
-        in: formData
-        name: username
+      - description: Review ID
+        in: path
+        name: id
         required: true
         type: string
-      - description: password
-        in: formData
-        name: password
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Удалить отзыв
+      tags:
+      - reviews
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: uuid
+        in: path
+        name: id
         required: true
         type: string
       produces:
@@ -227,7 +691,90 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.UserToken'
+            $ref: '#/definitions/entity.Review'
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Отзыв по id
+      tags:
+      - reviews
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Измененный отзыв
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.NewReview'
+      - description: Review ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Review'
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Изменить отзыв
+      tags:
+      - reviews
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Измененный отзыв
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.NewReview'
+      - description: Review ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Review'
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Изменить отзыв
+      tags:
+      - reviews
+  /token:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Регистрационная информация
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.LoginInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/authorization.CreateTokenResponse'
         "500":
           description: Internal Server Error
       summary: Авторизоваться
@@ -271,4 +818,32 @@ paths:
       summary: Зарегистрировать
       tags:
       - user
+  /user/{id}:
+    get:
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.UserInfo'
+        "500":
+          description: Internal Server Error
+      summary: Получить информацию о пользователе по id
+      tags:
+      - user
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: X-Auth-Token
+    scopes:
+      admin: Grants read and write access to administrative information
+      write: Grants write access
+    type: apiKey
 swagger: "2.0"

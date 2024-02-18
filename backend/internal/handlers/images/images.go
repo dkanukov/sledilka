@@ -63,7 +63,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 // @Tags         images
 // @Produce      mpfd
 // @Param		file	path  string	true "file name with extension"
-// @Success      200 {image} file
+// @Success      200 {file} file
 // @Router       /images/{file} [get]
 func Load(w http.ResponseWriter, r *http.Request) {
 	filename := gmux.Vars(r)["file"]
