@@ -10,11 +10,18 @@ interface Props<T> {
 }
 
 export const Sidebar = <T extends { id: string; name: string }>(props: Props<T>) => {
+	console.log(props.items)
 	return (
-		<div className={styles.sidebar}>
+		<Menu className={styles.menu}>
 			{props.items.map((item) => (
-				<Menu/>
+				<Menu.Item
+					key={item.id}
+					onClick={() => props.whenClick(item)}
+					title={item.name}
+				>
+					<div>{item.name}</div>
+				</Menu.Item>
 			))}
-		</div>
+		</Menu>
 	)
 }

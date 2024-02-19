@@ -21,6 +21,41 @@ export interface EntityAnnouncement {
   title?: string;
 }
 
+export interface EntityDevice {
+  created_at?: string;
+  id?: string;
+  /** для подключения к камерам и мб для других нужд, хз */
+  ip?: string;
+  is_active?: boolean;
+  /** ?? */
+  layer_id?: string;
+  location_x?: number;
+  location_y?: number;
+  mac_address?: string;
+  name?: string;
+  type?: EntityDeviceType;
+  updated_at?: string;
+}
+
+export enum EntityDeviceType {
+  Computer = "computer",
+  Camera = "camera",
+  Printer = "printer",
+}
+
+export interface EntityLayer {
+  angle?: number;
+  coordinate_x?: number;
+  coordinate_y?: number;
+  created_at?: string;
+  devices?: EntityDevice[];
+  floor_name?: string;
+  id?: string;
+  image?: string;
+  object_id?: string;
+  updated_at?: string;
+}
+
 export interface EntityLoginInfo {
   password?: string;
   username?: string;
@@ -29,6 +64,32 @@ export interface EntityLoginInfo {
 export interface EntityNewAnnouncement {
   description?: string;
   title?: string;
+}
+
+export interface EntityNewDevice {
+  /** для подключения к камерам и мб для других нужд, хз */
+  ip?: string;
+  /** ?? */
+  layer_id?: string;
+  location_x?: number;
+  location_y?: number;
+  mac_address?: string;
+  name?: string;
+  type?: EntityDeviceType;
+}
+
+export interface EntityNewLayer {
+  angle?: number;
+  coordinate_x?: number;
+  coordinate_y?: number;
+  floor_name?: string;
+  image?: string;
+}
+
+export interface EntityNewObject {
+  address?: string;
+  description?: string;
+  name?: string;
 }
 
 export interface EntityNewReview {
@@ -40,6 +101,16 @@ export interface EntityNewReview {
 export interface EntityNewUser {
   password?: string;
   username?: string;
+}
+
+export interface EntityObject {
+  address?: string;
+  created_at?: string;
+  description?: string;
+  id?: string;
+  layers?: EntityLayer[];
+  name?: string;
+  updated_at?: string;
 }
 
 export interface EntityReview {
@@ -105,7 +176,7 @@ export class HttpClient<SecurityDataType = unknown> {
   private format?: ResponseType;
 
   constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
-    this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "//localhost:8081" });
+    this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "//0.0.0.0:8081" });
     this.secure = secure;
     this.format = format;
     this.securityWorker = securityWorker;
@@ -195,7 +266,7 @@ export class HttpClient<SecurityDataType = unknown> {
  * @title Sledilka API
  * @version 1.0
  * @termsOfService http://swagger.io/terms/
- * @baseUrl //localhost:8081
+ * @baseUrl //0.0.0.0:8081
  * @contact
  *
  * API for Sledilka service
@@ -309,6 +380,209 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: "PATCH",
         body: request,
         secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+  };
+  devices = {
+    /**
+     * No description
+     *
+     * @tags devices
+     * @name DevicesCreate
+     * @summary Создать девайс
+     * @request POST:/devices
+     */
+    devicesCreate: (request: EntityNewDevice, params: RequestParams = {}) =>
+      this.request<EntityDevice, void>({
+        path: `/devices`,
+        method: "POST",
+        body: request,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags devices
+     * @name DevicesPartialUpdate
+     * @summary Изменить девайс
+     * @request PATCH:/devices/{id}
+     */
+    devicesPartialUpdate: (id: string, request: EntityNewDevice, params: RequestParams = {}) =>
+      this.request<EntityDevice, void>({
+        path: `/devices/${id}`,
+        method: "PATCH",
+        body: request,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+  };
+  images = {
+    /**
+     * No description
+     *
+     * @tags images
+     * @name ImagesCreate
+     * @summary Upload File
+     * @request POST:/images
+     */
+    imagesCreate: (
+      data: {
+        /**
+         * картинка слоя
+         * @format binary
+         */
+        request: File;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/images`,
+        method: "POST",
+        body: data,
+        type: ContentType.FormData,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags images
+     * @name ImagesDetail
+     * @summary Load File
+     * @request GET:/images/{file}
+     */
+    imagesDetail: (file: string, params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/images/${file}`,
+        method: "GET",
+        format: "document",
+        ...params,
+      }),
+  };
+  new = {
+    /**
+     * No description
+     *
+     * @tags new
+     * @name PostNew
+     * @summary Новые сущности
+     * @request POST:/new
+     */
+    postNew: (params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/new`,
+        method: "POST",
+        ...params,
+      }),
+  };
+  objects = {
+    /**
+     * No description
+     *
+     * @tags objects
+     * @name ObjectsList
+     * @summary Возвращает все объекты
+     * @request GET:/objects
+     */
+    objectsList: (params: RequestParams = {}) =>
+      this.request<EntityObject[], void>({
+        path: `/objects`,
+        method: "GET",
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags objects
+     * @name ObjectsCreate
+     * @summary Создать объект
+     * @request POST:/objects
+     */
+    objectsCreate: (request: EntityNewObject, params: RequestParams = {}) =>
+      this.request<EntityObject, void>({
+        path: `/objects`,
+        method: "POST",
+        body: request,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags objects
+     * @name ObjectsDetail
+     * @summary Объект по id
+     * @request GET:/objects/{id}
+     */
+    objectsDetail: (id: string, params: RequestParams = {}) =>
+      this.request<EntityObject, void>({
+        path: `/objects/${id}`,
+        method: "GET",
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags objects
+     * @name ObjectsPartialUpdate
+     * @summary Изменить объект
+     * @request PATCH:/objects/{id}
+     */
+    objectsPartialUpdate: (id: string, request: EntityNewObject, params: RequestParams = {}) =>
+      this.request<EntityObject, void>({
+        path: `/objects/${id}`,
+        method: "PATCH",
+        body: request,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags layers
+     * @name LayersCreate
+     * @summary Создать слой
+     * @request POST:/objects/{id}/layers
+     */
+    layersCreate: (id: string, request: EntityNewLayer, params: RequestParams = {}) =>
+      this.request<EntityLayer, void>({
+        path: `/objects/${id}/layers`,
+        method: "POST",
+        body: request,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags layers
+     * @name LayersPartialUpdate
+     * @summary Изменить объект
+     * @request PATCH:/objects/{object_id}/layers/{layer_id}
+     */
+    layersPartialUpdate: (objectId: string, layerId: string, request: EntityNewLayer, params: RequestParams = {}) =>
+      this.request<EntityLayer, void>({
+        path: `/objects/${objectId}/layers/${layerId}`,
+        method: "PATCH",
+        body: request,
         type: ContentType.Json,
         format: "json",
         ...params,

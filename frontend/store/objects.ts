@@ -1,18 +1,27 @@
 import { create } from 'zustand'
 
-import { ObjectsMock } from '@mocks'
+import { ObjectStorage } from '@models'
+import { objectService } from '@api'
 
 interface ObjectsStore {
-	objects: {id: string; name: string}[]
-	fetchObjects: () => void
+	objects: ObjectStorage[]
+	selectedObject: null | ObjectStorage
+	handleSelectedStorageChange: (objectStorage: ObjectStorage) => void
+	fetchObjects: () => Promise<void>
 }
 export const useObjectsStore = create<ObjectsStore>()((set) => ({
 	objects: [],
-	fetchObjects: () => {
-		//todo: fetch objects && mappings
-		const data = ObjectsMock
+	selectedObject: null,
+	handleSelectedStorageChange: (objectStorage: ObjectStorage) => {
 		set(() => ({
-			objects: data,
+			selectedObject: objectStorage,
+		}))
+	},
+	fetchObjects: async () => {
+		const objects = await objectService.getObjects()
+
+		set(() => ({
+			objects,
 		}))
 	},
 }))

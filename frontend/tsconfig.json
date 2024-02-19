@@ -27,7 +27,8 @@
 	  "@store": ["./store/index.ts"],
 	  "@helpers": ["./helpers/index.ts"],
       "@constants": ["./constants/index.ts"],
-      "@mocks": ["./api/mocks/index.ts"]
+      "@mocks": ["./api/mocks/index.ts"],
+      "@models": ["./models/index.ts"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".eslintrc.js", "next.config.js"],

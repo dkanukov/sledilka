@@ -6,8 +6,13 @@ import styles from './map.module.css'
 
 import 'leaflet/dist/leaflet.css'
 import '@maptiler/leaflet-maptilersdk'
+import { ObjectStorage } from '@models'
 
-export const Map = () => {
+interface Props {
+	objectStorage: ObjectStorage
+}
+
+export const Map = (props: Props) => {
 	const mapContainerRef = useRef<HTMLDivElement>(null)
 	const [mapRef, setMapRef] = useState<IMap>()
 
