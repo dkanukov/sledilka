@@ -1,0 +1,35 @@
+host: 0.0.0.0:8088
+info:
+  contact: {}
+  description: API for Imaging service
+  termsOfService: http://swagger.io/terms/
+  title: Imaging for Sledilka API
+  version: "1.0"
+paths:
+  /:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: фото
+        in: formData
+        name: request
+        required: true
+        type: file
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: Is image Low-Lighted
+      tags:
+      - luminance
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: X-Auth-Token
+    scopes:
+      admin: Grants read and write access to administrative information
+      write: Grants write access
+    type: apiKey
+swagger: "2.0"

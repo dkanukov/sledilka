@@ -1,0 +1,52 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API for Imaging service",
+        "title": "Imaging for Sledilka API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "0.0.0.0:8088",
+    "paths": {
+        "/": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "luminance"
+                ],
+                "summary": "Is image Low-Lighted",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "фото",
+                        "name": "request",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "X-Auth-Token",
+            "in": "header",
+            "scopes": {
+                "admin": "Grants read and write access to administrative information",
+                "write": "Grants write access"
+            }
+        }
+    }
+}
