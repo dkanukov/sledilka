@@ -38,5 +38,9 @@ services:
     build: frontend/.
     ports:
     - "3000:3000"
+  imaging-service:
+    build: imaging/.
+    ports:
+    - "8088:8088"
 volumes:
   postgres_data:
