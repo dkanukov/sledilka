@@ -25,8 +25,8 @@ export class ObjectLayer {
 	objectId!: string
 	floorName!: string
 	angle?: number
-	coordinateX?: number
-	coordinateY?: number
+	coordinateX: number
+	coordinateY: number
 	image?: string
 	createdAt!: string
 	updatedAt!: string
@@ -37,8 +37,8 @@ export class ObjectLayer {
 		this.objectId = dto.object_id || ''
 		this.floorName = dto.floor_name || ''
 		this.angle = dto.angle
-		this.coordinateX = dto.coordinate_x
-		this.coordinateY = dto.coordinate_y
+		this.coordinateX = dto.coordinate_x || 0
+		this.coordinateY = dto.coordinate_y || 0
 		this.image = dto.image
 		this.createdAt = dto.created_at || ''
 		this.updatedAt = dto.updated_at || ''

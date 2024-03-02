@@ -1,6 +1,6 @@
 'use client'
 
-import { Menu } from 'antd'
+import { Menu, MenuItemProps } from 'antd'
 
 import styles from './sidebar.module.css'
 
@@ -9,18 +9,27 @@ interface Props<T> {
 	whenClick: (item: T) => void
 }
 
+const { Item } = Menu
+
 export const Sidebar = <T extends { id: string; name: string }>(props: Props<T>) => {
-	console.log(props.items)
+	//TODO: заменить Item на items в Menu
+	/* const getMenuItems = (): MenuItemProps[] => {
+		return props.items.map((item) => (
+			{
+
+			}
+		))
+	} */
 	return (
 		<Menu className={styles.menu}>
 			{props.items.map((item) => (
-				<Menu.Item
+				<Item
 					key={item.id}
 					onClick={() => props.whenClick(item)}
 					title={item.name}
 				>
 					<div>{item.name}</div>
-				</Menu.Item>
+				</Item>
 			))}
 		</Menu>
 	)
