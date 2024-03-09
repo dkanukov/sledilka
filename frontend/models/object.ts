@@ -1,5 +1,7 @@
 import { EntityLayer, EntityObject } from '../api/generated/api'
 
+import { Device } from '@models'
+
 export class ObjectStorage {
 	id!: string
 	name!: string
@@ -30,12 +32,13 @@ export class ObjectLayer {
 	image?: string
 	createdAt!: string
 	updatedAt!: string
-	// devices?: EntityDevice[]
+	devices!: Device[]
 
 	constructor(dto: EntityLayer) {
 		this.id = dto.id || ''
 		this.objectId = dto.object_id || ''
 		this.floorName = dto.floor_name || ''
+		this.devices = dto.devices?.map((d) => new Device(d)) ?? []
 		this.angle = dto.angle
 		this.coordinateX = dto.coordinate_x || 0
 		this.coordinateY = dto.coordinate_y || 0

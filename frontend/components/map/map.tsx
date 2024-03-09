@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { map, Map as IMap, tileLayer, TileLayer } from 'leaflet'
+import { map, Map as IMap, tileLayer, TileLayer, imageOverlay } from 'leaflet'
 import { Switch } from 'antd'
 
 import styles from './map.module.css'
@@ -10,7 +10,9 @@ import 'leaflet/dist/leaflet.css'
 import '@maptiler/leaflet-maptilersdk'
 
 import { ObjectLayer } from '@models'
-import { useLocalStorage, usePersistState } from '@hooks'
+import { usePersistState } from '@hooks'
+
+const TileLayerURL = 'https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=wL6YzJn6rYPYSi4sb7R3'
 
 interface Props {
 	selectedLayer: ObjectLayer
@@ -21,11 +23,13 @@ export const Map = (props: Props) => {
 	const [mapRef, setMapRef] = useState<IMap>()
 	const { state: isRenderTileLayer, updateState: setRenderTileLayer } = usePersistState('render-tile-layer', false)
 
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => {
-		if (mapContainerRef.current) {
+		if (mapContainerRef.current && !mapRef) {
 			const mapInstance = map(mapContainerRef.current).setView([props.selectedLayer.coordinateY, props.selectedLayer.coordinateX], 13)
+
 			if (isRenderTileLayer) {
-				tileLayer('https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=wL6YzJn6rYPYSi4sb7R3', {
+				tileLayer(TileLayerURL, {
 				}).addTo(mapInstance)
 			}
 
@@ -34,14 +38,15 @@ export const Map = (props: Props) => {
 
 			setMapRef(mapInstance)
 		}
-	}, [])
+	})
 
 	useEffect(() => {
 		if (!mapRef) {
 			return
 		}
 
-		mapRef.setView([props.selectedLayer.coordinateX, props.selectedLayer.coordinateY], 13)
+		mapRef.setView([/* props.selectedLayer.coordinateX, props.selectedLayer.coordinateY */40.799311, -74.118464], 13)
+		imageOverlay('https://maps.lib.utexas.edu/maps/historical/newark_nj_1922.jpg', [[40.799311, -74.118464], [40.68202047785919, -74.33]]).addTo(mapRef)
 	}, [props.selectedLayer, mapRef])
 
 	const toggleTileLayer = () => {
@@ -52,7 +57,7 @@ export const Map = (props: Props) => {
 		setRenderTileLayer(!isRenderTileLayer)
 
 		if (!isRenderTileLayer) {
-			tileLayer('https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=wL6YzJn6rYPYSi4sb7R3', {}).addTo(mapRef)
+			tileLayer(TileLayerURL, {}).addTo(mapRef)
 			return
 		}
 
