@@ -10,7 +10,7 @@ type Object struct {
 	Name        string    `json:"name"`
 	Address     string    `json:"address"`
 	Description string    `json:"description"`
-	Layers      []Layer   `json:"layers" gorm:"foreignKey:ObjectID"`
+	Layers      []Layer   `json:"layers" gorm:"-"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
@@ -22,24 +22,45 @@ type NewObject struct {
 }
 
 type Layer struct {
-	ID          uuid.UUID `json:"id" gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
-	ObjectID    uuid.UUID `json:"object_id"`
-	FloorName   string    `json:"floor_name"`
-	Devices     []Device  `json:"devices,omitempty" gorm:"foreignKey:LayerID"`
-	CoordinateX float64   `json:"coordinate_x"`
-	CoordinateY float64   `json:"coordinate_y"`
-	Image       string    `json:"image"`
-	Angle       float64   `json:"angle"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID                uuid.UUID    `json:"id"`
+	ObjectID          uuid.UUID    `json:"object_id"`
+	FloorName         string       `json:"floor_name"`
+	Devices           []Device     `json:"devices,omitempty"`
+	CoordinateX       float64      `json:"coordinate_x"`
+	CoordinateY       float64      `json:"coordinate_y"`
+	AnglesCoordinates []Coordinate `json:"angles_coordinates"`
+	Image             string       `json:"image"`
+	Angle             float64      `json:"angle"`
+	CreatedAt         time.Time    `json:"created_at"`
+	UpdatedAt         time.Time    `json:"updated_at"`
+}
+
+type Coordinate struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+}
+
+type LayerForDB struct {
+	ID                uuid.UUID `json:"id" gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
+	ObjectID          uuid.UUID `json:"object_id"`
+	FloorName         string    `json:"floor_name"`
+	Devices           []Device  `json:"devices,omitempty" gorm:"foreignKey:LayerID"`
+	CoordinateX       float64   `json:"coordinate_x"`
+	CoordinateY       float64   `json:"coordinate_y"`
+	AnglesCoordinates string    `json:"angles_coordinates"`
+	Image             string    `json:"image"`
+	Angle             float64   `json:"angle"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
 }
 
 type NewLayer struct {
-	Image       string  `json:"image"`
-	FloorName   string  `json:"floor_name"`
-	CoordinateX float64 `json:"coordinate_x"`
-	CoordinateY float64 `json:"coordinate_y"`
-	Angle       float64 `json:"angle"`
+	Image             string       `json:"image"`
+	FloorName         string       `json:"floor_name"`
+	CoordinateX       float64      `json:"coordinate_x"`
+	CoordinateY       float64      `json:"coordinate_y"`
+	Angle             float64      `json:"angle"`
+	AnglesCoordinates []Coordinate `json:"angles_coordinates"`
 }
 
 type DeviceType string

@@ -17,6 +17,13 @@ definitions:
       title:
         type: string
     type: object
+  entity.Coordinate:
+    properties:
+      x:
+        type: number
+      "y":
+        type: number
+    type: object
   entity.Device:
     properties:
       created_at:
@@ -58,6 +65,10 @@ definitions:
     properties:
       angle:
         type: number
+      angles_coordinates:
+        items:
+          $ref: '#/definitions/entity.Coordinate'
+        type: array
       coordinate_x:
         type: number
       coordinate_y:
@@ -116,6 +127,10 @@ definitions:
     properties:
       angle:
         type: number
+      angles_coordinates:
+        items:
+          $ref: '#/definitions/entity.Coordinate'
+        type: array
       coordinate_x:
         type: number
       coordinate_y:

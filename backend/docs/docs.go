@@ -1038,6 +1038,17 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.Coordinate": {
+            "type": "object",
+            "properties": {
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                }
+            }
+        },
         "entity.Device": {
             "type": "object",
             "properties": {
@@ -1096,6 +1107,12 @@ const docTemplate = `{
             "properties": {
                 "angle": {
                     "type": "number"
+                },
+                "angles_coordinates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Coordinate"
+                    }
                 },
                 "coordinate_x": {
                     "type": "number"
@@ -1184,6 +1201,12 @@ const docTemplate = `{
             "properties": {
                 "angle": {
                     "type": "number"
+                },
+                "angles_coordinates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Coordinate"
+                    }
                 },
                 "coordinate_x": {
                     "type": "number"

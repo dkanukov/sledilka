@@ -26,8 +26,8 @@ func Post(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	if errRes != nil {
 		errRes.WriteResponse(w)
 	}
-	if res := db.Find(&entity.Layer{ID: newReq.LayerID}); res.RowsAffected == 0 {
-		w.WriteHeader(http.StatusBadRequest)
+	if res := db.Find(&entity.LayerForDB{ID: newReq.LayerID}); res.RowsAffected == 0 {
+		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("layer not found"))
 		return
 	}

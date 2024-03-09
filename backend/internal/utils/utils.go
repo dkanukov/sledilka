@@ -10,6 +10,7 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
+	"sort"
 	"time"
 )
 
@@ -26,9 +27,11 @@ func ValidateBody[T any](r *http.Request) (T, *errors.ResponseError) {
 }
 
 func SetLayers(db *gorm.DB, object *entity.Object) {
-	var layers []entity.Layer
-	db.Find(&layers, &entity.Layer{ObjectID: object.ID})
-	for i := range layers {
+	var layersDB []entity.LayerForDB
+	db.Find(&layersDB, &entity.LayerForDB{ObjectID: object.ID})
+	layers := make([]entity.Layer, len(layersDB))
+	for i := range layersDB {
+		layers[i] = DBFormatToLayer(layersDB[i])
 		SetDevices(db, &layers[i])
 	}
 	object.Layers = layers
@@ -77,6 +80,16 @@ func NewEntities() {
 		CoordinateY: 10,
 		CoordinateX: 10,
 		Angle:       0,
+		AnglesCoordinates: []entity.Coordinate{
+			{
+				X: 40.799311,
+				Y: -74.118464,
+			},
+			{
+				X: 40.68202047785919,
+				Y: -74.33,
+			},
+		},
 	}
 	body, _ = json.Marshal(newLayer)
 	resp, _ = http.Post(
@@ -105,4 +118,40 @@ func NewEntities() {
 		"application/json",
 		bytes.NewReader(body),
 	)
+}
+
+func LayerToDBFormat(layer entity.Layer) entity.LayerForDB {
+	b, _ := json.Marshal(&layer.AnglesCoordinates)
+	return entity.LayerForDB{
+		ID:                layer.ID,
+		ObjectID:          layer.ObjectID,
+		FloorName:         layer.FloorName,
+		CoordinateX:       layer.CoordinateX,
+		CoordinateY:       layer.CoordinateY,
+		Image:             layer.Image,
+		Angle:             layer.Angle,
+		AnglesCoordinates: string(b),
+		CreatedAt:         layer.CreatedAt,
+		UpdatedAt:         layer.UpdatedAt,
+	}
+}
+
+func DBFormatToLayer(layer entity.LayerForDB) entity.Layer {
+	var coors []entity.Coordinate
+	_ = json.Unmarshal([]byte(layer.AnglesCoordinates), &coors)
+	sort.Slice(coors, func(i, j int) bool {
+		return coors[i].X < coors[j].X
+	})
+	return entity.Layer{
+		ID:                layer.ID,
+		ObjectID:          layer.ObjectID,
+		FloorName:         layer.FloorName,
+		CoordinateX:       layer.CoordinateX,
+		CoordinateY:       layer.CoordinateY,
+		Image:             layer.Image,
+		Angle:             layer.Angle,
+		AnglesCoordinates: coors,
+		CreatedAt:         layer.CreatedAt,
+		UpdatedAt:         layer.UpdatedAt,
+	}
 }

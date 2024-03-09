@@ -29,7 +29,7 @@ func StartupDB() (*gorm.DB, error) {
 		&entity.Review{},
 		&entity.Announcement{},
 		&entity.Object{},
-		&entity.Layer{},
+		&entity.LayerForDB{},
 		&entity.Device{},
 	)
 	if err != nil {

@@ -1031,6 +1031,17 @@
                 }
             }
         },
+        "entity.Coordinate": {
+            "type": "object",
+            "properties": {
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                }
+            }
+        },
         "entity.Device": {
             "type": "object",
             "properties": {
@@ -1089,6 +1100,12 @@
             "properties": {
                 "angle": {
                     "type": "number"
+                },
+                "angles_coordinates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Coordinate"
+                    }
                 },
                 "coordinate_x": {
                     "type": "number"
@@ -1177,6 +1194,12 @@
             "properties": {
                 "angle": {
                     "type": "number"
+                },
+                "angles_coordinates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Coordinate"
+                    }
                 },
                 "coordinate_x": {
                     "type": "number"

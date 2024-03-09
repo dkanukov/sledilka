@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	gmux "github.com/gorilla/mux"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -46,22 +47,33 @@ func Post(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		w.Write([]byte("image not found"))
 		return
 	}
-
-	layer := entity.Layer{
-		ObjectID:    id,
-		FloorName:   newReq.FloorName,
-		CoordinateX: newReq.CoordinateX,
-		CoordinateY: newReq.CoordinateY,
-		Image:       newReq.Image,
-		Angle:       newReq.Angle,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+	if len(newReq.AnglesCoordinates) != 2 {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("angles coordinates must be 2"))
+		return
+	}
+	b, err := json.Marshal(&newReq.AnglesCoordinates)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+	layer := entity.LayerForDB{
+		ObjectID:          id,
+		FloorName:         newReq.FloorName,
+		CoordinateX:       newReq.CoordinateX,
+		CoordinateY:       newReq.CoordinateY,
+		Image:             newReq.Image,
+		Angle:             newReq.Angle,
+		AnglesCoordinates: string(b),
+		CreatedAt:         time.Now(),
+		UpdatedAt:         time.Now(),
 	}
 
 	if res := db.Create(&layer); res.Error != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	b, _ := json.Marshal(layer)
+	b, _ = json.Marshal(utils.DBFormatToLayer(layer))
 	w.Write(b)
 }
 
@@ -90,10 +102,16 @@ func Patch(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		errorMessage.WriteResponse(w)
 		return
 	}
-	layer := entity.Layer{ID: id, ObjectID: objectId}
-	res := db.Find(&layer)
+	layerDB := entity.LayerForDB{ID: id, ObjectID: objectId}
+	res := db.Find(&layerDB)
 	if res.RowsAffected == 0 {
 		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	layer := utils.DBFormatToLayer(layerDB)
+	if len(layer.AnglesCoordinates) != 2 {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("angles coordinates must be 2"))
 		return
 	}
 	if err = json.NewDecoder(r.Body).Decode(&layer); err != nil {
@@ -101,7 +119,8 @@ func Patch(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		return
 	}
 	layer.UpdatedAt = time.Now()
-	db.Save(&layer)
+	layerDB = utils.LayerToDBFormat(layer)
+	db.Save(&layerDB)
 	utils.SetDevices(db, &layer)
 	json.NewEncoder(w).Encode(&layer)
 }
