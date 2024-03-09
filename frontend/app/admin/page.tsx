@@ -4,7 +4,6 @@ import { useEffect } from 'react'
 
 import styles from './admin.module.css'
 
-import { ObjectStorage } from '@models'
 import { Sidebar, Map } from '@components'
 import { useObjectsStore } from '@store'
 
@@ -15,19 +14,20 @@ export default function Admin() {
 		objectsStore.fetchObjects()
 	}, [])
 
-	const handleSelectStorage = (objectStorage: ObjectStorage) => {
-		objectsStore.handleSelectedStorageChange(objectStorage)
+	const handleSelectLayer = (key: string) => {
+		objectsStore.handleSelectedLayerChange(key)
 	}
 
 	return (
 		<div className={styles.root}>
 			<Sidebar
 				items={objectsStore.objects}
-				whenClick={handleSelectStorage}
+				selectedItem={objectsStore.selectedLayer?.id ?? ''}
+				whenClick={handleSelectLayer}
 			/>
-			{objectsStore.selectedObject && (
+			{objectsStore.selectedLayer && (
 				<Map
-					objectStorage={objectsStore.selectedObject}
+					selectedLayer={objectsStore.selectedLayer}
 				/>
 			)}
 		</div>

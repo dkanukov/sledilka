@@ -1,3 +1,7 @@
+:root {
+	--z-index-max-overlay: 2000; 
+}
+
 * {
     margin: 0;
     padding: 0;

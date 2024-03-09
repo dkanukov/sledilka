@@ -1,4 +1,17 @@
 .map {
+	position: relative;
     min-height: 100vh;
     width: 100%;
+}
+
+.mapControl {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+
+	position: absolute;
+	right: 0;
+	z-index: var(--z-index-max-overlay);
+
+	padding: 20px;
 }
