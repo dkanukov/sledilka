@@ -6,6 +6,7 @@ import (
 	"backend/internal/handlers/devices"
 	"backend/internal/handlers/images"
 	"backend/internal/handlers/layer"
+	"backend/internal/handlers/luminance"
 	"backend/internal/handlers/object"
 	"backend/internal/handlers/review"
 	"backend/internal/handlers/streaming"
@@ -201,6 +202,10 @@ func GetHandlers(db *gorm.DB, tokenerClient tokener.TokenerClient) *gmux.Router 
 			writer.WriteHeader(http.StatusMethodNotAllowed)
 		}
 	}).Methods(http.MethodPost)
+
+	router.HandleFunc("/isLowLight/{id}", func(w http.ResponseWriter, r *http.Request) {
+		luminance.IsLowLighted(w, r, db)
+	}).Methods(http.MethodGet)
 
 	return router
 }

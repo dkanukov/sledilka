@@ -1,5 +1,18 @@
 import cv2, time
 
+
+def get_one_frame(url: str):
+    cap = cv2.VideoCapture(url)
+    success, frame = cap.read()
+    if not success:
+        return None
+    ret, buf = cv2.imencode(".jpg", frame)
+    if not ret:
+        return None
+
+    return buf.tobytes()
+
+
 def generate_frame(url: str):
     cap = cv2.VideoCapture(url)
     while True:

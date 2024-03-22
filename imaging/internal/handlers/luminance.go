@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/disintegration/imaging"
 	"image"
 	"imaging/internal/luminance"
@@ -41,5 +41,11 @@ func Luminance(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println(format)
 	lum := imaging.Histogram(img)
-	w.Write(fmt.Append(nil, luminance.IsLowLight(lum)))
+	b, err := json.Marshal(luminance.IsLowLight(lum))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err)
+		return
+	}
+	w.Write(b)
 }

@@ -467,6 +467,26 @@ paths:
       summary: Load File
       tags:
       - images
+  /isLowLight/{id}:
+    get:
+      parameters:
+      - description: Device ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "500":
+          description: Internal Server Error
+      summary: получить трансляцию
+      tags:
+      - isLowLight
   /new:
     post:
       responses:
