@@ -21,6 +21,11 @@ export interface EntityAnnouncement {
   title?: string;
 }
 
+export interface EntityCoordinate {
+  x?: number;
+  y?: number;
+}
+
 export interface EntityDevice {
   created_at?: string;
   id?: string;
@@ -45,6 +50,7 @@ export enum EntityDeviceType {
 
 export interface EntityLayer {
   angle?: number;
+  angles_coordinates?: EntityCoordinate[];
   coordinate_x?: number;
   coordinate_y?: number;
   created_at?: string;
@@ -80,6 +86,7 @@ export interface EntityNewDevice {
 
 export interface EntityNewLayer {
   angle?: number;
+  angles_coordinates?: EntityCoordinate[];
   coordinate_x?: number;
   coordinate_y?: number;
   floor_name?: string;

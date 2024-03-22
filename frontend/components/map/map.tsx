@@ -45,8 +45,8 @@ export const Map = (props: Props) => {
 			return
 		}
 
-		mapRef.setView([/* props.selectedLayer.coordinateX, props.selectedLayer.coordinateY */40.799311, -74.118464], 13)
-		imageOverlay('https://maps.lib.utexas.edu/maps/historical/newark_nj_1922.jpg', [[40.799311, -74.118464], [40.68202047785919, -74.33]]).addTo(mapRef)
+		imageOverlay(`http://localhost:8081/images/${props.selectedLayer.image}`, [props.selectedLayer.lan, props.selectedLayer.lot]).addTo(mapRef)
+		mapRef.fitBounds([props.selectedLayer.lan, props.selectedLayer.lot])
 	}, [props.selectedLayer, mapRef])
 
 	const toggleTileLayer = () => {

@@ -33,6 +33,8 @@ export class ObjectLayer {
 	createdAt!: string
 	updatedAt!: string
 	devices!: Device[]
+	lan!: [number, number]
+	lot!: [number, number]
 
 	constructor(dto: EntityLayer) {
 		this.id = dto.id || ''
@@ -42,6 +44,8 @@ export class ObjectLayer {
 		this.angle = dto.angle
 		this.coordinateX = dto.coordinate_x || 0
 		this.coordinateY = dto.coordinate_y || 0
+		this.lan = [dto.angles_coordinates?.[0].x ?? 0, dto.angles_coordinates?.[0].y ?? 0]
+		this.lot = [dto.angles_coordinates?.[1].x ?? 0, dto.angles_coordinates?.[1].y ?? 0]
 		this.image = dto.image
 		this.createdAt = dto.created_at || ''
 		this.updatedAt = dto.updated_at || ''
