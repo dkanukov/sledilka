@@ -29,7 +29,8 @@
     "react-dom": "^18.2.0",
     "react-multi-carousel": "^2.8.4",
     "swagger-typescript-api": "^13.0.3",
-    "three": "^0.160.0"
+    "three": "^0.160.0",
+    "zustand": "^4.5.0"
   },
   "devDependencies": {
     "@types/node": "^20",
