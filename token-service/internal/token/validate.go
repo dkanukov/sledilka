@@ -1,57 +1,51 @@
 package token
 
 import (
-	"context"
-	"encoding/json"
-	"net/http"
-
-	"github.com/redis/go-redis/v9"
+	"fmt"
+	"github.com/golang-jwt/jwt/v5"
+	"time"
 )
 
-type ValidateTokenRequest struct {
-	Token string `json:"token"`
+func Validate(token string) (string, error) {
+	return validate(token, false)
 }
 
-type ValidateTokenResponse struct {
-	UserId string `json:"user_id"`
-}
-
-func Validate(
-	w http.ResponseWriter,
-	r *http.Request,
-	ctx *context.Context,
-	redisClient *redis.Client,
-) {
-	var requestBody ValidateTokenRequest
-
-	err := json.NewDecoder(r.Body).Decode(&requestBody)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	token, err := redisClient.Get(*ctx, requestBody.Token).Result()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
-	}
-
-	userId, err := redisClient.Get(*ctx, token).Result()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
-	}
-
-	if token == requestBody.Token {
-		response, err := json.Marshal(&ValidateTokenResponse{
-			UserId: userId,
-		})
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusNotFound)
+func validate(inputToken string, isRefresh bool) (userId string, err error) {
+	token, err := jwt.Parse(inputToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("there's an error with the signing method")
 		}
+		return jwtSecretKey, nil
 
-		w.Write(response)
-		return
+	})
+	if err != nil {
+		return userId, err
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return userId, fmt.Errorf("unable to extract claims")
+	}
+	var exp time.Time
+	switch iat := claims["exp"].(type) {
+	case float64:
+		exp = time.Unix(int64(iat), 0)
+	default:
+		return "", fmt.Errorf("unable to extract claim expires_at")
+	}
+	if time.Now().After(exp) {
+		return userId, fmt.Errorf("expired token")
+	}
+	isRefreshToken, ok := claims["is_refresh"].(bool)
+	if !ok {
+		return userId, fmt.Errorf("unable to extract claim is_refresh")
+	}
+	if isRefreshToken != isRefresh {
+		return userId, fmt.Errorf("you sent incorrect token")
+	}
+	userID, ok := claims["sub"].(string)
+	if !ok {
+		return userId, fmt.Errorf("unable to extract claim userID")
 	}
 
-	http.Error(w, "invalid token", http.StatusUnauthorized)
+	return userID, nil
 }

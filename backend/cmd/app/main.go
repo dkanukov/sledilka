@@ -2,6 +2,9 @@ package main
 
 import (
 	"backend/internal/db"
+	"backend/internal/tokener"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/http"
 
@@ -30,7 +33,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	router := handlers.GetHandlers(DBConnection)
+	conn, err := grpc.Dial("token-service:8082", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatal(err)
+	}
+	tokenerClient := tokener.NewTokenerClient(conn)
+	router := handlers.GetHandlers(DBConnection, tokenerClient)
 	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 	router.HandleFunc("/swagger", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/swagger/", http.StatusSeeOther)

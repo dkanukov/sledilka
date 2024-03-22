@@ -1,11 +1,4 @@
 definitions:
-  authorization.CreateTokenResponse:
-    properties:
-      access_token:
-        type: string
-      refresh_token:
-        type: string
-    type: object
   entity.Announcement:
     properties:
       createdAt:
@@ -204,11 +197,38 @@ definitions:
       username:
         type: string
     type: object
-  entity.UserToken:
+  timestamppb.Timestamp:
     properties:
-      expires_in:
+      nanos:
+        description: |-
+          Non-negative fractions of a second at nanosecond resolution. Negative
+          second values with fractions must still have non-negative nanos values
+          that count forward in time. Must be from 0 to 999,999,999
+          inclusive.
         type: integer
-      token:
+      seconds:
+        description: |-
+          Represents seconds of UTC time since Unix epoch
+          1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
+          9999-12-31T23:59:59Z inclusive.
+        type: integer
+    type: object
+  tokener.CreateTokenResponse:
+    properties:
+      access_token:
+        type: string
+      expires_at:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      refresh_token:
+        type: string
+    type: object
+  tokener.RefreshTokenResponse:
+    properties:
+      access_token:
+        type: string
+      expires_at:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      refresh_token:
         type: string
     type: object
 host: 0.0.0.0:8081
@@ -623,7 +643,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.UserToken'
+            $ref: '#/definitions/tokener.RefreshTokenResponse'
         "500":
           description: Internal Server Error
       summary: Обновить токен
@@ -772,6 +792,24 @@ paths:
       summary: Изменить отзыв
       tags:
       - reviews
+  /stream/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Device ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "500":
+          description: Internal Server Error
+      summary: получить трансляцию
+      tags:
+      - stream
   /token:
     post:
       consumes:
@@ -789,7 +827,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/authorization.CreateTokenResponse'
+            $ref: '#/definitions/tokener.CreateTokenResponse'
         "500":
           description: Internal Server Error
       summary: Авторизоваться

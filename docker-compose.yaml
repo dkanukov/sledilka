@@ -13,34 +13,30 @@ services:
     #   - ./secrets/.env
     ports:
       - "5432:5432"
-  redis:
-      image: redis:latest
-      restart: always
-      ports:
-        - "6379:6379"
-      environment:
-        - REDIS_PASSWORD=""
-        - REDIS_PORT=6379
-        - REDIS_DATABASES=0
+  token-service:
+    build: token-service/.
+    ports:
+      - "8082:8082"
   backend:
     build: backend/.
     ports:
     - "8081:8081"
     depends_on: 
     - db
-  token-service:
-    build: token-service/.
-    depends_on: 
-    - redis
-    ports:
-    - "8082:8082"
-  frontend:
-    build: frontend/.
-    ports:
-    - "3000:3000"
+    - token-service
+    - streaming-service
+    - imaging-service
+#  frontend:
+#    build: frontend/.
+#    ports:
+#    - "3000:3000"
   imaging-service:
     build: imaging/.
     ports:
     - "8088:8088"
+  streaming-service:
+    build: streaming-service/.
+    ports:
+      - "8181:8181"
 volumes:
   postgres_data:

@@ -2,106 +2,15 @@ package authorization
 
 import (
 	"backend/internal/entity"
+	"backend/internal/tokener"
 	"backend/internal/utils"
-	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/context"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"log"
 	"net/http"
-	"strconv"
-	"time"
 )
-
-const (
-	TokenServiceURL = "http://token-service:8082"
-)
-
-type ValidateTokenRequest struct {
-	Token string `json:"token"`
-}
-
-type ValidateTokenResponse struct {
-	UserId string `json:"user_id"`
-}
-
-type TokenRequest struct {
-	UserId int `json:"user_id"`
-}
-type RefreshTokenRequest struct {
-	Token string `json:"token"`
-}
-
-type RefreshTokenResponse struct {
-	AccessToken string `json:"access_token"`
-}
-
-type CreateTokenResponse struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-}
-
-func refreshToken(token string) error {
-	// TODO
-	return nil
-}
-
-func createToken(UserId int64) (*CreateTokenResponse, error) {
-	body := TokenRequest{UserId: int(UserId)}
-	var buf bytes.Buffer
-	err := json.NewEncoder(&buf).Encode(body)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	request, err := http.NewRequest(http.MethodPost, TokenServiceURL+"/create-token", &buf)
-	client := &http.Client{}
-	if err != nil {
-		return nil, err
-	}
-	resp, err := client.Do(request)
-	if err != nil {
-		return nil, err
-	}
-	var token CreateTokenResponse
-	decoder := json.NewDecoder(resp.Body)
-	err = decoder.Decode(&token)
-	if err != nil {
-		return nil, err
-	}
-	return &token, nil
-}
-
-func VerifyUser(token string) (UserId int64, statusCode int) {
-	body := ValidateTokenRequest{Token: token}
-	var buf bytes.Buffer
-	err := json.NewEncoder(&buf).Encode(body)
-	if err != nil {
-		log.Println(err)
-		return 0, http.StatusInternalServerError
-	}
-	request, err := http.NewRequest(http.MethodPost, TokenServiceURL+"/create-token", &buf)
-	client := &http.Client{}
-	if err != nil {
-		return 0, http.StatusInternalServerError
-	}
-	resp, err := client.Do(request)
-	if err != nil {
-		return 0, http.StatusInternalServerError
-	}
-	if resp.StatusCode != 200 {
-		return 0, http.StatusUnauthorized
-	}
-	var val ValidateTokenResponse
-	decoder := json.NewDecoder(resp.Body)
-	err = decoder.Decode(&val)
-	if err != nil {
-		return 0, http.StatusInternalServerError
-	}
-	userId, _ := strconv.Atoi(val.UserId)
-	return int64(userId), http.StatusOK
-}
 
 func Auth(username string, password string, db *gorm.DB) (UserID int64, ok bool) {
 	user := entity.User{}
@@ -116,21 +25,21 @@ func Auth(username string, password string, db *gorm.DB) (UserID int64, ok bool)
 	return user.Id, true
 }
 
-func JwtAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func JwtAuthMiddleware(next http.HandlerFunc, client tokener.TokenerClient) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		authToken := r.Header.Get("X-Auth-Token")
 		if len(authToken) == 0 {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		userID, status := VerifyUser(authToken)
-		if status != http.StatusOK {
-			w.WriteHeader(status)
+		userID, err := client.ValidateToken(r.Context(), &tokener.ValidateTokenRequest{AccessToken: authToken})
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		context.Set(r, "x-user-id", userID)
+		context.Set(r, "x-user-id", userID.GetUserId())
 		next(w, r)
-	})
+	}
 }
 
 // @Summary	Авторизоваться
@@ -138,10 +47,10 @@ func JwtAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 // @Accept		json
 // @Produce	json
 // @Param		request	body	entity.LoginInfo	true	"Регистрационная информация"
-// @Success	200		{object}	CreateTokenResponse
+// @Success	200		{object}	tokener.CreateTokenResponse
 // @Failure	500
 // @Router		/token [post]
-func Token(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+func Token(w http.ResponseWriter, r *http.Request, db *gorm.DB, client tokener.TokenerClient) {
 	loginData, respErr := utils.ValidateBody[entity.LoginInfo](r)
 	if respErr != nil {
 		respErr.WriteResponse(w)
@@ -156,9 +65,10 @@ func Token(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	token, err := createToken(userId)
+	token, err := client.CreateToken(r.Context(), &tokener.CreateTokenRequest{UserId: fmt.Sprint(userId)})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(fmt.Append(nil, err))
 		return
 	}
 	b, _ := json.Marshal(token)
@@ -170,19 +80,21 @@ func Token(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 // @Accept		mpfd
 // @Produce	json
 // @Param token query string true "token"
-// @Success	200		{object}	entity.UserToken
+// @Success	200		{object}	tokener.RefreshTokenResponse
 // @Failure	500
 // @Router		/refresh [post]
-func Refresh(writer http.ResponseWriter, request *http.Request) {
+func Refresh(writer http.ResponseWriter, request *http.Request, client tokener.TokenerClient) {
 	token := request.Header.Get("X-Auth-Token")
 	if token == "" {
 		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	//if err := refreshToken(redis, token); !ok {
-	//	writer.WriteHeader(http.StatusUnauthorized)
-	//	return
-	//}
-	b, _ := json.Marshal(entity.UserToken{Token: token, ExpiresIn: int64(time.Hour.Seconds())})
+	newToken, err := client.RefreshToken(request.Context(), &tokener.RefreshTokenRequest{RefreshToken: token})
+	if err != nil {
+		writer.WriteHeader(http.StatusUnauthorized)
+		writer.Write(fmt.Append(nil, err))
+		return
+	}
+	b, _ := json.Marshal(newToken)
 	writer.Write(b)
 }

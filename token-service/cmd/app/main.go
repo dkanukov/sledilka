@@ -1,52 +1,27 @@
 package main
 
 import (
-	"context"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"log"
-	"net/http"
-
-	"github.com/redis/go-redis/v9"
-	"github.com/rs/cors"
-
-	"token-service/internal/router"
+	"net"
+	"token-service/internal/app"
+	"token-service/internal/tokener"
 )
 
 const (
 	serverAddr = "0.0.0.0:8082"
-	redisAddr  = "redis:6379"
 )
 
 func main() {
-	ctx := context.Background()
-
-	redisClient := redis.NewClient(&redis.Options{
-		Addr:     redisAddr,
-		Password: "",
-		DB:       0,
-	})
-
-	err := redisClient.Ping(ctx).Err()
+	lis, err := net.Listen("tcp", serverAddr)
 	if err != nil {
-		log.Println(err)
-		log.Fatal("Can't connect to redis client")
+		log.Fatalf("failed to listen: %v", err)
 	}
-
-	router := router.GetHandlers(&ctx, redisClient)
-
-	cors := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
-		AllowedMethods: []string{
-			http.MethodPost,
-			http.MethodGet,
-		},
-		AllowedHeaders:   []string{"*"},
-		AllowCredentials: false,
-	})
-
-	app := http.Server{
-		Addr:    serverAddr,
-		Handler: cors.Handler(router),
-	}
-
-	log.Fatal(app.ListenAndServe())
+	s := grpc.NewServer()
+	reflection.Register(s)
+	tokenerService := app.New()
+	tokener.RegisterTokenerServer(s, tokenerService)
+	log.Println("starting grpc")
+	log.Fatal(s.Serve(lis))
 }

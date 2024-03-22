@@ -109,7 +109,7 @@ func NewEntities() {
 		LayerID:    lay.ID,
 		LocationX:  0,
 		LocationY:  0,
-		IpAddress:  "127.0.0.1",
+		IpAddress:  "pipipi.mp4",
 		MacAddress: "00:1b:63:84:45:e6",
 	}
 	body, _ = json.Marshal(newDev)

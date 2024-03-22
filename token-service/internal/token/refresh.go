@@ -1,84 +1,23 @@
 package token
 
 import (
-	"context"
-	"encoding/json"
-	"net/http"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
-
-	"github.com/golang-jwt/jwt"
-	"github.com/redis/go-redis/v9"
-
-	"token-service/internal/utils"
+	"token-service/internal/tokener"
 )
 
-type RefreshTokenRequest struct {
-	Token string `json:"token"`
-}
-
-type RefreshTokenResponse struct {
-	AccessToken string `json:"access_token"`
-}
-
-func Refresh(
-	w http.ResponseWriter,
-	r *http.Request,
-	ctx *context.Context,
-	redisClient *redis.Client,
-) {
-	w.Header().Set("Content-Type", "application/json")
-	var requestBody RefreshTokenRequest
-
-	err := json.NewDecoder(r.Body).Decode(&requestBody)
+func Refresh(refreshToken string) (*tokener.RefreshTokenResponse, error) {
+	userID, err := validate(refreshToken, true)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+		return nil, err
 	}
-
-	userId, err := redisClient.Get(*ctx, requestBody.Token).Result()
+	accessToken, err := create(userID, TokenLiveTimeShort)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
+		return nil, err
 	}
-
-	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.StandardClaims{
-		ExpiresAt: utils.TokenExpire(TokenLiveTimeShort),
-		IssuedAt:  time.Now().Unix(),
-		Id:        userId,
-	})
-
-	signedAccessToken, err := accessToken.SignedString([]byte(JwtSecretKey))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	oldAccessToken, err := redisClient.Get(*ctx, userId).Result()
-	if err == nil {
-		redisClient.Del(*ctx, userId)
-		redisClient.Del(*ctx, oldAccessToken)
-	}
-
-	redisErr := redisClient.SetEx(*ctx, signedAccessToken, userId, 10*time.Minute).
-		Err()
-	if redisErr != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	redisErr = redisClient.SetEx(*ctx, userId, signedAccessToken, 10*time.Minute).
-		Err()
-	if redisErr != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	response, err := json.Marshal(&RefreshTokenResponse{
-		AccessToken: signedAccessToken,
-	})
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	w.Write(response)
+	return &tokener.RefreshTokenResponse{
+		RefreshToken: refreshToken,
+		AccessToken:  accessToken,
+		ExpiresAt:    timestamppb.New(time.Now().Add(TokenLiveTimeShort)),
+	}, nil
 }

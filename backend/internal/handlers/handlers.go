@@ -8,29 +8,17 @@ import (
 	"backend/internal/handlers/layer"
 	"backend/internal/handlers/object"
 	"backend/internal/handlers/review"
+	"backend/internal/handlers/streaming"
 	"backend/internal/handlers/user"
+	"backend/internal/tokener"
 	"backend/internal/utils"
-	"encoding/json"
 	gmux "github.com/gorilla/mux"
 	"gorm.io/gorm"
 	"net/http"
 )
 
-func GetHandlers(db *gorm.DB) *gmux.Router {
+func GetHandlers(db *gorm.DB, tokenerClient tokener.TokenerClient) *gmux.Router {
 	router := gmux.NewRouter()
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			b, err := json.Marshal("Hello world")
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			_, _ = w.Write(b)
-		default:
-			w.WriteHeader(http.StatusMethodNotAllowed)
-		}
-	}).Methods(http.MethodGet)
 
 	router.HandleFunc("/announcement", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -56,7 +44,7 @@ func GetHandlers(db *gorm.DB) *gmux.Router {
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
-	})).Methods(http.MethodGet, http.MethodDelete, http.MethodPatch, http.MethodPut)
+	}, tokenerClient)).Methods(http.MethodGet, http.MethodDelete, http.MethodPatch, http.MethodPut)
 
 	router.HandleFunc("/review", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -82,7 +70,7 @@ func GetHandlers(db *gorm.DB) *gmux.Router {
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
-	})).Methods(http.MethodGet, http.MethodDelete, http.MethodPatch, http.MethodPut)
+	}, tokenerClient)).Methods(http.MethodGet, http.MethodDelete, http.MethodPatch, http.MethodPut)
 
 	router.HandleFunc("/user", func(writer http.ResponseWriter, request *http.Request) {
 		switch request.Method {
@@ -106,7 +94,7 @@ func GetHandlers(db *gorm.DB) *gmux.Router {
 	router.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
-			authorization.Token(w, r, db)
+			authorization.Token(w, r, db, tokenerClient)
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
@@ -191,14 +179,28 @@ func GetHandlers(db *gorm.DB) *gmux.Router {
 	router.HandleFunc("/new", func(w http.ResponseWriter, r *http.Request) {
 		utils.NewEntities()
 	}).Methods(http.MethodPost)
-	//router.HandleFunc("/refresh", func(writer http.ResponseWriter, request *http.Request) {
-	//	switch request.Method {
-	//	case http.MethodPut:
-	//		authorization.Refresh(writer, request)
-	//	default:
-	//		writer.WriteHeader(http.StatusMethodNotAllowed)
-	//	}
-	//})
+
+	router.HandleFunc("/stream/{id}", func(w http.ResponseWriter, r *http.Request) {
+		streaming.Get(w, r, db)
+	}).Methods(http.MethodGet)
+
+	router.HandleFunc("/token", func(writer http.ResponseWriter, request *http.Request) {
+		switch request.Method {
+		case http.MethodPost:
+			authorization.Token(writer, request, db, tokenerClient)
+		default:
+			writer.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}).Methods(http.MethodPost)
+
+	router.HandleFunc("/refresh", func(writer http.ResponseWriter, request *http.Request) {
+		switch request.Method {
+		case http.MethodPost:
+			authorization.Refresh(writer, request, tokenerClient)
+		default:
+			writer.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}).Methods(http.MethodPost)
 
 	return router
 }

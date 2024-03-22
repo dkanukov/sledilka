@@ -646,7 +646,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.UserToken"
+                            "$ref": "#/definitions/tokener.RefreshTokenResponse"
                         }
                     },
                     "500": {
@@ -882,6 +882,34 @@ const docTemplate = `{
                 }
             }
         },
+        "/stream/{id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stream"
+                ],
+                "summary": "получить трансляцию",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Device ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/token": {
             "post": {
                 "consumes": [
@@ -909,7 +937,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/authorization.CreateTokenResponse"
+                            "$ref": "#/definitions/tokener.CreateTokenResponse"
                         }
                     },
                     "500": {
@@ -1010,17 +1038,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "authorization.CreateTokenResponse": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "refresh_token": {
-                    "type": "string"
-                }
-            }
-        },
         "entity.Announcement": {
             "type": "object",
             "properties": {
@@ -1321,13 +1338,43 @@ const docTemplate = `{
                 }
             }
         },
-        "entity.UserToken": {
+        "timestamppb.Timestamp": {
             "type": "object",
             "properties": {
-                "expires_in": {
+                "nanos": {
+                    "description": "Non-negative fractions of a second at nanosecond resolution. Negative\nsecond values with fractions must still have non-negative nanos values\nthat count forward in time. Must be from 0 to 999,999,999\ninclusive.",
                     "type": "integer"
                 },
-                "token": {
+                "seconds": {
+                    "description": "Represents seconds of UTC time since Unix epoch\n1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to\n9999-12-31T23:59:59Z inclusive.",
+                    "type": "integer"
+                }
+            }
+        },
+        "tokener.CreateTokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "tokener.RefreshTokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "refresh_token": {
                     "type": "string"
                 }
             }

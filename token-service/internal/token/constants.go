@@ -5,6 +5,8 @@ import (
 )
 
 const (
-	TokenLiveTimeShort = 10 * time.Minute
-	TokenLiveTimeLong  = 12 * time.Hour
+	TokenLiveTimeShort = 1 * time.Hour
+	TokenLiveTimeLong  = 24 * time.Hour
 )
+
+var jwtSecretKey = []byte("c5d60d79-09cb-44a1-a934-e05fb12c2953")
