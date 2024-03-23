@@ -38,8 +38,8 @@
 
 ## Разработчики
 
-- [@dkanukov]([https://www.github.com/octokatherine](https://github.com/dkanukov))
-- [@gevorg-tsat]([https://www.github.com/octokatherine](https://github.com/gevorg-tsat))
+- [@dkanukov](https://github.com/dkanukov)
+- [@gevorg-tsat](https://github.com/gevorg-tsat)
 
 ## [Документация](https://linktodocumentation)
 
