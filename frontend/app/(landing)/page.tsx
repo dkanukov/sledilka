@@ -1,9 +1,9 @@
 'use client'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { Image, Typography } from 'antd'
+import { Image, List, Typography } from 'antd'
 import Carousel from 'react-multi-carousel'
 
 import styles from './index.module.css'
@@ -13,6 +13,13 @@ const { Title, Text, Paragraph } = Typography
 export default function Landing() {
 	const containerRef = useRef<HTMLDivElement>(null)
 	const renderer = useRef(new THREE.WebGLRenderer())
+	const [listRows] = useState([
+		'Просмотр текущего состояния устройств на карте: Наша система позволяет вам в реальном времени отслеживать расположение и состояние всех устройств в вашей локальной сети с помощью удобного интерфейса карты.',
+		'Просмотр видео с камер: Вы можете легко получать доступ к видеопотокам с камер видеонаблюдения, установленным в вашей организации, прямо через наше приложение.',
+		'Создание объектов и добавление слоев на карту: Вы можете создавать и настраивать объекты на карте для более удобного отображения вашей инфраструктуры. Добавляйте слои, чтобы структурировать информацию и делать ее более доступной.',
+		'Добавление/изменение элементов сети на схему объекта: Наша система позволяет вам управлять элементами сети, включая коммутаторы, маршрутизаторы и другие устройства, прямо на схеме объекта.\n',
+		'Добавление/изменение камер на схеме объекта: Легко добавляйте и настраивайте камеры видеонаблюдения на схеме вашего объекта для более удобного контроля.',
+	])
 
 	const setupScene = () => {
 		const scene = new THREE.Scene()
@@ -157,6 +164,23 @@ export default function Landing() {
 			>
 				Удобный просмотр ваших устройств
 			</Title>
+			<Text>
+				Мы представляем вам инновационное программное обеспечение, которое поможет вам эффективно контролировать и управлять вашей организационной инфраструктурой. Наша система предлагает широкий спектр функций, предназначенных для мониторинга и управления вашими устройствами прямо с вашего компьютера или мобильного устройства.
+			</Text>
+			<Title
+				className={styles.mt20px}
+			>
+				Функционал системы:
+			</Title>
+			<List
+				bordered
+				dataSource={listRows}
+				renderItem={(item) => (
+					<List.Item>
+						{item}
+					</List.Item>
+				)}
+			/>
 		</div>
 	)
 }
