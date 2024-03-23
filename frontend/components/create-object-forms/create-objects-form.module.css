@@ -3,3 +3,13 @@
 	gap: 12px;
 	flex-direction: column;
 }
+
+.bottomControls {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 12px;
+}
+
+.map {
+	height: calc(100vh - 190px);
+}

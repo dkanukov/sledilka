@@ -3,6 +3,7 @@
 import { Steps, StepProps, Button, Typography } from 'antd'
 import { useState } from 'react'
 import { LoadingOutlined } from '@ant-design/icons'
+import { useRouter } from 'next/navigation'
 
 import { EntityNewLayer, EntityNewObject } from '../../../api/generated/api'
 
@@ -11,9 +12,9 @@ import styles from './object-create.module.css'
 import { CreateObjectForms } from '@components'
 import { useObjectCreateStore } from '@store'
 
-const { Text } = Typography
 export default function ObjectCreate() {
 	const objectCreateStore = useObjectCreateStore()
+	const router = useRouter()
 	const [currentStep, setCurrentStep] = useState(0)
 	const [isFetching, setIsFetching] = useState(false)
 
@@ -26,6 +27,11 @@ export default function ObjectCreate() {
 		{
 			title: 'Добавление слоев',
 			disabled: currentStep !== 1,
+			icon: isFetching && <LoadingOutlined/>,
+		},
+		{
+			title: 'Редактирование схемы',
+			disabled: currentStep !== 2,
 			icon: isFetching && <LoadingOutlined/>,
 		},
 	]
@@ -41,14 +47,28 @@ export default function ObjectCreate() {
 		setIsFetching(false)
 	}
 
-	const handleCreateNewLayer = async (newLayer: EntityNewLayer) => {
+	const handleUploadImage = async (file: File) => {
+		setIsFetching(true)
+		await objectCreateStore.uploadImage(file)
+		nextStep()
+		setIsFetching(false)
+	}
+
+	const handleLayerDrag = (lan:[number, number], lot: [number, number]) => {
+		objectCreateStore.whenLayerLanLotChange(lan, lot)
+	}
+
+	const handleCreateNewLayer = async () => {
 		if (!objectCreateStore.createdObject) {
 			return
 		}
 
 		setIsFetching(true)
-		await objectCreateStore.createNewLayer(objectCreateStore.createdObject.id, newLayer)
+		const response = await objectCreateStore.createNewLayer(objectCreateStore.createdObject.id, objectCreateStore.createdObject.layers[0])
 		setIsFetching(false)
+		if (response.success) {
+			router.push(`/admin?layerId=${response.id}`)
+		}
 	}
 
 	const renderStepContent = () => {
@@ -63,6 +83,16 @@ export default function ObjectCreate() {
 		if (currentStep === 1) {
 			return (
 				<CreateObjectForms.SecondStep
+					whenNextStepClick={handleUploadImage}
+				/>
+			)
+		}
+
+		if (currentStep === 2 && objectCreateStore.createdObject?.layers[0]) {
+			return (
+				<CreateObjectForms.ThirdStep
+					selectedLayer={objectCreateStore.createdObject.layers[0]}
+					handleLayerDrag={handleLayerDrag}
 					whenNextStepClick={handleCreateNewLayer}
 				/>
 			)

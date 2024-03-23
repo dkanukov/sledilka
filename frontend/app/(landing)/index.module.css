@@ -4,6 +4,10 @@
 }
 
 .root {
+	padding: 20px;
+}
+
+.header {
 	display: flex;
 	justify-content: center;
 }
@@ -18,4 +22,12 @@
 	font-family: 'oswald';
 	font-size: 65px !important;
 	margin-left: -40px;
+}
+
+.carousel {
+	max-height: 500px;
+}
+
+.mt20px {
+	margin-top: 20px;
 }

@@ -1,8 +1,9 @@
 .root {
     display: flex;
+    height: calc(100vh - 63px);
 }
 
 .page {
-	height: 100vh;
-	overflow: hidden;
+	min-height: 100vh;
 }
+

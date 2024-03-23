@@ -1,4 +1,4 @@
-import { EntityNewLayer, EntityNewObject } from '../generated/api'
+import { EntityNewObject } from '../generated/api'
 import CustomedApi from '../generated/customed-api'
 
 import { ObjectLayer, ObjectStorage } from '@models'
@@ -14,7 +14,20 @@ export const createObject = async (newObject: EntityNewObject) => {
 	return new ObjectStorage(data)
 }
 
-export const createLayer = async (objectId: string, newLayer: EntityNewLayer) => {
-	const { data } = await CustomedApi.objects.layersCreate(objectId, newLayer)
-	return new ObjectLayer(data)
+export const createLayer = async (objectId: string, newLayer: ObjectLayer) => {
+	const { data } = await CustomedApi.objects.layersCreate(objectId, {
+		angles_coordinates: [
+			{
+				x: newLayer.lan[0],
+				y: newLayer.lan[1],
+			}, {
+				x: newLayer.lot[0],
+				y: newLayer.lot[1],
+			},
+		],
+		floor_name: 'test',
+		image: newLayer.image,
+	})
+
+	return data.id
 }

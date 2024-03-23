@@ -45,12 +45,12 @@ export const LandingHeaderV2 = (props: Props) => {
 			label: 'Обновления',
 			link: '/changelog',
 			isActive: path.includes('/changelog'),
-		},
+		}, */
 		{
 			label: 'Планы',
 			link: '/roadmap',
 			isActive: path.includes('/roadmap'),
-		}, */
+		},
 	]
 
 	const handleTabClick = (to: string) => {

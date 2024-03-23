@@ -27,11 +27,13 @@ export const Sidebar = (props: Props) => {
 	))
 
 	return (
-		<Menu
-			className={styles.menu}
-			selectedKeys={[props.selectedItem]}
-			items={menuItems}
-			onSelect={(item) => props.whenClick(item.key)}
-		/>
+		<div className={styles.sidebarWrapper}>
+			<Menu
+				className={styles.menu}
+				selectedKeys={[props.selectedItem]}
+				items={menuItems}
+				onSelect={(item) => props.whenClick(item.key)}
+			/>
+		</div>
 	)
 }
