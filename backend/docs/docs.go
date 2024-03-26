@@ -406,6 +406,31 @@ const docTemplate = `{
                 }
             }
         },
+        "/layers/{id}/newDevices": {
+            "post": {
+                "tags": [
+                    "new"
+                ],
+                "summary": "Новые девайсы для слоя",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Layer ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/new": {
             "post": {
                 "tags": [

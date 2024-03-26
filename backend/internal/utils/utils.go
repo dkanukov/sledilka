@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"io"
 	"math/rand"
@@ -104,8 +105,8 @@ func NewEntities() {
 	body, _ = io.ReadAll(resp.Body)
 	json.Unmarshal(body, &lay)
 	newDev := entity.NewDevice{
-		Name:       "комп твоей мамаши",
-		Type:       entity.Computer,
+		Name:       "Камера в холле",
+		Type:       entity.Camera,
 		LayerID:    lay.ID,
 		LocationX:  0,
 		LocationY:  0,
@@ -118,6 +119,43 @@ func NewEntities() {
 		"application/json",
 		bytes.NewReader(body),
 	)
+}
+
+// @Summary	Новые девайсы для слоя
+// @Tags		new
+// @Success	200
+// @Param		id path string true "Layer ID"
+// @Failure	500
+// @Router		/layers/{id}/newDevices [post]
+func NewDevices(layerID uuid.UUID) {
+	newDevs := []entity.NewDevice{
+		{
+			Name:       "комп-" + uuid.NewString(),
+			Type:       entity.Computer,
+			LayerID:    layerID,
+			LocationX:  0,
+			LocationY:  0,
+			IpAddress:  "127.0.0.1",
+			MacAddress: "00:1b:63:84:45:e6",
+		},
+		{
+			Name:       "камера-" + uuid.NewString(),
+			Type:       entity.Camera,
+			LayerID:    layerID,
+			LocationX:  0,
+			LocationY:  0,
+			IpAddress:  "pipipi.mp4",
+			MacAddress: "00:1b:63:84:45:e6",
+		},
+	}
+	for _, dev := range newDevs {
+		body, _ := json.Marshal(dev)
+		http.Post(
+			"http://localhost:8081/devices",
+			"application/json",
+			bytes.NewReader(body),
+		)
+	}
 }
 
 func LayerToDBFormat(layer entity.Layer) entity.LayerForDB {
