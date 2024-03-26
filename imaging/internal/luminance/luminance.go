@@ -9,6 +9,5 @@ func IsLowLight(luminance [256]float64) bool {
 	for i := 65; i < len(luminance); i++ {
 		midPlusTones += luminance[i]
 	}
-
 	return lowTones > midPlusTones
 }

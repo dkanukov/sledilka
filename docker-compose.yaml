@@ -9,8 +9,6 @@ services:
       - ./sql:/sql/
     environment:
       - POSTGRES_PASSWORD=postgres
-    # env_file:
-    #   - ./secrets/.env
     ports:
       - "5432:5432"
   token-service:
@@ -28,6 +26,8 @@ services:
     - imaging-service
 #  frontend:
 #    build: frontend/.
+#    depends_on:
+#      - backend
 #    ports:
 #    - "3000:3000"
   imaging-service:

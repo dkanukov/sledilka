@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"backend/internal/authorization"
+	"backend/internal/entity"
 	"backend/internal/handlers/announcement"
 	"backend/internal/handlers/devices"
 	"backend/internal/handlers/images"
@@ -13,8 +14,10 @@ import (
 	"backend/internal/handlers/user"
 	"backend/internal/tokener"
 	"backend/internal/utils"
+	"github.com/google/uuid"
 	gmux "github.com/gorilla/mux"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
 )
 
@@ -179,6 +182,22 @@ func GetHandlers(db *gorm.DB, tokenerClient tokener.TokenerClient) *gmux.Router 
 
 	router.HandleFunc("/new", func(w http.ResponseWriter, r *http.Request) {
 		utils.NewEntities()
+	}).Methods(http.MethodPost)
+
+	router.HandleFunc("/layers/{id}/newDevices", func(w http.ResponseWriter, r *http.Request) {
+		l := gmux.Vars(r)["id"]
+		layerID, err := uuid.Parse(l)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			log.Println(err)
+			return
+		}
+		if res := db.Find(&entity.LayerForDB{ID: layerID}); res.Error != nil || res.RowsAffected == 0 {
+			w.WriteHeader(http.StatusNotFound)
+			log.Println(res.Error)
+			return
+		}
+		utils.NewDevices(layerID)
 	}).Methods(http.MethodPost)
 
 	router.HandleFunc("/stream/{id}", func(w http.ResponseWriter, r *http.Request) {
