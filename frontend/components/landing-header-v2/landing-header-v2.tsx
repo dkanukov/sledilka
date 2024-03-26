@@ -2,9 +2,9 @@
 import { LoginOutlined } from '@ant-design/icons'
 import { Button, Layout, Switch, Tabs } from 'antd'
 import { usePathname, useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 import styles from './landing-header-v2.module.css'
-import { useState } from 'react'
 
 const { Header } = Layout
 
@@ -45,12 +45,12 @@ export const LandingHeaderV2 = (props: Props) => {
 			label: 'Обновления',
 			link: '/changelog',
 			isActive: path.includes('/changelog'),
-		},
+		}, */
 		{
 			label: 'Планы',
 			link: '/roadmap',
 			isActive: path.includes('/roadmap'),
-		}, */
+		},
 	]
 
 	const handleTabClick = (to: string) => {

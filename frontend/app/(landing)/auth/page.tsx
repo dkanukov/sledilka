@@ -1,35 +1,79 @@
 'use client'
-import * as React from 'react'
-import { Box, Grid, Link, Checkbox, FormControlLabel, TextField, CssBaseline, Button, Avatar, Typography, Container } from '@mui/material'
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Button, Input } from 'antd'
 
-import { authService } from '@api'
+import styles from './auth.module.css'
+
+import { useUserStore } from '@store'
 
 export default function SignIn() {
 	const router = useRouter()
-	const [isShowError, setIsShowError] = useState(false)
+	const userStore = useUserStore()
 
+	const [isLoginButtonDisabled, setIsLoginButtonActive] = useState(true)
+	const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
-	const handleFormSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
-		event.preventDefault()
+	useEffect(() => {
+		setIsLoginButtonActive(Boolean(userStore.userCredential.password && userStore.userCredential.username))
+	}, [userStore.userCredential])
 
-		const isOk = await authService.login({
-			username: userName,
-			password: userPassword,
-		})
+	const handleUserLogin = async () => {
+		const isAuthed = await userStore.handleUserLogin(userStore.userCredential)
 
-		if (!isOk) {
-			setIsShowError(true)
-			return
+		if (isAuthed) {
+			router.push('/admin')
 		}
-
-		router.push('/admin')
-		setIsShowError(false)
-		return
 	}
 
 	return (
+		<div
+			className={styles.wrapper}
+		>
+			<div
+				className={styles.form}
+			>
+				<Input
+					placeholder={'Логин'}
+					size={'large'}
+					className={styles.formInput}
+					value={userStore.userCredential.username}
+					onChange={(e) => userStore.handleUserCredentialChange({
+						username: e.target.value,
+					})}
+				/>
+				<Input.Password
+					placeholder={'Пароль'}
+					size={'large'}
+					className={styles.formInput}
+					value={userStore.userCredential.password}
+					visibilityToggle={{ visible: isPasswordVisible,
+						onVisibleChange: setIsPasswordVisible }}
+					onChange={(e) => userStore.handleUserCredentialChange({
+						password: e.target.value,
+					})}
+				/>
+				<div
+					className={styles.buttonGroup}
+				>
+					<Button
+						type={'primary'}
+						disabled={!isLoginButtonDisabled}
+						onClick={handleUserLogin}
+					>
+						Войти
+					</Button>
+					<Button
+						danger
+						onClick={() => userStore.handleUserCredentialChange({
+							username: '',
+							password: '',
+						})}
+					>
+						Сбросить
+					</Button>
+				</div>
+			</div>
+		</div>
 	)
 }

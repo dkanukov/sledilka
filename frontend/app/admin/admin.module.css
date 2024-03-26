@@ -1,3 +1,9 @@
-.adminLayout {
-    padding: 20px;
+.root {
+    display: flex;
+    height: calc(100vh - 63px);
 }
+
+.page {
+	min-height: 100vh;
+}
+

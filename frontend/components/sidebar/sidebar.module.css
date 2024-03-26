@@ -1,0 +1,9 @@
+.menu {
+	/*width: 30%;*/
+}
+
+.sidebarWrapper {
+	max-height: calc(100vh - 63px);
+	width: 30%;
+	overflow: auto;
+}
