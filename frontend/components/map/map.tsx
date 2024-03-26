@@ -32,7 +32,6 @@ export const Map = (props: Props) => {
 		}
 		overlay.pm.enableLayerDrag()
 
-
 		overlay.on('pm:change', (e) => props.handleLayerDrag?.(e.latlngs))
 
 	}
