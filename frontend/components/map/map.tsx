@@ -7,9 +7,8 @@ import styles from './map.module.css'
 
 import 'leaflet/dist/leaflet.css'
 import '@maptiler/leaflet-maptilersdk'
-import '@geoman-io/leaflet-geoman-free'
-import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
-
+import 'leaflet-path-transform'
+import 'leaflet-path-drag'
 import { ObjectLayer } from '@models'
 import { usePersistState } from '@hooks'
 
@@ -17,23 +16,56 @@ const TileLayerURL = 'https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=
 
 interface Props {
 	selectedLayer: ObjectLayer
-	handleLayerDrag?: (e: L.LatLng | L.LatLng[]) => void
+	handleLayerDrag?: (lan: [number, number], lot: [number, number]) => void
 	edit?: boolean
 }
 
 export const Map = (props: Props) => {
-	const mapContainerRef = useRef<HTMLDivElement>(null)
 	const [mapRef, setMapRef] = useState<L.Map>()
+	const [groupLayerAdded, setGroupLayerAdded] = useState(false)
+	const mapContainerRef = useRef<HTMLDivElement>(null)
 	const { state: isRenderTileLayer, updateState: setRenderTileLayer } = usePersistState('render-tile-layer', false)
 
-	const handleStartEdit = (overlay: L.ImageOverlay) => {
-		if (!mapRef || !props.handleLayerDrag) {
+	const handleStartEdit = () => {
+		if (!mapRef) {
 			return
 		}
-		overlay.pm.enableLayerDrag()
 
-		overlay.on('pm:change', (e) => props.handleLayerDrag?.(e.latlngs))
+		console.log('call')
+		const overlay = L.imageOverlay(
+			`http://localhost:8081/images/${props.selectedLayer.image}`,
+			[props.selectedLayer.lan, props.selectedLayer.lot],
+		)
 
+		const rectangle = L.rectangle([props.selectedLayer.lan, props.selectedLayer.lot], {
+			color: 'red',
+			interactive: true,
+			//@ts-expect-error
+			transform: true,
+			draggable: true,
+		})
+
+		// const layersGroup = L.layerGroup([rectangle, overlay])
+
+		mapRef.addLayer(rectangle)
+		mapRef.addLayer(overlay)
+
+		//@ts-expect-error
+		rectangle.transform.enable()
+
+		rectangle.on('transformed', () => {
+			console.log(rectangle.getBounds().getNorthWest())
+			const northWest = rectangle.getBounds().getNorthWest()
+			const southEast = rectangle.getBounds().getSouthEast()
+			const southWest = rectangle.getBounds().getSouthWest()
+			const northEast = rectangle.getBounds().getNorthEast()
+
+			const test = new L.LatLngBounds(southWest, northEast)
+			props.handleLayerDrag?.([southEast.lng, southEast.lng], [northWest.lng, northWest.lat])
+			overlay.setBounds(test)
+		})
+		mapRef.fitBounds([props.selectedLayer.lan, props.selectedLayer.lot])
+		setGroupLayerAdded(true)
 	}
 
 	useEffect(() => {
@@ -41,8 +73,7 @@ export const Map = (props: Props) => {
 			const mapInstance = L.map(mapContainerRef.current).setView([props.selectedLayer.coordinateY, props.selectedLayer.coordinateX], 13)
 
 			if (isRenderTileLayer) {
-				L.tileLayer(TileLayerURL, {
-				}).addTo(mapInstance)
+				L.tileLayer(TileLayerURL).addTo(mapInstance)
 			}
 
 			// убираем кнопки зума
@@ -50,40 +81,31 @@ export const Map = (props: Props) => {
 
 			setMapRef(mapInstance)
 		}
-	})
+	}, [])
 
 	useEffect(() => {
 		if (!mapRef) {
 			return
 		}
 
-		mapRef.pm.addControls({
-			position: 'topleft',
-		})
-
-		const overlay = L.imageOverlay(
-			`http://localhost:8081/images/${props.selectedLayer.image}`,
-			[props.selectedLayer.lan, props.selectedLayer.lot],
-			{ interactive: true },
-		)
-
 		let hasOverlay = false
-		mapRef.eachLayer((layer) => {
-			if (layer instanceof L.ImageOverlay) {
-				hasOverlay = true
-			}
-		})
 
-		if (props.edit) {
-			overlay.on('click', () => handleStartEdit(overlay))
-
-			if (!hasOverlay) {
-				mapRef.addLayer(overlay)
-				mapRef.fitBounds([props.selectedLayer.lan, props.selectedLayer.lot])
-			}
+		if (props.edit && !groupLayerAdded) {
+			handleStartEdit()
 		}
 
 		if (!props.edit) {
+			mapRef.eachLayer((layer) => {
+				if (layer instanceof L.ImageOverlay) {
+					hasOverlay = true
+				}
+			})
+
+			const overlay = L.imageOverlay(
+				`http://localhost:8081/images/${props.selectedLayer.image}`,
+				[props.selectedLayer.lan, props.selectedLayer.lot],
+			)
+
 			if (hasOverlay) {
 				mapRef.eachLayer((layer) => {
 					if (layer instanceof L.ImageOverlay) {
@@ -91,6 +113,7 @@ export const Map = (props: Props) => {
 					}
 				})
 			}
+
 			mapRef.addLayer(overlay)
 			mapRef.fitBounds([props.selectedLayer.lan, props.selectedLayer.lot])
 		}

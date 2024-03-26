@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect } from 'react'
+
 import styles from './admin.module.css'
 
 import { Sidebar, Map } from '@components'
@@ -8,16 +10,28 @@ import { useCustomRouter } from '@hooks'
 
 export default function Admin() {
 	const objectsStore = useObjectsStore()
-	// const { customRouter } = useCustomRouter()
+	const { customRouter, query } = useCustomRouter()
+
+	useEffect(() => {
+		objectsStore.fetchObjects()
+			.then(() => {
+				const id = query.get('layerId')
+				if (id) {
+					objectsStore.handleSelectedLayerChange(id)
+				}
+			})
+			.catch(() => console.error('cant get objects'))
+
+	}, [])
 
 	const handleSelectLayer = (key: string) => {
 		objectsStore.handleSelectedLayerChange(key)
-		// customRouter.push({
-		// 	path: '/admin',
-		// 	query: {
-		// 		layerId: [key],
-		// 	},
-		// })
+		customRouter.push({
+			path: '/admin',
+			query: {
+				layerId: [key],
+			},
+		})
 	}
 
 	return (
@@ -29,6 +43,7 @@ export default function Admin() {
 			/>
 			{objectsStore.selectedLayer && (
 				<Map
+					// edit
 					selectedLayer={objectsStore.selectedLayer}
 				/>
 			)}

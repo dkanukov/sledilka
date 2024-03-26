@@ -139,21 +139,13 @@ interface ThirdStepProps {
 }
 
 export const ThirdStep = (props: ThirdStepProps) => {
-	const handleLayerDrag = (e: L.LatLng | L.LatLng[]) => {
-		// @ts-expect-error
-		const lan = [e['_southWest'].lat, e['_southWest'].lng] as [number, number]
-		// @ts-expect-error
-		const lot = [e['_northEast'].lat, e['_northEast'].lng]as [number, number]
-
-		props.handleLayerDrag(lan, lot)
-	}
 
 	return (
 		<div className={styles.map}>
 			<Map
 				edit
 				selectedLayer={props.selectedLayer}
-				handleLayerDrag={handleLayerDrag}
+				handleLayerDrag={props.handleLayerDrag}
 			/>
 			<div className={styles.bottomControls}>
 				<Button

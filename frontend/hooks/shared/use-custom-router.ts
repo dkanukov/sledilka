@@ -25,9 +25,9 @@ export const useCustomRouter = () => {
 				router.push(location.path + createQueryString(location.query))
 				return
 			}
-
 			router.push(location.path)
 		},
+		query,
 	}
 
 	return {
