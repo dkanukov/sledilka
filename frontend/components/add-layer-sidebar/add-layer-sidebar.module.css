@@ -1,0 +1,9 @@
+.sidebarWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 10px;
+    max-height: calc(100vh - 63px);
+    width: 40%;
+    overflow: auto;
+}

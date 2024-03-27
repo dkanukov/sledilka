@@ -134,14 +134,21 @@ export const SecondStep = (props: SecondStepProps) => {
 
 interface ThirdStepProps {
 	selectedLayer: ObjectLayer
-	handleLayerDrag: (lan:[number, number], lot: [number, number]) => void
-	whenNextStepClick: () => Promise<void>
+	handleLayerDrag: (southWest:[number, number], northEast: [number, number]) => void
+	whenNextStepClick: (name: string) => Promise<void>
 }
 
 export const ThirdStep = (props: ThirdStepProps) => {
+	const [floorName, setFloorName] = useState('')
 
 	return (
 		<div className={styles.map}>
+			<Input
+				className={styles.floorNameInput}
+				placeholder={'Название слоя'}
+				value={floorName}
+				onChange={(e) => setFloorName(e.target.value)}
+			/>
 			<Map
 				edit
 				selectedLayer={props.selectedLayer}
@@ -149,7 +156,8 @@ export const ThirdStep = (props: ThirdStepProps) => {
 			/>
 			<div className={styles.bottomControls}>
 				<Button
-					onClick={props.whenNextStepClick}
+					disabled={!floorName}
+					onClick={() => props.whenNextStepClick(floorName)}
 				>
 					Далее
 				</Button>

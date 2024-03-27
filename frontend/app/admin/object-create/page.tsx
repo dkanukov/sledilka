@@ -54,17 +54,17 @@ export default function ObjectCreate() {
 		setIsFetching(false)
 	}
 
-	const handleLayerDrag = (lan:[number, number], lot: [number, number]) => {
-		objectCreateStore.whenLayerLanLotChange(lan, lot)
+	const handleLayerDrag = (southWest:[number, number], northEast: [number, number]) => {
+		objectCreateStore.whenLayerLanLotChange(southWest, northEast)
 	}
 
-	const handleCreateNewLayer = async () => {
+	const handleCreateNewLayer = async (name: string) => {
 		if (!objectCreateStore.createdObject) {
 			return
 		}
 
 		setIsFetching(true)
-		const response = await objectCreateStore.createNewLayer(objectCreateStore.createdObject.id, objectCreateStore.createdObject.layers[0])
+		const response = await objectCreateStore.createNewLayer(objectCreateStore.createdObject.id, objectCreateStore.createdObject.layers[0], name)
 		setIsFetching(false)
 		if (response.success) {
 			router.push(`/admin?layerId=${response.id}`)

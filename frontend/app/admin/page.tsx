@@ -1,16 +1,18 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import styles from './admin.module.css'
 
-import { Sidebar, Map } from '@components'
-import { useObjectsStore } from '@store'
+import { Sidebar, Map, AddLayerSidebar } from '@components'
+import { useObjectCreateStore, useObjectsStore } from '@store'
 import { useCustomRouter } from '@hooks'
 
 export default function Admin() {
 	const objectsStore = useObjectsStore()
 	const { customRouter, query } = useCustomRouter()
+	const [action, setAction] = useState<'addLayer' | 'editLayer' | null>(null)
+	const isEdit = action === 'addLayer' || action === 'editLayer'
 
 	useEffect(() => {
 		objectsStore.fetchObjects()
@@ -34,16 +36,43 @@ export default function Admin() {
 		})
 	}
 
-	return (
-		<div className={styles.root}>
+	const handleAddLayer = () => {
+		setAction('addLayer')
+	}
+
+	const handleLayerTransform = (southWest:[number, number], northEast: [number, number]) => {
+		objectsStore.handleSelectedLayerTransform(southWest, northEast)
+	}
+
+	const handleUploadImage = async (file: File) => {
+		await objectsStore.handleUploadImage(file)
+	}
+
+	const renderSidebar = () => {
+		switch (action) {
+		case 'addLayer': return (
+			<AddLayerSidebar
+				whenUploadImage={handleUploadImage}
+			/>
+		)
+		case null: return (
 			<Sidebar
 				items={objectsStore.objects}
 				selectedItem={objectsStore.selectedLayer?.id ?? ''}
 				whenClick={handleSelectLayer}
+				whenCreateLayerClick={handleAddLayer}
 			/>
+		)
+		}
+	}
+
+	return (
+		<div className={styles.root}>
+			{renderSidebar()}
 			{objectsStore.selectedLayer && (
 				<Map
-					// edit
+					action={action}
+					handleLayerDrag={handleLayerTransform}
 					selectedLayer={objectsStore.selectedLayer}
 				/>
 			)}

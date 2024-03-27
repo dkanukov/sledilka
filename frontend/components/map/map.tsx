@@ -8,22 +8,33 @@ import styles from './map.module.css'
 import 'leaflet/dist/leaflet.css'
 import '@maptiler/leaflet-maptilersdk'
 import 'leaflet-path-transform'
-import 'leaflet-path-drag'
 import { ObjectLayer } from '@models'
 import { usePersistState } from '@hooks'
+import { getRotatedBounds, radiansToDegress } from '@helpers'
 
 const TileLayerURL = 'https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=wL6YzJn6rYPYSi4sb7R3'
 
 interface Props {
 	selectedLayer: ObjectLayer
-	handleLayerDrag?: (lan: [number, number], lot: [number, number]) => void
+	handleLayerDrag?: (southWest: [number, number], northEast: [number, number]) => void
 	edit?: boolean
+	action?: 'addLayer' | 'editLayer' | null
 }
 
 export const Map = (props: Props) => {
 	const [mapRef, setMapRef] = useState<L.Map>()
-	const [groupLayerAdded, setGroupLayerAdded] = useState(false)
 	const mapContainerRef = useRef<HTMLDivElement>(null)
+	const [mapLayers, setMapLayers] = useState<{
+		imageOverlay: null | L.ImageOverlay
+		editRectangle: null | L.Rectangle
+		editImageOverlay: null | L.ImageOverlay
+		tile: null | L.TileLayer
+	}>({
+		imageOverlay: null,
+		editRectangle: null,
+		tile: null,
+		editImageOverlay: null,
+	})
 	const { state: isRenderTileLayer, updateState: setRenderTileLayer } = usePersistState('render-tile-layer', false)
 
 	const handleStartEdit = () => {
@@ -31,41 +42,74 @@ export const Map = (props: Props) => {
 			return
 		}
 
-		console.log('call')
 		const overlay = L.imageOverlay(
 			`http://localhost:8081/images/${props.selectedLayer.image}`,
-			[props.selectedLayer.lan, props.selectedLayer.lot],
-		)
+			[props.selectedLayer.southWest, props.selectedLayer.northEast],
+		).addTo(mapRef)
 
-		const rectangle = L.rectangle([props.selectedLayer.lan, props.selectedLayer.lot], {
+		const rectangle = L.rectangle([props.selectedLayer.southWest, props.selectedLayer.northEast], {
 			color: 'red',
 			interactive: true,
 			//@ts-expect-error
 			transform: true,
 			draggable: true,
+		}).addTo(mapRef)
+
+		setMapLayers({
+			...mapLayers,
+			imageOverlay: overlay,
 		})
 
-		// const layersGroup = L.layerGroup([rectangle, overlay])
+		//@ts-expect-error
+		rectangle.transform.enable()
+		mapRef.fitBounds([props.selectedLayer.southWest, props.selectedLayer.northEast])
 
-		mapRef.addLayer(rectangle)
-		mapRef.addLayer(overlay)
+		rectangle.on('transformed', (e) => {
+			if (e.type === 'scalestart' || e.type === 'scale' || e.type === 'scaleend') {
+				return
+			}
+
+			//@ts-expect-error
+			const rotation = e.rotation as number
+			const southWest = rectangle.getBounds().getSouthWest()
+			const northEast = rectangle.getBounds().getNorthEast()
+
+			props.handleLayerDrag?.([southWest.lat, southWest.lng], [northEast.lat, northEast.lng])
+			overlay.setBounds(new L.LatLngBounds(southWest, northEast))
+		})
+
+	}
+
+	const handleStartAddingLayer = () => {
+		if (!mapRef || mapLayers.editRectangle) {
+			return
+		}
+
+		const rectangle = L.rectangle([props.selectedLayer.southWest, props.selectedLayer.northEast], {
+			color: 'red',
+			interactive: true,
+			//@ts-expect-error
+			transform: true,
+			draggable: true,
+		}).addTo(mapRef)
+		setMapLayers({
+			...mapLayers,
+			editRectangle: rectangle,
+		})
 
 		//@ts-expect-error
 		rectangle.transform.enable()
 
-		rectangle.on('transformed', () => {
-			console.log(rectangle.getBounds().getNorthWest())
-			const northWest = rectangle.getBounds().getNorthWest()
-			const southEast = rectangle.getBounds().getSouthEast()
+		rectangle.on('transformed', (e) => {
+			if (e.type === 'scalestart' || e.type === 'scale' || e.type === 'scaleend') {
+				return
+			}
+
 			const southWest = rectangle.getBounds().getSouthWest()
 			const northEast = rectangle.getBounds().getNorthEast()
 
-			const test = new L.LatLngBounds(southWest, northEast)
-			props.handleLayerDrag?.([southEast.lng, southEast.lng], [northWest.lng, northWest.lat])
-			overlay.setBounds(test)
+			props.handleLayerDrag?.([southWest.lat, southWest.lng], [northEast.lat, northEast.lng])
 		})
-		mapRef.fitBounds([props.selectedLayer.lan, props.selectedLayer.lot])
-		setGroupLayerAdded(true)
 	}
 
 	useEffect(() => {
@@ -73,7 +117,11 @@ export const Map = (props: Props) => {
 			const mapInstance = L.map(mapContainerRef.current).setView([props.selectedLayer.coordinateY, props.selectedLayer.coordinateX], 13)
 
 			if (isRenderTileLayer) {
-				L.tileLayer(TileLayerURL).addTo(mapInstance)
+				const tileLayer = L.tileLayer(TileLayerURL).addTo(mapInstance)
+				setMapLayers({
+					...mapLayers,
+					tile: tileLayer,
+				})
 			}
 
 			// убираем кнопки зума
@@ -88,37 +136,63 @@ export const Map = (props: Props) => {
 			return
 		}
 
-		let hasOverlay = false
-
-		if (props.edit && !groupLayerAdded) {
+		if (props.edit) {
 			handleStartEdit()
 		}
 
-		if (!props.edit) {
-			mapRef.eachLayer((layer) => {
-				if (layer instanceof L.ImageOverlay) {
-					hasOverlay = true
-				}
-			})
+		if (!props.edit && !props.action) {
+			if (mapLayers.imageOverlay) {
+				mapLayers.imageOverlay.remove()
+				mapLayers.imageOverlay = null
+			}
 
 			const overlay = L.imageOverlay(
 				`http://localhost:8081/images/${props.selectedLayer.image}`,
-				[props.selectedLayer.lan, props.selectedLayer.lot],
-			)
-
-			if (hasOverlay) {
-				mapRef.eachLayer((layer) => {
-					if (layer instanceof L.ImageOverlay) {
-						layer.remove()
-					}
-				})
-			}
-
-			mapRef.addLayer(overlay)
-			mapRef.fitBounds([props.selectedLayer.lan, props.selectedLayer.lot])
+				[props.selectedLayer.southWest, props.selectedLayer.northEast],
+			).addTo(mapRef)
+			setMapLayers({
+				...mapLayers,
+				imageOverlay: overlay,
+			})
+			mapRef.fitBounds([props.selectedLayer.southWest, props.selectedLayer.northEast])
 		}
 
-	}, [props.selectedLayer, mapRef])
+		if (props.action === 'addLayer') {
+			mapLayers.imageOverlay?.remove()
+			handleStartAddingLayer()
+		}
+
+	}, [props.selectedLayer, props.action, mapRef])
+
+	useEffect(() => {
+		if (props.action !== 'addLayer' || !mapRef) {
+			return
+		}
+
+		if (props.selectedLayer.image) {
+			const overlay = L.imageOverlay(
+				`http://localhost:8081/images/${props.selectedLayer.image}`,
+				[props.selectedLayer.southWest, props.selectedLayer.northEast],
+			).addTo(mapRef)
+
+			setMapLayers({
+				...mapLayers,
+				editImageOverlay: overlay,
+			})
+
+			mapLayers.editRectangle?.on('transformed', (e) => {
+				if (e.type === 'scalestart' || e.type === 'scale' || e.type === 'scaleend') {
+					return
+				}
+
+				const southWest = mapLayers.editRectangle?.getBounds().getSouthWest()
+				const northEast = mapLayers.editRectangle?.getBounds().getNorthEast()
+				if (southWest && northEast) {
+					overlay.setBounds(new L.LatLngBounds(southWest, northEast))
+				}
+			})
+		}
+	}, [props.selectedLayer.image])
 
 	const toggleTileLayer = () => {
 		if (!mapRef) {
@@ -128,15 +202,14 @@ export const Map = (props: Props) => {
 		setRenderTileLayer(!isRenderTileLayer)
 
 		if (!isRenderTileLayer) {
-			L.tileLayer(TileLayerURL).addTo(mapRef)
+			const tileLayer = L.tileLayer(TileLayerURL).addTo(mapRef)
+			setMapLayers({
+				...mapLayers,
+				tile: tileLayer,
+			})
 			return
 		}
-
-		mapRef.eachLayer((layer) => {
-			if (layer instanceof L.TileLayer) {
-				layer.remove()
-			}
-		})
+		mapLayers.tile?.remove()
 	}
 
 	return (
