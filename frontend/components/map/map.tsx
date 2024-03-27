@@ -163,6 +163,28 @@ export const Map = (props: Props) => {
 				imageOverlay: overlay,
 			})
 			mapRef.fitBounds([props.selectedLayer.southWest, props.selectedLayer.northEast])
+
+			const features = props.selectedLayer.devices.map((device) => {
+				console.log(device)
+				return L.icon({
+					iconUrl: '/camera.png',
+					iconSize: [20, 20],
+				})
+			})
+
+			const customMarker = L.Marker.extend({
+				id: '',
+			})
+
+			features.forEach((f) => {
+				const marker = L.marker(props.selectedLayer.southWest, {
+					icon: f,
+					interactive: true,
+					draggable: true,
+				}).addTo(mapRef)
+
+				marker.on('dragend', (e) => console.log(e.sourceTarget))
+			})
 		}
 
 		if (props.action === 'addLayer') {
