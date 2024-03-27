@@ -158,7 +158,7 @@ export const Map = (props: Props) => {
 			})
 
 			const overlay = L.imageOverlay(
-				`http://backend/images/${props.selectedLayer.image}`,
+				`http://backend:8081/images/${props.selectedLayer.image}`,
 				[props.selectedLayer.southWest, props.selectedLayer.northEast],
 			).addTo(mapRef)
 			setMapLayers({
