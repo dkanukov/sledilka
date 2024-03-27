@@ -20,6 +20,7 @@ interface Props {
 	handleSaveDices?: () => void
 	edit?: boolean
 	action?: 'addLayer' | 'editLayer' | null
+	moveObject?: boolean
 }
 
 export const Map = (props: Props) => {
@@ -170,26 +171,28 @@ export const Map = (props: Props) => {
 				id: '',
 			})
 
-			const features = props.selectedLayer.devices.map((device) => {
-				console.log(device)
-				const icon = L.icon({
-					iconUrl: '/camera.png',
-					iconSize: [20, 20],
-				})
+			if (props.moveObject) {
+				const features = props.selectedLayer.devices.map((device) => {
+					console.log(device)
+					const icon = L.icon({
+						iconUrl: '/camera.png',
+						iconSize: [20, 20],
+					})
 
-				const marker = new CustomMarker([device.locationX, device.locationY], {
-					icon: icon,
-					interactive: true,
-					draggable: true,
-					id: device.id,
-				}).addTo(mapRef)
+					const marker = new CustomMarker([device.locationX, device.locationY], {
+						icon: icon,
+						interactive: true,
+						draggable: true,
+						id: device.id,
+					}).addTo(mapRef)
 
-				marker.on('dragend', (e) => {
-					const coords = [e.target.getLatLng().lat, e.target.getLatLng().lng] as [number, number]
-					const deviceId = e.target.options.id as string
-					props.handleDeviceDrag?.(deviceId, coords)
+					marker.on('dragend', (e) => {
+						const coords = [e.target.getLatLng().lat, e.target.getLatLng().lng] as [number, number]
+						const deviceId = e.target.options.id as string
+						props.handleDeviceDrag?.(deviceId, coords)
+					})
 				})
-			})
+			}
 		}
 
 		if (props.action === 'addLayer') {
@@ -255,11 +258,15 @@ export const Map = (props: Props) => {
 			<div
 				className={styles.mapControl}
 			>
-				<Button
-					onClick={props.handleSaveDices}
-				>
-					save
-				</Button>
+				{props.moveObject && (
+					<Button
+						ghost
+						type={'primary'}
+						onClick={props.handleSaveDices}
+					>
+					Сохранить изменения
+					</Button>
+				)}
 				<Switch
 					checked={isRenderTileLayer}
 					onClick={toggleTileLayer}

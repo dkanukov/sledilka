@@ -103,6 +103,7 @@ export default function Admin() {
 					selectedLayer={objectsStore.selectedLayer}
 					handleDeviceDrag={objectsStore.handleDeviceMove}
 					handleSaveDices={objectsStore.updateDevices}
+					moveObject
 				/>
 			)}
 		</div>
