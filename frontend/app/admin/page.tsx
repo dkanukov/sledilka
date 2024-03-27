@@ -67,11 +67,16 @@ export default function Admin() {
 		await objectsStore.handleUploadImage(file)
 	}
 
+	const handleCancel = () => {
+		setAction(null)
+	}
+
 	const renderSidebar = () => {
 		switch (action) {
 		case 'addLayer': return (
 			<AddLayerSidebar
 				selectedLayer={objectsStore.selectedLayer}
+				whenCancel={handleCancel}
 				whenUploadImage={handleUploadImage}
 				whenFloorNameChange={objectsStore.handleSelectedFloorNameChange}
 				whenCreateNewLayer={handleCreateNewLayer}

@@ -1,4 +1,4 @@
-import { InboxOutlined } from '@ant-design/icons'
+import { ArrowLeftOutlined, InboxOutlined } from '@ant-design/icons'
 import { Button, Input, message, Upload, UploadFile, UploadProps } from 'antd'
 import { useState } from 'react'
 
@@ -8,6 +8,7 @@ import { ObjectLayer } from '@models'
 
 interface Props {
 	selectedLayer: ObjectLayer | null
+	whenCancel: () => void
 	whenUploadImage: (file: File) => void
 	whenFloorNameChange: (value: string) => void
 	whenCreateNewLayer: () => void
@@ -43,30 +44,35 @@ export const AddLayerSidebar = (props: Props) => {
 		<div
 			className={styles.sidebarWrapper}
 		>
+			<div>
+				<Button
+					icon={<ArrowLeftOutlined/>}
+					onClick={props.whenCancel}
+				/>
+			</div>
 			<Input
 				placeholder={'Название слоя'}
 				size={'large'}
 				value={props.selectedLayer?.floorName || ''}
 				onChange={(e) => props.whenFloorNameChange(e.target.value)}
 			/>
-			<div>
-				<Dragger
-					{...LoadFileConfig}
-					fileList={fileList}
-					maxCount={1}
-				>
-					<p className="ant-upload-drag-icon">
-						<InboxOutlined />
-					</p>
-					<p className="ant-upload-text">
+			<Dragger
+				{...LoadFileConfig}
+				fileList={fileList}
+				maxCount={1}
+			>
+				<p className="ant-upload-drag-icon">
+					<InboxOutlined />
+				</p>
+				<p className="ant-upload-text">
 						Нажмите или перетащите на эту область, чтобы загрузить файл
-					</p>
-					<p className="ant-upload-hint">
+				</p>
+				<p className="ant-upload-hint">
 						Выберите 1 файл в формате PNG
-					</p>
-				</Dragger>
-			</div>
+				</p>
+			</Dragger>
 			<Button
+				className={styles.addButton}
 				disabled={!fileList.length || !props.selectedLayer?.floorName}
 				onClick={props.whenCreateNewLayer}
 			>
