@@ -1,0 +1,13 @@
+.sidebarWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px 10px 10px;
+    max-height: calc(100vh - 63px);
+    width: 40%;
+    overflow: auto;
+}
+
+.addButton {
+    margin-top: 22px;
+}

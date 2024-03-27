@@ -1,6 +1,6 @@
-import { EntityDevice, EntityDeviceType } from '../../api/generated/api'
+import { EntityDevice, EntityDeviceType } from '../api/generated/api'
 
-const pathToIcons = '~/models/device/device-svgs'
+const pathToIcons = './device-svgs'
 
 export class Device {
 	id!: string
@@ -21,16 +21,8 @@ export class Device {
 		this.macAddress = dto.mac_address
 		this.layerId = dto.layer_id || 'no-layer-id-device'
 		this.type = dto.type || EntityDeviceType.Computer
-		this.locationX = dto.location_x || 0
-		this.locationY = dto.location_y || 0
-	}
-
-	getDeviceIcon() {
-		switch (this.type) {
-		case EntityDeviceType.Camera: return `${pathToIcons}/camera.svg`
-		case EntityDeviceType.Printer: return `${pathToIcons}/printer.svg`
-		case EntityDeviceType.Computer: return `${pathToIcons}/laptop.svg`
-		}
+		this.locationX = dto.location_x ?? 0
+		this.locationY = dto.location_y ?? 0
 	}
 }
 

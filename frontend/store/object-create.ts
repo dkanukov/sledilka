@@ -9,7 +9,7 @@ interface ObjectCreateStore {
 	createdObject: ObjectStorage | null
 	// createdLayer: ObjectLayer | null
 	createNewObject: (objectData: EntityNewObject) => Promise<void>
-	createNewLayer: (objectId: string, layer: ObjectLayer) => Promise<{
+	createNewLayer: (objectId: string, layer: ObjectLayer, name: string) => Promise<{
 		success: boolean
 		id: string
 	}>
@@ -19,14 +19,13 @@ interface ObjectCreateStore {
 
 export const useObjectCreateStore = create<ObjectCreateStore>()((set) => ({
 	createdObject: null,
-	// createdLayer: null,
 	createNewObject: async (objectData) => {
 		const newObject = await objectService.createObject(objectData)
 		set(({
 			createdObject: newObject,
 		}))
 	},
-	whenLayerLanLotChange: (lan, lot) => {
+	whenLayerLanLotChange: (southWest, northEast) => {
 		set((state) => {
 			if (!state.createdObject || !state.createdObject.layers[0]) {
 				return state
@@ -37,16 +36,19 @@ export const useObjectCreateStore = create<ObjectCreateStore>()((set) => ({
 					...state.createdObject,
 					layers: [state.createdObject.layers[0] = {
 						...state.createdObject.layers[0],
-						lan: lan,
-						lot: lot,
+						southWest,
+						northEast,
 					}],
 				},
 			}
 
 		})
 	},
-	createNewLayer: async (objectId, layer) => {
-		const response = await objectService.createLayer(objectId, layer)
+	createNewLayer: async (objectId, layer, name) => {
+		const response = await objectService.createLayer(objectId, {
+			...layer,
+			floorName: name,
+		})
 		return {
 			success: Boolean(response),
 			id: response ?? '',

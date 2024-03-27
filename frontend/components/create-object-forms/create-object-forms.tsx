@@ -134,30 +134,30 @@ export const SecondStep = (props: SecondStepProps) => {
 
 interface ThirdStepProps {
 	selectedLayer: ObjectLayer
-	handleLayerDrag: (lan:[number, number], lot: [number, number]) => void
-	whenNextStepClick: () => Promise<void>
+	handleLayerDrag: (southWest:[number, number], northEast: [number, number]) => void
+	whenNextStepClick: (name: string) => Promise<void>
 }
 
 export const ThirdStep = (props: ThirdStepProps) => {
-	const handleLayerDrag = (e: L.LatLng | L.LatLng[]) => {
-		// @ts-expect-error
-		const lan = [e['_southWest'].lat, e['_southWest'].lng] as [number, number]
-		// @ts-expect-error
-		const lot = [e['_northEast'].lat, e['_northEast'].lng]as [number, number]
-
-		props.handleLayerDrag(lan, lot)
-	}
+	const [floorName, setFloorName] = useState('')
 
 	return (
 		<div className={styles.map}>
+			<Input
+				className={styles.floorNameInput}
+				placeholder={'Название слоя'}
+				value={floorName}
+				onChange={(e) => setFloorName(e.target.value)}
+			/>
 			<Map
 				edit
 				selectedLayer={props.selectedLayer}
-				handleLayerDrag={handleLayerDrag}
+				handleLayerDrag={props.handleLayerDrag}
 			/>
 			<div className={styles.bottomControls}>
 				<Button
-					onClick={props.whenNextStepClick}
+					disabled={!floorName}
+					onClick={() => props.whenNextStepClick(floorName)}
 				>
 					Далее
 				</Button>
