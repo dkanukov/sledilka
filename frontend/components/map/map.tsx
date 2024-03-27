@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { Switch } from 'antd'
+import { Button, Switch } from 'antd'
 import * as L from 'leaflet'
 
 import styles from './map.module.css'
@@ -16,6 +16,8 @@ const TileLayerURL = 'https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=
 interface Props {
 	selectedLayer: ObjectLayer
 	handleLayerDrag?: (southWest: [number, number], northEast: [number, number]) => void
+	handleDeviceDrag?: (deviceId: string, coords: [number, number]) => void
+	handleSaveDices?: () => void
 	edit?: boolean
 	action?: 'addLayer' | 'editLayer' | null
 }
@@ -164,26 +166,29 @@ export const Map = (props: Props) => {
 			})
 			mapRef.fitBounds([props.selectedLayer.southWest, props.selectedLayer.northEast])
 
-			const features = props.selectedLayer.devices.map((device) => {
-				console.log(device)
-				return L.icon({
-					iconUrl: '/camera.png',
-					iconSize: [20, 20],
-				})
-			})
-
-			const customMarker = L.Marker.extend({
+			const CustomMarker = L.Marker.extend({
 				id: '',
 			})
 
-			features.forEach((f) => {
-				const marker = L.marker(props.selectedLayer.southWest, {
-					icon: f,
+			const features = props.selectedLayer.devices.map((device) => {
+				console.log(device)
+				const icon = L.icon({
+					iconUrl: '/camera.png',
+					iconSize: [20, 20],
+				})
+
+				const marker = new CustomMarker([device.locationX, device.locationY], {
+					icon: icon,
 					interactive: true,
 					draggable: true,
+					id: device.id,
 				}).addTo(mapRef)
 
-				marker.on('dragend', (e) => console.log(e.sourceTarget))
+				marker.on('dragend', (e) => {
+					const coords = [e.target.getLatLng().lat, e.target.getLatLng().lng] as [number, number]
+					const deviceId = e.target.options.id as string
+					props.handleDeviceDrag?.(deviceId, coords)
+				})
 			})
 		}
 
@@ -250,6 +255,11 @@ export const Map = (props: Props) => {
 			<div
 				className={styles.mapControl}
 			>
+				<Button
+					onClick={props.handleSaveDices}
+				>
+					save
+				</Button>
 				<Switch
 					checked={isRenderTileLayer}
 					onClick={toggleTileLayer}

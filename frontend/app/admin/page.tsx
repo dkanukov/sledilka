@@ -101,6 +101,8 @@ export default function Admin() {
 					action={action}
 					handleLayerDrag={handleLayerTransform}
 					selectedLayer={objectsStore.selectedLayer}
+					handleDeviceDrag={objectsStore.handleDeviceMove}
+					handleSaveDices={objectsStore.updateDevices}
 				/>
 			)}
 		</div>

@@ -21,8 +21,8 @@ export class Device {
 		this.macAddress = dto.mac_address
 		this.layerId = dto.layer_id || 'no-layer-id-device'
 		this.type = dto.type || EntityDeviceType.Computer
-		this.locationX = dto.location_x || 0
-		this.locationY = dto.location_y || 0
+		this.locationX = dto.location_x ?? 0
+		this.locationY = dto.location_y ?? 0
 	}
 }
 

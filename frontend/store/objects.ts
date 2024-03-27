@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import { ObjectLayer, ObjectStorage } from '@models'
+import { Device, ObjectLayer, ObjectStorage } from '@models'
 import { objectService, imageService } from '@api'
 
 interface ObjectsStore {
@@ -14,6 +14,8 @@ interface ObjectsStore {
 	handleSelectedFloorNameChange: (value: string) => void
 	fetchObjects: () => Promise<void>
 	createNewLayer: (objectId: string, newLayer: ObjectLayer) => Promise<string>
+	handleDeviceMove: (deviceId: string, coords: [number, number]) => void
+	updateDevices: () => void
 }
 export const useObjectsStore = create<ObjectsStore>()((set) => ({
 	objects: [],
@@ -114,6 +116,38 @@ export const useObjectsStore = create<ObjectsStore>()((set) => ({
 				},
 			}
 		})
+	},
+
+	handleDeviceMove: (deviceId, coords) => {
+		set((state) => {
+			if (!state.selectedLayer) {
+				return state
+			}
+
+			const movedDevice = state.selectedLayer.devices.find((device) => device.id === deviceId)
+
+			if (!movedDevice) {
+				return state
+			}
+
+			console.log(coords)
+			movedDevice.locationX = coords[0]
+			movedDevice.locationY = coords[1]
+
+			return state
+		})
+	},
+
+	updateDevices: () => {
+		set((state) => {
+			state.selectedLayer?.devices.forEach(async (d) => {
+				const response = await objectService.updateDevice(d)
+				console.log(response)
+			})
+
+			return state
+		})
+
 	},
 
 	fetchObjects: async () => {
