@@ -4,14 +4,18 @@ import { useState } from 'react'
 
 import styles from './add-layer-sidebar.module.css'
 
+import { ObjectLayer } from '@models'
+
 interface Props {
+	selectedLayer: ObjectLayer | null
 	whenUploadImage: (file: File) => void
+	whenFloorNameChange: (value: string) => void
+	whenCreateNewLayer: () => void
 }
 
 const { Dragger } = Upload
 export const AddLayerSidebar = (props: Props) => {
 	const [fileList, setFileList] = useState<UploadFile[]>([])
-	const [floorName, setFloorName] = useState('')
 
 	const handleBeforeFileUpload: UploadProps['beforeUpload'] = (file) => {
 		const isCorrectFileType = file.type === 'image/png'
@@ -42,8 +46,8 @@ export const AddLayerSidebar = (props: Props) => {
 			<Input
 				placeholder={'Название слоя'}
 				size={'large'}
-				value={floorName}
-				onChange={(e) => setFloorName(e.target.value)}
+				value={props.selectedLayer?.floorName || ''}
+				onChange={(e) => props.whenFloorNameChange(e.target.value)}
 			/>
 			<div>
 				<Dragger
@@ -62,6 +66,12 @@ export const AddLayerSidebar = (props: Props) => {
 					</p>
 				</Dragger>
 			</div>
+			<Button
+				disabled={!fileList.length || !props.selectedLayer?.floorName}
+				onClick={props.whenCreateNewLayer}
+			>
+				Добавить
+			</Button>
 		</div>
 	)
 }

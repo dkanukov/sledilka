@@ -36,8 +36,27 @@ export default function Admin() {
 		})
 	}
 
-	const handleAddLayer = () => {
+	const handleAddLayer = (objectId: string) => {
+		objectsStore.handleAddLayer(objectId)
 		setAction('addLayer')
+	}
+
+	const handleCreateNewLayer = async () => {
+		if (!objectsStore.selectedObject?.id || !objectsStore.selectedLayer) {
+			return
+		}
+		const id = await objectsStore.createNewLayer(objectsStore.selectedObject.id, objectsStore.selectedLayer)
+
+		await objectsStore.fetchObjects()
+		objectsStore.handleSelectedLayerChange(id)
+
+		setAction(null)
+		customRouter.push({
+			path: '/admin',
+			query: {
+				'layerId': [id],
+			},
+		})
 	}
 
 	const handleLayerTransform = (southWest:[number, number], northEast: [number, number]) => {
@@ -52,7 +71,10 @@ export default function Admin() {
 		switch (action) {
 		case 'addLayer': return (
 			<AddLayerSidebar
+				selectedLayer={objectsStore.selectedLayer}
 				whenUploadImage={handleUploadImage}
+				whenFloorNameChange={objectsStore.handleSelectedFloorNameChange}
+				whenCreateNewLayer={handleCreateNewLayer}
 			/>
 		)
 		case null: return (

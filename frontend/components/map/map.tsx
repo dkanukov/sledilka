@@ -10,7 +10,6 @@ import '@maptiler/leaflet-maptilersdk'
 import 'leaflet-path-transform'
 import { ObjectLayer } from '@models'
 import { usePersistState } from '@hooks'
-import { getRotatedBounds, radiansToDegress } from '@helpers'
 
 const TileLayerURL = 'https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=wL6YzJn6rYPYSi4sb7R3'
 
@@ -25,10 +24,10 @@ export const Map = (props: Props) => {
 	const [mapRef, setMapRef] = useState<L.Map>()
 	const mapContainerRef = useRef<HTMLDivElement>(null)
 	const [mapLayers, setMapLayers] = useState<{
-		imageOverlay: null | L.ImageOverlay
-		editRectangle: null | L.Rectangle
-		editImageOverlay: null | L.ImageOverlay
-		tile: null | L.TileLayer
+		imageOverlay?: null | L.ImageOverlay
+		editRectangle?: null | L.Rectangle
+		editImageOverlay?: null | L.ImageOverlay
+		tile?: null | L.TileLayer
 	}>({
 		imageOverlay: null,
 		editRectangle: null,
@@ -82,8 +81,11 @@ export const Map = (props: Props) => {
 
 	const handleStartAddingLayer = () => {
 		if (!mapRef || mapLayers.editRectangle) {
+			console.log('end')
 			return
 		}
+
+		console.log('start')
 
 		const rectangle = L.rectangle([props.selectedLayer.southWest, props.selectedLayer.northEast], {
 			color: 'red',
@@ -136,15 +138,21 @@ export const Map = (props: Props) => {
 			return
 		}
 
-		if (props.edit) {
+		if (props.edit && !mapLayers.imageOverlay) {
 			handleStartEdit()
 		}
 
 		if (!props.edit && !props.action) {
-			if (mapLayers.imageOverlay) {
-				mapLayers.imageOverlay.remove()
-				mapLayers.imageOverlay = null
-			}
+			mapLayers.imageOverlay?.remove()
+			mapLayers.editRectangle?.remove()
+			mapLayers.editImageOverlay?.remove()
+			// @ts-expect-error
+			mapLayers.editRectangle?.transform?.disable?.()
+			setMapLayers({
+				imageOverlay: null,
+				editImageOverlay: null,
+				editRectangle: null,
+			})
 
 			const overlay = L.imageOverlay(
 				`http://localhost:8081/images/${props.selectedLayer.image}`,

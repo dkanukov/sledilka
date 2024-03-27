@@ -1,7 +1,6 @@
 'use client'
 
 import { Menu } from 'antd'
-import { v4 as uuidv4 } from 'uuid'
 
 import styles from './sidebar.module.css'
 
@@ -12,7 +11,7 @@ interface Props {
 	items: ObjectStorage[]
 	selectedItem: string
 	whenClick: (item: string) => void
-	whenCreateLayerClick: () => void
+	whenCreateLayerClick: (objectId: string) => void
 }
 
 export const Sidebar = (props: Props) => {
@@ -26,14 +25,15 @@ export const Sidebar = (props: Props) => {
 				key: layer.id,
 			})), {
 				label: '+',
-				key: `create-layer-${uuidv4()}`,
+				key: `create-layer-${item.id}`,
 			}],
 		})
 	))
 
 	const handleItemClick = (key: string) => {
 		if (key.includes('create-layer')) {
-			props.whenCreateLayerClick()
+			const objectId = key.replace('create-layer-', '')
+			props.whenCreateLayerClick(objectId)
 			return
 		}
 		props.whenClick(key)
