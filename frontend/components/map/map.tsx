@@ -45,7 +45,7 @@ export const Map = (props: Props) => {
 		}
 
 		const overlay = L.imageOverlay(
-			`http://localhost:8081/images/${props.selectedLayer.image}`,
+			`http://backend:8081/images/${props.selectedLayer.image}`,
 			[props.selectedLayer.southWest, props.selectedLayer.northEast],
 		).addTo(mapRef)
 
@@ -158,7 +158,7 @@ export const Map = (props: Props) => {
 			})
 
 			const overlay = L.imageOverlay(
-				`http://localhost:8081/images/${props.selectedLayer.image}`,
+				`http://backend/images/${props.selectedLayer.image}`,
 				[props.selectedLayer.southWest, props.selectedLayer.northEast],
 			).addTo(mapRef)
 			setMapLayers({
@@ -209,7 +209,7 @@ export const Map = (props: Props) => {
 
 		if (props.selectedLayer.image) {
 			const overlay = L.imageOverlay(
-				`http://localhost:8081/images/${props.selectedLayer.image}`,
+				`http://backend:8081/images/${props.selectedLayer.image}`,
 				[props.selectedLayer.southWest, props.selectedLayer.northEast],
 			).addTo(mapRef)
 
