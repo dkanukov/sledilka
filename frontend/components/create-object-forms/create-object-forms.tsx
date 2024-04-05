@@ -150,9 +150,7 @@ export const ThirdStep = (props: ThirdStepProps) => {
 				onChange={(e) => setFloorName(e.target.value)}
 			/>
 			<Map
-				edit
 				selectedLayer={props.selectedLayer}
-				handleLayerDrag={props.handleLayerDrag}
 			/>
 			<div className={styles.bottomControls}>
 				<Button

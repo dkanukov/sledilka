@@ -5,14 +5,13 @@ import { useEffect, useState } from 'react'
 import styles from './admin.module.css'
 
 import { Sidebar, Map, AddLayerSidebar } from '@components'
-import { useObjectCreateStore, useObjectsStore } from '@store'
+import { useObjectsStore } from '@store'
 import { useCustomRouter } from '@hooks'
 
 export default function Admin() {
 	const objectsStore = useObjectsStore()
 	const { customRouter, query } = useCustomRouter()
 	const [action, setAction] = useState<'addLayer' | 'editLayer' | null>(null)
-	const isEdit = action === 'addLayer' || action === 'editLayer'
 
 	useEffect(() => {
 		objectsStore.fetchObjects()
@@ -23,7 +22,6 @@ export default function Admin() {
 				}
 			})
 			.catch(() => console.error('cant get objects'))
-
 	}, [])
 
 	const handleSelectLayer = (key: string) => {
@@ -36,44 +34,22 @@ export default function Admin() {
 		})
 	}
 
-	const handleAddLayer = (objectId: string) => {
-		objectsStore.handleAddLayer(objectId)
-		setAction('addLayer')
-	}
-
-	const handleCreateNewLayer = async () => {
-		if (!objectsStore.selectedObject?.id || !objectsStore.selectedLayer) {
+	const handleEditToggle = () => {
+		if (action === 'editLayer') {
+			setAction(null)
 			return
 		}
-		const id = await objectsStore.createNewLayer(objectsStore.selectedObject.id, objectsStore.selectedLayer)
 
-		await objectsStore.fetchObjects()
-		objectsStore.handleSelectedLayerChange(id)
-
-		setAction(null)
-		customRouter.push({
-			path: '/admin',
-			query: {
-				'layerId': [id],
-			},
-		})
+		setAction('editLayer')
 	}
 
-	const handleLayerTransform = (southWest:[number, number], northEast: [number, number]) => {
+	/* const handleLayerTransform = (southWest:[number, number], northEast: [number, number]) => {
 		objectsStore.handleSelectedLayerTransform(southWest, northEast)
-	}
-
-	const handleUploadImage = async (file: File) => {
-		await objectsStore.handleUploadImage(file)
-	}
-
-	const handleCancel = () => {
-		setAction(null)
-	}
+	} */
 
 	const renderSidebar = () => {
 		switch (action) {
-		case 'addLayer': return (
+		/* case 'addLayer': return (
 			<AddLayerSidebar
 				selectedLayer={objectsStore.selectedLayer}
 				whenCancel={handleCancel}
@@ -81,13 +57,15 @@ export default function Admin() {
 				whenFloorNameChange={objectsStore.handleSelectedFloorNameChange}
 				whenCreateNewLayer={handleCreateNewLayer}
 			/>
+		) */
+		case 'editLayer': return (
+			<>edit sidebar</>
 		)
 		case null: return (
 			<Sidebar
 				items={objectsStore.objects}
 				selectedItem={objectsStore.selectedLayer?.id ?? ''}
 				whenClick={handleSelectLayer}
-				whenCreateLayerClick={handleAddLayer}
 			/>
 		)
 		}
@@ -98,12 +76,7 @@ export default function Admin() {
 			{renderSidebar()}
 			{objectsStore.selectedLayer && (
 				<Map
-					action={action}
-					handleLayerDrag={handleLayerTransform}
 					selectedLayer={objectsStore.selectedLayer}
-					handleDeviceDrag={objectsStore.handleDeviceMove}
-					handleSaveDices={objectsStore.updateDevices}
-					moveObject
 				/>
 			)}
 		</div>
