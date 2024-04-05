@@ -15,3 +15,12 @@
 
 	padding: 20px;
 }
+
+.territoryControl {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px;
+	border-radius: 8px;
+	background-color: var(--main-0);
+}
