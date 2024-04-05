@@ -12,9 +12,9 @@ definitions:
     type: object
   entity.Coordinate:
     properties:
-      x:
+      lat:
         type: number
-      "y":
+      long:
         type: number
     type: object
   entity.Device:
@@ -62,10 +62,6 @@ definitions:
         items:
           $ref: '#/definitions/entity.Coordinate'
         type: array
-      coordinate_x:
-        type: number
-      coordinate_y:
-        type: number
       created_at:
         type: string
       devices:
@@ -124,10 +120,6 @@ definitions:
         items:
           $ref: '#/definitions/entity.Coordinate'
         type: array
-      coordinate_x:
-        type: number
-      coordinate_y:
-        type: number
       floor_name:
         type: string
       image:

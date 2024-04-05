@@ -1114,10 +1114,10 @@ const docTemplate = `{
         "entity.Coordinate": {
             "type": "object",
             "properties": {
-                "x": {
+                "lat": {
                     "type": "number"
                 },
-                "y": {
+                "long": {
                     "type": "number"
                 }
             }
@@ -1186,12 +1186,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/entity.Coordinate"
                     }
-                },
-                "coordinate_x": {
-                    "type": "number"
-                },
-                "coordinate_y": {
-                    "type": "number"
                 },
                 "created_at": {
                     "type": "string"
@@ -1280,12 +1274,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/entity.Coordinate"
                     }
-                },
-                "coordinate_x": {
-                    "type": "number"
-                },
-                "coordinate_y": {
-                    "type": "number"
                 },
                 "floor_name": {
                     "type": "string"

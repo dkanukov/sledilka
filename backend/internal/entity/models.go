@@ -26,8 +26,6 @@ type Layer struct {
 	ObjectID          uuid.UUID    `json:"object_id"`
 	FloorName         string       `json:"floor_name"`
 	Devices           []Device     `json:"devices,omitempty"`
-	CoordinateX       float64      `json:"coordinate_x"`
-	CoordinateY       float64      `json:"coordinate_y"`
 	AnglesCoordinates []Coordinate `json:"angles_coordinates"`
 	Image             string       `json:"image"`
 	Angle             float64      `json:"angle"`
@@ -36,8 +34,8 @@ type Layer struct {
 }
 
 type Coordinate struct {
-	X float64 `json:"x"`
-	Y float64 `json:"y"`
+	Lat  float64 `json:"lat"`
+	Long float64 `json:"long"`
 }
 
 type LayerForDB struct {
@@ -45,8 +43,6 @@ type LayerForDB struct {
 	ObjectID          uuid.UUID `json:"object_id"`
 	FloorName         string    `json:"floor_name"`
 	Devices           []Device  `json:"devices,omitempty" gorm:"foreignKey:LayerID"`
-	CoordinateX       float64   `json:"coordinate_x"`
-	CoordinateY       float64   `json:"coordinate_y"`
 	AnglesCoordinates string    `json:"angles_coordinates"`
 	Image             string    `json:"image"`
 	Angle             float64   `json:"angle"`
@@ -57,8 +53,6 @@ type LayerForDB struct {
 type NewLayer struct {
 	Image             string       `json:"image"`
 	FloorName         string       `json:"floor_name"`
-	CoordinateX       float64      `json:"coordinate_x"`
-	CoordinateY       float64      `json:"coordinate_y"`
 	Angle             float64      `json:"angle"`
 	AnglesCoordinates []Coordinate `json:"angles_coordinates"`
 }

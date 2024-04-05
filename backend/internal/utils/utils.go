@@ -76,19 +76,25 @@ func NewEntities() {
 	body, _ = io.ReadAll(resp.Body)
 	json.Unmarshal(body, &obj)
 	newLayer := entity.NewLayer{
-		Image:       "capybara.jpg",
-		FloorName:   "1",
-		CoordinateY: 10,
-		CoordinateX: 10,
-		Angle:       0,
+		Image:     "capybara.jpg",
+		FloorName: "1",
+		Angle:     0,
 		AnglesCoordinates: []entity.Coordinate{
 			{
-				X: 40.799311,
-				Y: -74.118464,
+				Lat:  56.127655,
+				Long: 37.210096,
 			},
 			{
-				X: 40.68202047785919,
-				Y: -74.33,
+				Lat:  56.127792,
+				Long: 37.212361,
+			},
+			{
+				Lat:  56.126285,
+				Long: 37.212654,
+			},
+			{
+				Lat:  56.126148,
+				Long: 37.210389,
 			},
 		},
 	}
@@ -164,8 +170,6 @@ func LayerToDBFormat(layer entity.Layer) entity.LayerForDB {
 		ID:                layer.ID,
 		ObjectID:          layer.ObjectID,
 		FloorName:         layer.FloorName,
-		CoordinateX:       layer.CoordinateX,
-		CoordinateY:       layer.CoordinateY,
 		Image:             layer.Image,
 		Angle:             layer.Angle,
 		AnglesCoordinates: string(b),
@@ -178,14 +182,12 @@ func DBFormatToLayer(layer entity.LayerForDB) entity.Layer {
 	var coors []entity.Coordinate
 	_ = json.Unmarshal([]byte(layer.AnglesCoordinates), &coors)
 	sort.Slice(coors, func(i, j int) bool {
-		return coors[i].X < coors[j].X
+		return coors[i].Lat < coors[j].Lat
 	})
 	return entity.Layer{
 		ID:                layer.ID,
 		ObjectID:          layer.ObjectID,
 		FloorName:         layer.FloorName,
-		CoordinateX:       layer.CoordinateX,
-		CoordinateY:       layer.CoordinateY,
 		Image:             layer.Image,
 		Angle:             layer.Angle,
 		AnglesCoordinates: coors,

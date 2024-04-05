@@ -47,9 +47,9 @@ func Post(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		w.Write([]byte("image not found"))
 		return
 	}
-	if len(newReq.AnglesCoordinates) != 2 {
+	if len(newReq.AnglesCoordinates) != 4 {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("angles coordinates must be 2"))
+		w.Write([]byte("angles coordinates must be 4"))
 		return
 	}
 	b, err := json.Marshal(&newReq.AnglesCoordinates)
@@ -61,8 +61,6 @@ func Post(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	layer := entity.LayerForDB{
 		ObjectID:          id,
 		FloorName:         newReq.FloorName,
-		CoordinateX:       newReq.CoordinateX,
-		CoordinateY:       newReq.CoordinateY,
 		Image:             newReq.Image,
 		Angle:             newReq.Angle,
 		AnglesCoordinates: string(b),
