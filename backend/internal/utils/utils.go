@@ -11,7 +11,6 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
-	"sort"
 	"time"
 )
 
@@ -181,9 +180,6 @@ func LayerToDBFormat(layer entity.Layer) entity.LayerForDB {
 func DBFormatToLayer(layer entity.LayerForDB) entity.Layer {
 	var coors []entity.Coordinate
 	_ = json.Unmarshal([]byte(layer.AnglesCoordinates), &coors)
-	sort.Slice(coors, func(i, j int) bool {
-		return coors[i].Lat < coors[j].Lat
-	})
 	return entity.Layer{
 		ID:                layer.ID,
 		ObjectID:          layer.ObjectID,
