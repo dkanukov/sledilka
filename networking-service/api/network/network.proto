@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package network;
+
+option go_package="network/internal/network;network";
+
+service network {
+  rpc IsActiveListDevice (IsActiveListDeviceRequest) returns (IsActiveListDeviceResponse);
+  rpc Subscribe (Empty) returns (stream DeviceStatus);
+}
+
+message Empty {
+
+}
+
+message IsActiveListDeviceRequest {
+  repeated Device devices = 1;
+}
+
+message IsActiveListDeviceResponse {
+  repeated DeviceStatus devices = 1;
+}
+
+
+message Device {
+  string macAddress = 1;
+}
+
+message DeviceStatus {
+  string macAddress = 1;
+  bool isActive = 2;
+}

@@ -1,4 +1,4 @@
-PHONY: generate-structs
+.PHONY: generate-structs
 generate-proto:
 	mkdir -p internal/tokener
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
