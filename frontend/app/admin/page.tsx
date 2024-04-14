@@ -77,6 +77,7 @@ export default function Admin() {
 			{objectsStore.selectedLayer && (
 				<Map
 					selectedLayer={objectsStore.selectedLayer}
+					whenPolygonChange={objectsStore.handlePolygonChange}
 				/>
 			)}
 		</div>

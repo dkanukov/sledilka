@@ -9,11 +9,6 @@
  * ---------------------------------------------------------------
  */
 
-export interface AuthorizationCreateTokenResponse {
-  access_token?: string;
-  refresh_token?: string;
-}
-
 export interface EntityAnnouncement {
   createdAt?: string;
   description?: string;
@@ -22,8 +17,8 @@ export interface EntityAnnouncement {
 }
 
 export interface EntityCoordinate {
-  x?: number;
-  y?: number;
+  lat?: number;
+  long?: number;
 }
 
 export interface EntityDevice {
@@ -51,8 +46,6 @@ export enum EntityDeviceType {
 export interface EntityLayer {
   angle?: number;
   angles_coordinates?: EntityCoordinate[];
-  coordinate_x?: number;
-  coordinate_y?: number;
   created_at?: string;
   devices?: EntityDevice[];
   floor_name?: string;
@@ -87,8 +80,6 @@ export interface EntityNewDevice {
 export interface EntityNewLayer {
   angle?: number;
   angles_coordinates?: EntityCoordinate[];
-  coordinate_x?: number;
-  coordinate_y?: number;
   floor_name?: string;
   image?: string;
 }
@@ -133,9 +124,32 @@ export interface EntityUserInfo {
   username?: string;
 }
 
-export interface EntityUserToken {
-  expires_in?: number;
-  token?: string;
+export interface TimestamppbTimestamp {
+  /**
+   * Non-negative fractions of a second at nanosecond resolution. Negative
+   * second values with fractions must still have non-negative nanos values
+   * that count forward in time. Must be from 0 to 999,999,999
+   * inclusive.
+   */
+  nanos?: number;
+  /**
+   * Represents seconds of UTC time since Unix epoch
+   * 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
+   * 9999-12-31T23:59:59Z inclusive.
+   */
+  seconds?: number;
+}
+
+export interface TokenerCreateTokenResponse {
+  access_token?: string;
+  expires_at?: TimestamppbTimestamp;
+  refresh_token?: string;
+}
+
+export interface TokenerRefreshTokenResponse {
+  access_token?: string;
+  expires_at?: TimestamppbTimestamp;
+  refresh_token?: string;
 }
 
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
@@ -472,6 +486,39 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
   };
+  isLowLight = {
+    /**
+     * No description
+     *
+     * @tags isLowLight
+     * @name IsLowLightDetail
+     * @summary получить трансляцию
+     * @request GET:/isLowLight/{id}
+     */
+    isLowLightDetail: (id: string, params: RequestParams = {}) =>
+      this.request<boolean, void>({
+        path: `/isLowLight/${id}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+  };
+  layers = {
+    /**
+     * No description
+     *
+     * @tags new
+     * @name NewDevicesCreate
+     * @summary Новые девайсы для слоя
+     * @request POST:/layers/{id}/newDevices
+     */
+    newDevicesCreate: (id: string, params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/layers/${id}/newDevices`,
+        method: "POST",
+        ...params,
+      }),
+  };
   new = {
     /**
      * No description
@@ -612,7 +659,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       data?: any,
       params: RequestParams = {},
     ) =>
-      this.request<EntityUserToken, void>({
+      this.request<TokenerRefreshTokenResponse, void>({
         path: `/refresh`,
         method: "POST",
         query: query,
@@ -735,6 +782,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
   };
+  stream = {
+    /**
+     * No description
+     *
+     * @tags stream
+     * @name StreamDetail
+     * @summary получить трансляцию
+     * @request GET:/stream/{id}
+     */
+    streamDetail: (id: string, params: RequestParams = {}) =>
+      this.request<any, void>({
+        path: `/stream/${id}`,
+        method: "GET",
+        type: ContentType.Json,
+        ...params,
+      }),
+  };
   token = {
     /**
      * No description
@@ -745,7 +809,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/token
      */
     tokenCreate: (request: EntityLoginInfo, params: RequestParams = {}) =>
-      this.request<AuthorizationCreateTokenResponse, void>({
+      this.request<TokenerCreateTokenResponse, void>({
         path: `/token`,
         method: "POST",
         body: request,

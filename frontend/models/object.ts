@@ -1,8 +1,7 @@
-import { LatLngBounds } from 'leaflet'
-
 import { EntityLayer, EntityObject } from '../api/generated/api'
 
 import { Device } from '@models'
+import { Area } from '@typos'
 
 export class ObjectStorage {
 	id!: string
@@ -28,27 +27,30 @@ export class ObjectLayer {
 	id!: string
 	objectId!: string
 	floorName!: string
-	angle?: number
-	coordinateX: number
-	coordinateY: number
+	angle: number
 	image?: string
 	createdAt!: string
 	updatedAt!: string
 	devices!: Device[]
-	southWest!: [number, number]
-	northEast!: [number, number]
+	coordinates!: Area
 
 	constructor(dto: EntityLayer) {
 		this.id = dto.id || ''
 		this.objectId = dto.object_id || ''
 		this.floorName = dto.floor_name || ''
 		this.devices = dto.devices?.map((d) => new Device(d)) ?? []
-		this.angle = dto.angle
-		this.coordinateX = dto.coordinate_x || 0
-		this.coordinateY = dto.coordinate_y || 0
-		// lat || lot
-		this.southWest = [dto.angles_coordinates?.[0].x ?? 0, dto.angles_coordinates?.[0].y ?? 0]
-		this.northEast = [dto.angles_coordinates?.[1].x ?? 0, dto.angles_coordinates?.[1].y ?? 0]
+		this.coordinates = dto.angles_coordinates?.reduce<Area>((result, layer, _, array) => {
+			if (array.length < 4) {
+				return result
+			}
+
+			if (!layer || layer.lat === undefined || layer.long === undefined) {
+				return result
+			}
+
+			return [...result, [layer.long, layer.lat]]
+		}, []) ?? []
+		this.angle = dto.angle || 0
 		this.image = dto.image
 		this.createdAt = dto.created_at || ''
 		this.updatedAt = dto.updated_at || ''

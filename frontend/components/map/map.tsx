@@ -6,12 +6,12 @@ import styles from './map.module.css'
 
 import { useMap, usePersistState } from '@hooks'
 import { ObjectLayer } from '@models'
+import { Area } from '@typos'
 
 interface Props {
 	selectedLayer: ObjectLayer
+	whenPolygonChange?: (coordinates: Area, angle: number) => void
 }
-
-const { Text } = Typography
 
 export const Map = (props: Props) => {
 	const {
@@ -20,22 +20,54 @@ export const Map = (props: Props) => {
 		initializeMap,
 		drawTile,
 		drawScheme,
-	} = useMap()
+		drawPolygon,
+		clearScheme,
+		setCenterByArea,
+		toggleTileVisibility,
+	} = useMap({
+		onPolygonChange: props.whenPolygonChange,
+	})
 	const { state: isTileVisible, updateState: setIsTileVisible } = usePersistState('toggle-tile-layer', true)
+
+	const redrawScheme = async () => {
+		if (map && props.selectedLayer.image && props.selectedLayer.coordinates) {
+			clearScheme()
+			await drawScheme(
+				props.selectedLayer.image,
+				props.selectedLayer.angle,
+				props.selectedLayer.coordinates,
+			)
+		}
+	}
+
+	const handleToggleTileLayer = () => {
+		setIsTileVisible(!isTileVisible)
+		toggleTileVisibility(!isTileVisible)
+	}
 
 	useEffect(() => {
 		initializeMap()
 	}, [])
 
 	useEffect(() => {
-		console.log(isTileVisible)
 		drawTile(isTileVisible)
 
-		/* if (props.selectedLayer?.image) {
-			drawScheme(props.selectedLayer.image, props.selectedLayer.angle || 0, [props.selectedLayer.southWest, props.selectedLayer.northEast])
+		if (props.selectedLayer?.image) {
+			drawScheme(props.selectedLayer.image, props.selectedLayer.angle, props.selectedLayer.coordinates)
 				.catch(() => console.error('не загрузили картинку слоя'))
-		} */
-	}, [map, isTileVisible, props.selectedLayer])
+			setCenterByArea(props.selectedLayer.coordinates)
+		}
+
+		drawPolygon(props.selectedLayer.coordinates, props.selectedLayer.angle)
+	}, [map])
+
+	useEffect(() => {
+		redrawScheme().catch(() => {})
+	}, [props.selectedLayer.coordinates])
+
+	useEffect(() => {
+		redrawScheme().catch(() => {})
+	}, [props.selectedLayer.image])
 
 	return (
 		<>
@@ -44,8 +76,8 @@ export const Map = (props: Props) => {
 					className={styles.territoryControl}
 				>
 					<Switch
-						defaultChecked={isTileVisible}
-						onChange={() => setIsTileVisible(!isTileVisible)}
+						value={isTileVisible}
+						onChange={handleToggleTileLayer}
 					/>
 					<p>Территория</p>
 				</div>
