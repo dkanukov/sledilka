@@ -1,6 +1,6 @@
 'use client'
 import { useEffect } from 'react'
-import { Switch, Typography } from 'antd'
+import { Switch } from 'antd'
 
 import styles from './map.module.css'
 
@@ -62,12 +62,11 @@ export const Map = (props: Props) => {
 	}, [map])
 
 	useEffect(() => {
+		console.log('change')
+		console.log(props.selectedLayer)
 		redrawScheme().catch(() => {})
-	}, [props.selectedLayer.coordinates])
-
-	useEffect(() => {
-		redrawScheme().catch(() => {})
-	}, [props.selectedLayer.image])
+		setCenterByArea(props.selectedLayer.coordinates)
+	}, [props.selectedLayer.image, props.selectedLayer.coordinates])
 
 	return (
 		<>
