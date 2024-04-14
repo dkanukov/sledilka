@@ -7,13 +7,14 @@ import (
 	"encoding/json"
 	builinerrors "errors"
 	"fmt"
-	"github.com/google/uuid"
-	gmux "github.com/gorilla/mux"
-	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/google/uuid"
+	gmux "github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 // @Summary	Создать слой
@@ -107,9 +108,9 @@ func Patch(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		return
 	}
 	layer := utils.DBFormatToLayer(layerDB)
-	if len(layer.AnglesCoordinates) != 2 {
+	if len(layer.AnglesCoordinates) != 4 {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("angles coordinates must be 2"))
+		w.Write([]byte("angles coordinates must be 4"))
 		return
 	}
 	if err = json.NewDecoder(r.Body).Decode(&layer); err != nil {
