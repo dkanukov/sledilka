@@ -35,8 +35,6 @@ export const useObjectsStore = create<ObjectsStore>()((set) => ({
 	},
 
 	handlePolygonChange: (coordinates, angle) => {
-		console.log(coordinates)
-		console.log(angle)
 		set((state) => {
 			if (!state.selectedLayer) {
 				return {}
