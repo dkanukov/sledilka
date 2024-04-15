@@ -1,16 +1,21 @@
 'use client'
 import { useEffect } from 'react'
-import { Switch } from 'antd'
+import { Button, Switch } from 'antd'
+import { DoubleLeftOutlined, DoubleRightOutlined, EditOutlined, SaveOutlined } from '@ant-design/icons'
 
 import styles from './map.module.css'
 
 import { useMap, usePersistState } from '@hooks'
-import { ObjectLayer } from '@models'
 import { Area } from '@typos'
 
 interface Props {
-	selectedLayer: ObjectLayer
+	isPolygonNeed: boolean
+	image?: string
+	coordinates?: Area
+	angle?: number
 	whenPolygonChange?: (coordinates: Area, angle: number) => void
+	whenLayerEditStart?: () => void
+	whenLayerSave?: () => void
 }
 
 export const Map = (props: Props) => {
@@ -22,27 +27,30 @@ export const Map = (props: Props) => {
 		drawScheme,
 		drawPolygon,
 		clearScheme,
+		clearPolygon,
 		setCenterByArea,
 		toggleTileVisibility,
 	} = useMap({
 		onPolygonChange: props.whenPolygonChange,
 	})
-	const { state: isTileVisible, updateState: setIsTileVisible } = usePersistState('toggle-tile-layer', true)
+	const { state: tileLayerVisible, updateState: setTileLayerVisible } = usePersistState('toggle-tile-layer', true)
+	const { state: showMapControls, updateState: setShowMapControls } = usePersistState('show-map-controls', true)
 
 	const redrawScheme = async () => {
-		if (map && props.selectedLayer.image && props.selectedLayer.coordinates) {
+		if (map && props.image && props.coordinates && props.angle !== undefined) {
+			console.log('redraw')
 			clearScheme()
 			await drawScheme(
-				props.selectedLayer.image,
-				props.selectedLayer.angle,
-				props.selectedLayer.coordinates,
+				props.image,
+				props.angle,
+				props.coordinates,
 			)
 		}
 	}
 
 	const handleToggleTileLayer = () => {
-		setIsTileVisible(!isTileVisible)
-		toggleTileVisibility(!isTileVisible)
+		setTileLayerVisible(!tileLayerVisible)
+		toggleTileVisibility(!tileLayerVisible)
 	}
 
 	useEffect(() => {
@@ -50,36 +58,66 @@ export const Map = (props: Props) => {
 	}, [])
 
 	useEffect(() => {
-		drawTile(isTileVisible)
+		drawTile(tileLayerVisible)
 
-		if (props.selectedLayer?.image) {
-			drawScheme(props.selectedLayer.image, props.selectedLayer.angle, props.selectedLayer.coordinates)
+		if (props?.image) {
+			drawScheme(props.image, props.angle || 0, props.coordinates || [])
 				.catch(() => console.error('не загрузили картинку слоя'))
-			setCenterByArea(props.selectedLayer.coordinates)
+			setCenterByArea(props.coordinates || [])
 		}
 
-		drawPolygon(props.selectedLayer.coordinates, props.selectedLayer.angle)
+		if (props.isPolygonNeed) {
+			drawPolygon(props.coordinates || [], props.angle || 0)
+		}
 	}, [map])
 
 	useEffect(() => {
-		console.log('change')
-		console.log(props.selectedLayer)
+		if (props.isPolygonNeed) {
+			drawPolygon(props.coordinates || [], props.angle || 0)
+			return
+		}
+
+		clearPolygon()
+	}, [props.isPolygonNeed])
+
+	useEffect(() => {
 		redrawScheme().catch(() => {})
-		setCenterByArea(props.selectedLayer.coordinates)
-	}, [props.selectedLayer.image, props.selectedLayer.coordinates])
+		setCenterByArea(props.coordinates || [])
+	}, [props.image, props.coordinates])
 
 	return (
 		<>
 			<div className={styles.mapControl}>
-				<div
-					className={styles.territoryControl}
-				>
-					<Switch
-						value={isTileVisible}
-						onChange={handleToggleTileLayer}
-					/>
-					<p>Территория</p>
-				</div>
+				<Button
+					type={'primary'}
+					icon={showMapControls ? <DoubleRightOutlined/> : <DoubleLeftOutlined/>}
+					onClick={() => setShowMapControls(!showMapControls)}
+				/>
+				{showMapControls && (
+					<>
+						<Button
+							ghost
+							type={'primary'}
+							icon={<EditOutlined/>}
+							onClick={props.whenLayerEditStart}
+						/>
+						<Button
+							ghost
+							type={'primary'}
+							icon={<SaveOutlined/>}
+							onClick={props.whenLayerSave}
+						/>
+						<div
+							className={styles.territoryControl}
+						>
+							<Switch
+								value={tileLayerVisible}
+								onChange={handleToggleTileLayer}
+							/>
+							<p>Территория</p>
+						</div>
+					</>
+				)}
 			</div>
 			<div
 				className={styles.map}
