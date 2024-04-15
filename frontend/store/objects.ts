@@ -10,6 +10,7 @@ interface ObjectsStore {
 	selectedObject: ObjectStorage | null
 	handleSelectedLayerChange: (layerString: string) => void
 	handlePolygonChange: (coordinates: Area, angle: number) => void
+	handleSelectedLayerUpdate: (layer: ObjectLayer) => Promise<boolean>
 	fetchObjects: () => Promise<void>
 }
 export const useObjectsStore = create<ObjectsStore>()((set) => ({
@@ -48,6 +49,12 @@ export const useObjectsStore = create<ObjectsStore>()((set) => ({
 				},
 			}
 		})
+	},
+
+	handleSelectedLayerUpdate: async (layer: ObjectLayer) => {
+		const response = await objectService.updateLayer(layer)
+
+		return response
 	},
 
 	fetchObjects: async () => {

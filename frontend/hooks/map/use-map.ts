@@ -167,6 +167,25 @@ export const useMap = ({
 		layersDict.current.delete('scheme')
 	}
 
+	const clearPolygon = () => {
+		const currentPolygonLayer = layersDict.current.get('polygon')
+		if (!currentPolygonLayer || !map) {
+			return
+		}
+
+		// this.addTransformToCameras()
+
+		map.getInteractions().forEach((interaction) => {
+			if (interaction instanceof Transform) {
+				map?.removeInteraction(interaction)
+			}
+		})
+
+		map.removeLayer(currentPolygonLayer)
+		polygonLayer.current = null
+		layersDict.current.delete('polygon')
+	}
+
 	const handlePolygonChange = (feature: PolygonLayer['feature']) => {
 		const geometry = feature.getGeometry()
 		const rectCoordinates = geometry.getCoordinates()[0]
@@ -232,6 +251,7 @@ export const useMap = ({
 		drawScheme,
 		drawPolygon,
 		clearScheme,
+		clearPolygon,
 		setCenterByArea,
 		toggleTileVisibility,
 	}

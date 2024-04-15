@@ -15,7 +15,7 @@ export const createObject = async (newObject: EntityNewObject) => {
 }
 
 export const createLayer = async (objectId: string, newLayer: ObjectLayer) => {
-	const { data } = await CustomedApi.objects.layersCreate(objectId, {
+	/* const { data } = await CustomedApi.objects.layersCreate(objectId, {
 		angles_coordinates: [
 			{
 				x: newLayer.southWest[0],
@@ -29,7 +29,7 @@ export const createLayer = async (objectId: string, newLayer: ObjectLayer) => {
 		image: newLayer.image,
 	})
 
-	return data.id
+	return data.id */
 }
 
 export const updateDevice = async (device: Device) => {
@@ -39,4 +39,18 @@ export const updateDevice = async (device: Device) => {
 	})
 
 	return new Device(data)
+}
+
+export const updateLayer = async (layer: ObjectLayer) => {
+	const response = await CustomedApi.objects.layersPartialUpdate(layer.objectId, layer.id, {
+		angle: layer.angle,
+		angles_coordinates: layer.coordinates.map((area) => ({
+			long: area[0],
+			lat: area[1],
+		})),
+		// floor_name?: string;
+		// image?: string;
+	})
+
+	return response.status === 200
 }
