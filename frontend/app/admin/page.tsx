@@ -1,25 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 import styles from './admin.module.css'
 
-import { Sidebar, Map, AddLayerSidebar } from '@components'
+import { Sidebar, Map } from '@components'
 import { useObjectsStore } from '@store'
 import { useCustomRouter } from '@hooks'
-import { message } from 'antd'
-
-const enum Mode {
-	ADD_LAYER = 'ADD_LAYER',
-	ADD_CAMERA = 'ADD_CAMERA',
-	CAMERA_INFO = 'CAMERA_INFO',
-	EDIT_LAYER = 'EDIT_LAYER',
-}
 
 export default function Admin() {
 	const objectsStore = useObjectsStore()
 	const { customRouter, query } = useCustomRouter()
-	const [mode, setMode] = useState<Mode | null>(null)
 
 	useEffect(() => {
 		objectsStore.fetchObjects()
@@ -42,29 +33,15 @@ export default function Admin() {
 		})
 	}
 
-	const handleSelectedLayerEditStart = () => {
-		setMode(Mode.EDIT_LAYER)
-	}
-
-	const handleLayerSave = async () => {
+	const handleRedirectToEditPage = () => {
 		if (!objectsStore.selectedLayer) {
 			return
 		}
 
-		const response = await objectsStore.handleSelectedLayerUpdate(objectsStore.selectedLayer)
-
-		if (response) {
-			await message.success({ content: 'Слой сохранен' })
-			setMode(null)
-			return
-		}
-
-		await message.error({ content: 'Слой не был сохранен' })
+		customRouter.push({
+			path: `/admin/${objectsStore.selectedLayer.id}`,
+		})
 	}
-
-	/* const handleLayerTransform = (southWest:[number, number], northEast: [number, number]) => {
-		objectsStore.handleSelectedLayerTransform(southWest, northEast)
-	} */
 
 	return (
 		<div className={styles.root}>
@@ -79,9 +56,7 @@ export default function Admin() {
 					image={objectsStore.selectedLayer.image}
 					coordinates={objectsStore.selectedLayer.coordinates}
 					angle={objectsStore.selectedLayer.angle}
-					whenPolygonChange={objectsStore.handlePolygonChange}
-					whenLayerEditStart={handleSelectedLayerEditStart}
-					whenLayerSave={handleLayerSave}
+					whenLayerEditStart={handleRedirectToEditPage}
 				/>
 			)}
 		</div>
