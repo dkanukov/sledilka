@@ -18,7 +18,6 @@ export const Sidebar = (props: Props) => {
 		getMenuItem({
 			label: item.name,
 			key: item.id,
-			type: 'group',
 			children: item.layers.map((layer) => getMenuItem({
 				label: layer.floorName,
 				key: layer.id,
@@ -34,6 +33,7 @@ export const Sidebar = (props: Props) => {
 		<div className={styles.sidebarWrapper}>
 			<Menu
 				className={styles.menu}
+				mode={'inline'}
 				selectedKeys={[props.selectedItem]}
 				items={menuItems}
 				onSelect={({ key }) => handleItemClick(key)}
