@@ -153,6 +153,15 @@ func GetHandlers(db *gorm.DB, tokenerClient tokener.TokenerClient) *gmux.Router 
 		}
 	}).Methods(http.MethodPost)
 
+	router.HandleFunc("/layers/{id}", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			layer.GetById(w, r, db)
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	}).Methods(http.MethodGet)
+
 	router.HandleFunc("/objects/{object_id}/layers/{layer_id}", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPatch:

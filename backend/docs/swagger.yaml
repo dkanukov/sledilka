@@ -479,6 +479,26 @@ paths:
       summary: получить трансляцию
       tags:
       - isLowLight
+  /layers/{id}:
+    get:
+      parameters:
+      - description: Layer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Layer'
+        "500":
+          description: Internal Server Error
+      summary: Получить слой
+      tags:
+      - layers
   /layers/{id}/newDevices:
     post:
       parameters:

@@ -406,6 +406,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/layers/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "layers"
+                ],
+                "summary": "Получить слой",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Layer ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Layer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/layers/{id}/newDevices": {
             "post": {
                 "tags": [

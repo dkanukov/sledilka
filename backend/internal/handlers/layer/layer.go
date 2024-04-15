@@ -108,13 +108,13 @@ func Patch(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		return
 	}
 	layer := utils.DBFormatToLayer(layerDB)
+	if err = json.NewDecoder(r.Body).Decode(&layer); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	if len(layer.AnglesCoordinates) != 4 {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("angles coordinates must be 4"))
-		return
-	}
-	if err = json.NewDecoder(r.Body).Decode(&layer); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	layer.UpdatedAt = time.Now()
@@ -124,20 +124,29 @@ func Patch(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	json.NewEncoder(w).Encode(&layer)
 }
 
-//func GetById(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
-//	idParam := gmux.Vars(r)["id"]
-//	uuidId, err := uuid.Parse(idParam)
-//	if err != nil {
-//		errResp := &errors.ResponseError{StatusCode: http.StatusBadRequest, Message: err.Error()}
-//		errResp.WriteResponse(w)
-//		return
-//	}
-//	object := entity.Object{ID: uuidId}
-//	res := db.Find(&object)
-//	if res.RowsAffected == 0 {
-//		w.WriteHeader(http.StatusNotFound)
-//		return
-//	}
-//	b, _ := json.Marshal(object)
-//	w.Write(b)
-//}
+// @Summary	Получить слой
+// @Tags		layers
+// @Produce	json
+// @Param		id path string true "Layer ID"
+// @Success	200		{object}	entity.Layer
+// @Failure	500
+// @Router		/layers/{id} [get]
+func GetById(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+	idParam := gmux.Vars(r)["id"]
+	uuidId, err := uuid.Parse(idParam)
+	if err != nil {
+		errResp := &errors.ResponseError{StatusCode: http.StatusBadRequest, Message: err.Error()}
+		errResp.WriteResponse(w)
+		return
+	}
+	layerDb := entity.LayerForDB{ID: uuidId}
+	res := db.Find(&layerDb)
+	if res.RowsAffected == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	layer := utils.DBFormatToLayer(layerDb)
+	utils.SetDevices(db, &layer)
+	b, _ := json.Marshal(layer)
+	w.Write(b)
+}
