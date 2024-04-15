@@ -95,18 +95,22 @@ export const Map = (props: Props) => {
 				/>
 				{showMapControls && (
 					<>
-						<Button
-							ghost
-							type={'primary'}
-							icon={<EditOutlined/>}
-							onClick={props.whenLayerEditStart}
-						/>
-						<Button
-							ghost
-							type={'primary'}
-							icon={<SaveOutlined/>}
-							onClick={props.whenLayerSave}
-						/>
+						{!props.isPolygonNeed && (
+							<Button
+								ghost
+								type={'primary'}
+								icon={<EditOutlined/>}
+								onClick={props.whenLayerEditStart}
+							/>
+						)}
+						{props.whenLayerSave && (
+							<Button
+								ghost
+								type={'primary'}
+								icon={<SaveOutlined/>}
+								onClick={props.whenLayerSave}
+							/>
+						)}
 						<div
 							className={styles.territoryControl}
 						>
