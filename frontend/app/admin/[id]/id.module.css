@@ -1,9 +1,9 @@
 .root {
+	display: flex;
     height: calc(100vh - 63px);
 }
 
 .emptyMessage {
-	display: flex;
 	justify-content: center;
 	margin-top: 40px;
 }

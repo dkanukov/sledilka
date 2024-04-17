@@ -54,3 +54,15 @@ export const updateLayer = async (layer: ObjectLayer) => {
 
 	return response.status === 200
 }
+
+export const getLayerById = async (id: string) => {
+	const { data } = await CustomedApi.layers.layersDetail(id)
+
+	return new ObjectLayer(data)
+}
+
+export const getObjectById = async (objectId: string) => {
+	const { data } = await CustomedApi.objects.objectsDetail(objectId)
+
+	return new ObjectStorage(data)
+}

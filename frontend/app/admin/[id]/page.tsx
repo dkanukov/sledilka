@@ -1,51 +1,56 @@
 'use client'
-import { message, Typography } from 'antd'
-import { useEffect } from 'react'
+import { useState } from 'react'
 
 import styles from './id.module.css'
 
-import { Map } from '@components'
-import { useLayerEditStore } from '@store'
+import { EditSidebar, Map } from '@components'
+import { useLayerEdit, useCreateNewLayer } from '@hooks'
 
-const { Title } = Typography
+const enum Mode {
+	ADD_LAYER = 'ADD_LAYER',
+	ADD_CAMERA = 'ADD_CAMERA',
+	CAMERA_INFO = 'CAMERA_INFO',
+	EDIT_LAYER = 'EDIT_LAYER',
+}
 
-export default function Id() {
-	const layerStore = useLayerEditStore()
+export default function Id({ params } : { params: { id: string } }) {
+	const [mode, setMode] = useState<Mode | null>(Mode.EDIT_LAYER)
+	const {
+		layerStore,
+		handleLayerSave,
+	} = useLayerEdit(params.id ?? '')
+	const {
+		createNewLayer,
+	} = useCreateNewLayer()
 
-	useEffect(() => {
-	})
-
-	const handleLayerSave = async () => {
-		if (!layerStore.layer) {
-			return
-		}
-
-		const response = await layerStore.handleLayerUpdate(layerStore.layer)
-
-		if (response) {
-			await message.success({ content: 'Слой сохранен' })
-			return
-		}
-
-		await message.error({ content: 'Слой не был сохранен' })
+	const handleNewLayerCreateClick = () => {
+		//меняем мод, чтобы перерендерить полигон в Map
+		setMode(null)
+		createNewLayer()
+		setMode(Mode.ADD_LAYER)
 	}
+
 	return (
 		<div
 			className={styles.root}
 		>
-			{layerStore.layer ? (
+			{layerStore.object && (
+				<EditSidebar
+					object={layerStore.object}
+					selectedItem={layerStore.layer?.id ?? ''}
+					whenClick={layerStore.handleSelectedLayerChange}
+					whenCreateNewLayerClick={handleNewLayerCreateClick}
+				/>
+			)}
+			{layerStore.layer && (
 				<Map
-					isPolygonNeed
+					isPolygonNeed={mode === Mode.ADD_LAYER || mode === Mode.EDIT_LAYER}
 					angle={layerStore.layer.angle}
 					image={layerStore.layer.image}
 					coordinates={layerStore.layer.coordinates}
 					whenLayerSave={handleLayerSave}
 					whenPolygonChange={layerStore.handlePolygonChange}
 				/>
-			) : (
-				<div className={styles.emptyMessage}>
-					<Title>Нет слоя с ID</Title>
-				</div>
 			)}
 		</div>
 	)

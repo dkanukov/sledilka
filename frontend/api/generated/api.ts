@@ -507,6 +507,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     /**
      * No description
      *
+     * @tags layers
+     * @name LayersDetail
+     * @summary Получить слой
+     * @request GET:/layers/{id}
+     */
+    layersDetail: (id: string, params: RequestParams = {}) =>
+      this.request<EntityLayer, void>({
+        path: `/layers/${id}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags new
      * @name NewDevicesCreate
      * @summary Новые девайсы для слоя

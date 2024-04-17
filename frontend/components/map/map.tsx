@@ -9,7 +9,8 @@ import { useMap, usePersistState } from '@hooks'
 import { Area } from '@typos'
 
 interface Props {
-	isPolygonNeed: boolean
+	isPolygonNeed?: boolean
+
 	image?: string
 	coordinates?: Area
 	angle?: number
@@ -38,7 +39,6 @@ export const Map = (props: Props) => {
 
 	const redrawScheme = async () => {
 		if (map && props.image && props.coordinates && props.angle !== undefined) {
-			console.log('redraw')
 			clearScheme()
 			await drawScheme(
 				props.image,
@@ -46,7 +46,11 @@ export const Map = (props: Props) => {
 				props.coordinates,
 			)
 		}
-	}
+		// if (props.isPolygonNeed) {
+		// 	clearPolygon()
+		// 	drawPolygon(props.coordinates || [], props.angle || 0)
+		// }
+ 	}
 
 	const handleToggleTileLayer = () => {
 		setTileLayerVisible(!tileLayerVisible)
