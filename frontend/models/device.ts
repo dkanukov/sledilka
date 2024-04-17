@@ -1,17 +1,15 @@
 import { EntityDevice, EntityDeviceType } from '../api/generated/api'
 
-const pathToIcons = './device-svgs'
-
 export class Device {
 	id!: string
 	name!: string
 	isActive!: boolean
 	ip?: string
 	macAddress?: string
-	locationX!: number
-	locationY!: number
+	coordinates!: [number, number]
 	layerId!: string
 	type!: EntityDeviceType
+	angle!: number
 
 	constructor (dto: EntityDevice) {
 		this.id = dto.id || ''
@@ -21,8 +19,8 @@ export class Device {
 		this.macAddress = dto.mac_address
 		this.layerId = dto.layer_id || 'no-layer-id-device'
 		this.type = dto.type || EntityDeviceType.Computer
-		this.locationX = dto.location_x ?? 0
-		this.locationY = dto.location_y ?? 0
+		this.coordinates = [dto.location_y || 0, dto.location_x || 0]
+		this.angle = 0
 	}
 }
 

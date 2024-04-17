@@ -7,11 +7,13 @@ import styles from './map.module.css'
 
 import { useMap, usePersistState } from '@hooks'
 import { Area } from '@typos'
+import { Device } from '@models'
 
 interface Props {
 	isPolygonNeed?: boolean
 	image?: string
 	coordinates?: Area
+	devices?: Device[]
 	angle?: number
 	whenPolygonChange?: (coordinates: Area, angle: number) => void
 	whenLayerEditStart?: () => void
@@ -26,6 +28,7 @@ export const Map = (props: Props) => {
 		drawTile,
 		drawScheme,
 		drawPolygon,
+		drawDevices,
 		clearScheme,
 		clearPolygon,
 		setCenterByArea,
@@ -45,11 +48,7 @@ export const Map = (props: Props) => {
 				props.coordinates,
 			)
 		}
-		// if (props.isPolygonNeed) {
-		// 	clearPolygon()
-		// 	drawPolygon(props.coordinates || [], props.angle || 0)
-		// }
- 	}
+	}
 
 	const handleToggleTileLayer = () => {
 		setTileLayerVisible(!tileLayerVisible)
@@ -71,6 +70,10 @@ export const Map = (props: Props) => {
 
 		if (props.isPolygonNeed) {
 			drawPolygon(props.coordinates || [], props.angle || 0)
+		}
+
+		if (props.devices) {
+			drawDevices(props.devices)
 		}
 	}, [map])
 

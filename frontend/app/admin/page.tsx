@@ -56,6 +56,7 @@ export default function Admin() {
 					image={objectsStore.selectedLayer.image}
 					coordinates={objectsStore.selectedLayer.coordinates}
 					angle={objectsStore.selectedLayer.angle}
+					devices={objectsStore.selectedLayer.devices}
 					whenLayerEditStart={handleRedirectToEditPage}
 				/>
 			)}

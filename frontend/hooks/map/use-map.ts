@@ -4,13 +4,15 @@ import { fromLonLat, toLonLat, transform } from 'ol/proj'
 import { Coordinate } from 'ol/coordinate'
 import { Layer } from 'ol/layer'
 import { message } from 'antd'
-//@ts-expect-error
+//@ts-expect-error no types
 import Transform from 'ol-ext/interaction/Transform'
+import { Point } from 'ol/geom'
 
-import { MapLayer, PolygonLayer, SchemeLayer } from '.'
+import { MapLayer, PointsLayer, PolygonLayer, SchemeLayer } from '.'
 
 import { degreeToRadian, getImgParams, getRectCenter, loadImage, radianToDegree } from '@helpers'
 import { Area } from '@typos'
+import { Device } from '@models'
 
 interface BasicTransformEvent {
 	coordinate: Coordinate
@@ -42,6 +44,7 @@ export const useMap = ({
 	const layersDict = useRef<Map<LayerKeys, Layer>>(new Map())
 	const polygonTransform = useRef<typeof Transform>()
 	const polygonLayer = useRef<PolygonLayer | null>(null)
+	const pointsLayer = useRef<PointsLayer | null>(null)
 
 	const initializeMap = (center?: Coordinate) => {
 		if (!mapRootElement.current) {
@@ -156,6 +159,39 @@ export const useMap = ({
 		// handlePolygonChange(createdPolygonLayer.feature)
 	}
 
+	const drawDevices = (devices: Device[]) => {
+		if (!devices.length) {
+			return
+		}
+
+		const features = devices.map((device) => {
+			const feature = new Feature({
+				geometry: new Point(fromLonLat(device.coordinates)),
+			})
+
+			feature.set('rotation', device.angle * (Math.PI / 180))
+			feature.set('id', device.id)
+			feature.set('type', device.type)
+
+			return feature
+		})
+
+		const createdPointsLayer = new PointsLayer(features, /* this.clusteringEnabled */ false)
+
+		createdPointsLayer.getSource()?.addFeatures(features)
+		map?.addLayer(createdPointsLayer)
+		layersDict.current.set('points', createdPointsLayer)
+		pointsLayer.current = createdPointsLayer
+
+		const view = new View({
+			center: [0, 0] || DEFAULT_CENTER,
+			zoom: DEFAULT_ZOOM,
+			rotation: DEFAULT_ROTATION,
+		})
+
+		map?.setView(view)
+	}
+
 	const clearScheme = () => {
 		const schemeLayer = layersDict.current.get('scheme')
 
@@ -250,6 +286,7 @@ export const useMap = ({
 		drawTile,
 		drawScheme,
 		drawPolygon,
+		drawDevices,
 		clearScheme,
 		clearPolygon,
 		setCenterByArea,
