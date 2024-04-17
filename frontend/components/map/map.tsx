@@ -10,7 +10,6 @@ import { Area } from '@typos'
 
 interface Props {
 	isPolygonNeed?: boolean
-
 	image?: string
 	coordinates?: Area
 	angle?: number
@@ -87,6 +86,11 @@ export const Map = (props: Props) => {
 	useEffect(() => {
 		redrawScheme().catch(() => {})
 		setCenterByArea(props.coordinates || [])
+
+		if (props.isPolygonNeed) {
+			clearPolygon()
+			drawPolygon(props.coordinates || [], props.angle || 0)
+		}
 	}, [props.image, props.coordinates])
 
 	return (

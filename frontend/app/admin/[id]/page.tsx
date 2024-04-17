@@ -1,10 +1,11 @@
 'use client'
 import { useState } from 'react'
+import { Drawer, Input } from 'antd'
 
 import styles from './id.module.css'
 
-import { EditSidebar, Map } from '@components'
-import { useLayerEdit, useCreateNewLayer } from '@hooks'
+import { EditSidebar, FileUpload, Map } from '@components'
+import { useLayerEdit, useCreateNewLayer, useDrawer } from '@hooks'
 
 const enum Mode {
 	ADD_LAYER = 'ADD_LAYER',
@@ -14,21 +15,62 @@ const enum Mode {
 }
 
 export default function Id({ params } : { params: { id: string } }) {
-	const [mode, setMode] = useState<Mode | null>(Mode.EDIT_LAYER)
+	const [mode, setMode] = useState<Mode>(Mode.EDIT_LAYER)
+	const { show, open, close } = useDrawer()
 	const {
 		layerStore,
 		handleLayerSave,
 	} = useLayerEdit(params.id ?? '')
 	const {
+		layer,
 		createNewLayer,
+		removeNewLayer,
+		handleLayerNameChange,
+		handleFileUpload,
+		createLayer,
 	} = useCreateNewLayer()
 
-	const handleNewLayerCreateClick = () => {
-		//меняем мод, чтобы перерендерить полигон в Map
-		setMode(null)
+	const handleCreateNewLayer = () => {
 		createNewLayer()
 		setMode(Mode.ADD_LAYER)
+		open()
 	}
+
+	const handleCreateNewLayerDrawerClose = () => {
+		removeNewLayer(),
+		close()
+	}
+
+	const handleLayerCreate = async () => {
+		await createLayer()
+		close()
+	}
+
+	const renderAddLayerDrawer = () => (
+		<Drawer
+			closable
+			title={'Добавление слоя'}
+			open={show}
+			onClose={handleCreateNewLayerDrawerClose}
+			mask={false}
+			placement={'bottom'}
+			rootClassName={styles.drawerRoot}
+		>
+			<div
+				className={styles.drawerContent}
+			>
+				<Input
+					placeholder={'Названте слоя'}
+					value={layer?.floorName}
+					onChange={(e) => handleLayerNameChange(e.target.value)}
+				/>
+				<FileUpload
+					whenFileUpload={handleFileUpload}
+					whenLayerCreate={handleLayerCreate}
+				/>
+			</div>
+		</Drawer>
+	)
 
 	return (
 		<div
@@ -39,12 +81,12 @@ export default function Id({ params } : { params: { id: string } }) {
 					object={layerStore.object}
 					selectedItem={layerStore.layer?.id ?? ''}
 					whenClick={layerStore.handleSelectedLayerChange}
-					whenCreateNewLayerClick={handleNewLayerCreateClick}
+					whenCreateNewLayerClick={handleCreateNewLayer}
 				/>
 			)}
 			{layerStore.layer && (
 				<Map
-					isPolygonNeed={mode === Mode.ADD_LAYER || mode === Mode.EDIT_LAYER}
+					isPolygonNeed
 					angle={layerStore.layer.angle}
 					image={layerStore.layer.image}
 					coordinates={layerStore.layer.coordinates}
@@ -52,6 +94,7 @@ export default function Id({ params } : { params: { id: string } }) {
 					whenPolygonChange={layerStore.handlePolygonChange}
 				/>
 			)}
+			{renderAddLayerDrawer()}
 		</div>
 	)
 }

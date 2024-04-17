@@ -2,15 +2,19 @@ import { create } from 'zustand'
 
 import { ObjectLayer, ObjectStorage } from '@models'
 import { Area } from '@typos'
-import { objectService } from '@api'
+import { imageService, objectService } from '@api'
 
 interface LayerEdit{
 	layer: ObjectLayer | null
 	object: ObjectStorage | null
+	uploadFile: (file: File) => Promise<void>
 	handlePolygonChange: (coordinates: Area, angle: number) => void
 	handleLayerUpdate: (layer: ObjectLayer) => Promise<boolean>
 	handleSelectedLayerChange: (layerId: string) => void
+	handleLayerNameChange: (value: string) => void
+	handleLayerCreate: (objectId: string, layer: ObjectLayer) => Promise<void>
 	createNewLayer: () => void
+	removeNewLayer: () => void
 	fetchLayerById: (id: string) => Promise<ObjectLayer>
 	fetchObjectById: (objectId: string) => Promise<void>
 }
@@ -18,6 +22,23 @@ interface LayerEdit{
 export const useLayerEditStore = create<LayerEdit>()((set) => ({
 	layer: null,
 	object: null,
+
+	uploadFile: async (file: File) => {
+		await imageService.uploadImage(file)
+
+		set((state) => {
+			if (!state.layer) {
+				return {}
+			}
+
+			return {
+				layer: {
+					...state.layer,
+					image: file.name,
+				},
+			}
+		})
+	},
 
 	handleSelectedLayerUpdate: async (layer: ObjectLayer) => {
 		const response = await objectService.updateLayer(layer)
@@ -41,6 +62,19 @@ export const useLayerEditStore = create<LayerEdit>()((set) => ({
 		})
 	},
 
+	handleLayerNameChange: (value) => set((state) => {
+		if (!state.layer) {
+			return {}
+		}
+
+		return {
+			layer: {
+				...state.layer,
+				floorName: value,
+			},
+		}
+	}),
+
 	handleLayerUpdate: async (layer: ObjectLayer) => {
 		const response = await objectService.updateLayer(layer)
 		return response
@@ -56,6 +90,26 @@ export const useLayerEditStore = create<LayerEdit>()((set) => ({
 
 			return {
 				layer: layerToSelect,
+			}
+		})
+	},
+
+	handleLayerCreate: async (objectId, layer) => {
+		const newlayer = await objectService.createLayer(objectId, layer)
+
+		set((state) => {
+			if (!state.object) {
+				return {}
+			}
+
+			const layers = [...state.object.layers.slice(0, -1), newlayer]
+
+			return {
+				layer: newlayer,
+				object: {
+					...state.object,
+					layers,
+				},
 			}
 		})
 	},
@@ -95,6 +149,25 @@ export const useLayerEditStore = create<LayerEdit>()((set) => ({
 					layers: [...state.object.layers, newLayer],
 				},
 				layer: newLayer,
+			}
+		})
+	},
+
+	removeNewLayer: () => {
+		set((state) => {
+			if (!state.object) {
+				return {}
+			}
+			const layers = state.object.layers.slice(0, -1)
+
+			console.log(layers)
+
+			return {
+				object: {
+					...state.object,
+					layers,
+				},
+				layer: null,
 			}
 		})
 	},

@@ -15,21 +15,17 @@ export const createObject = async (newObject: EntityNewObject) => {
 }
 
 export const createLayer = async (objectId: string, newLayer: ObjectLayer) => {
-	/* const { data } = await CustomedApi.objects.layersCreate(objectId, {
-		angles_coordinates: [
-			{
-				x: newLayer.southWest[0],
-				y: newLayer.southWest[1],
-			}, {
-				x: newLayer.northEast[0],
-				y: newLayer.northEast[1],
-			},
-		],
+	const { data } = await CustomedApi.objects.layersCreate(objectId, {
+		angles_coordinates: newLayer.coordinates.map((coord) => ({
+			long: coord[0],
+			lat: coord[1],
+		})),
+		angle: newLayer.angle,
 		floor_name: newLayer.floorName,
 		image: newLayer.image,
 	})
 
-	return data.id */
+	return new ObjectLayer(data)
 }
 
 export const updateDevice = async (device: Device) => {

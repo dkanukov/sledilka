@@ -153,7 +153,7 @@ export const useMap = ({
 
 		polygonLayer.current = createdPolygonLayer
 		polygonTransform.current.select(createdPolygonLayer.feature, true)
-		handlePolygonChange(createdPolygonLayer.feature)
+		// handlePolygonChange(createdPolygonLayer.feature)
 	}
 
 	const clearScheme = () => {
