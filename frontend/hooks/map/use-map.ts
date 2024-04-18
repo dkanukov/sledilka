@@ -182,14 +182,6 @@ export const useMap = ({
 		map?.addLayer(createdPointsLayer)
 		layersDict.current.set('points', createdPointsLayer)
 		pointsLayer.current = createdPointsLayer
-
-		const view = new View({
-			center: [0, 0] || DEFAULT_CENTER,
-			zoom: DEFAULT_ZOOM,
-			rotation: DEFAULT_ROTATION,
-		})
-
-		map?.setView(view)
 	}
 
 	const clearScheme = () => {
