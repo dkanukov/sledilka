@@ -80,6 +80,7 @@ type Device struct {
 	LayerID    uuid.UUID  `json:"layer_id,omitempty"` // ??
 	LocationX  float64    `json:"location_x"`
 	LocationY  float64    `json:"location_y"`
+	Angle      float64    `json:"angle"`
 	IpAddress  string     `json:"ip"` // для подключения к камерам и мб для других нужд, хз
 	MacAddress string     `json:"mac_address"`
 	IsActive   bool       `json:"is_active"`
@@ -93,6 +94,7 @@ type NewDevice struct {
 	LayerID    uuid.UUID  `json:"layer_id,omitempty"` // ??
 	LocationX  float64    `json:"location_x"`
 	LocationY  float64    `json:"location_y"`
+	Angle      float64    `json:"angle"`
 	IpAddress  string     `json:"ip,omitempty"` // для подключения к камерам и мб для других нужд, хз
 	MacAddress string     `json:"mac_address"`
 }
