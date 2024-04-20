@@ -8,10 +8,16 @@
 	display: flex;
 	align-items: center;
 	gap: 8px;
-
 	position: absolute;
 	right: 0;
 	z-index: var(--z-index-max-overlay);
+	padding: 8px;
+	border-radius: 8px;
+	background-color: var(--main-0);
+}
 
-	padding: 20px;
+.territoryControl {
+	display: flex;
+	align-items: center;
+	gap: 6px;
 }

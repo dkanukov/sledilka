@@ -43,8 +43,9 @@ export const Sidebar = (props: Props) => {
 		<div className={styles.sidebarWrapper}>
 			<Menu
 				className={styles.menu}
-				selectedKeys={[props.selectedItem]}
+				mode={'inline'}
 				items={menuItems}
+				selectedKeys={[props.selectedItem]}
 				onSelect={({ key }) => handleItemClick(key)}
 			/>
 		</div>

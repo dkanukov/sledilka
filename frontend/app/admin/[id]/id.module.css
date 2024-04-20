@@ -1,0 +1,19 @@
+.root {
+	display: flex;
+    height: calc(100vh - 63px);
+}
+
+.emptyMessage {
+	justify-content: center;
+	margin-top: 40px;
+}
+
+.drawerRoot {
+	width: 40%;
+}
+
+.drawerContent {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}

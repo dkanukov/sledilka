@@ -1,0 +1,7 @@
+export const enum Mode {
+	ADD_LAYER = 'ADD_LAYER',
+	ADD_CAMERA = 'ADD_CAMERA',
+	CAMERA_INFO = 'CAMERA_INFO',
+	EDIT_LAYER = 'EDIT_LAYER',
+}
+
