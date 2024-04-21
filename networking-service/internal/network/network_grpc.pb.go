@@ -23,7 +23,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NetworkClient interface {
 	IsActiveListDevice(ctx context.Context, in *IsActiveListDeviceRequest, opts ...grpc.CallOption) (*IsActiveListDeviceResponse, error)
-	Subscribe(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Network_SubscribeClient, error)
+	Subscribe(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (Network_SubscribeClient, error)
+	GetAllMacAddresses(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetAllMacAddressesResponse, error)
 }
 
 type networkClient struct {
@@ -43,7 +44,7 @@ func (c *networkClient) IsActiveListDevice(ctx context.Context, in *IsActiveList
 	return out, nil
 }
 
-func (c *networkClient) Subscribe(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Network_SubscribeClient, error) {
+func (c *networkClient) Subscribe(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (Network_SubscribeClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Network_ServiceDesc.Streams[0], "/network.network/Subscribe", opts...)
 	if err != nil {
 		return nil, err
@@ -75,12 +76,22 @@ func (x *networkSubscribeClient) Recv() (*DeviceStatus, error) {
 	return m, nil
 }
 
+func (c *networkClient) GetAllMacAddresses(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetAllMacAddressesResponse, error) {
+	out := new(GetAllMacAddressesResponse)
+	err := c.cc.Invoke(ctx, "/network.network/GetAllMacAddresses", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NetworkServer is the server API for Network service.
 // All implementations must embed UnimplementedNetworkServer
 // for forward compatibility
 type NetworkServer interface {
 	IsActiveListDevice(context.Context, *IsActiveListDeviceRequest) (*IsActiveListDeviceResponse, error)
-	Subscribe(*Empty, Network_SubscribeServer) error
+	Subscribe(*SubscribeRequest, Network_SubscribeServer) error
+	GetAllMacAddresses(context.Context, *Empty) (*GetAllMacAddressesResponse, error)
 	mustEmbedUnimplementedNetworkServer()
 }
 
@@ -91,8 +102,11 @@ type UnimplementedNetworkServer struct {
 func (UnimplementedNetworkServer) IsActiveListDevice(context.Context, *IsActiveListDeviceRequest) (*IsActiveListDeviceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IsActiveListDevice not implemented")
 }
-func (UnimplementedNetworkServer) Subscribe(*Empty, Network_SubscribeServer) error {
+func (UnimplementedNetworkServer) Subscribe(*SubscribeRequest, Network_SubscribeServer) error {
 	return status.Errorf(codes.Unimplemented, "method Subscribe not implemented")
+}
+func (UnimplementedNetworkServer) GetAllMacAddresses(context.Context, *Empty) (*GetAllMacAddressesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllMacAddresses not implemented")
 }
 func (UnimplementedNetworkServer) mustEmbedUnimplementedNetworkServer() {}
 
@@ -126,7 +140,7 @@ func _Network_IsActiveListDevice_Handler(srv interface{}, ctx context.Context, d
 }
 
 func _Network_Subscribe_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(Empty)
+	m := new(SubscribeRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
@@ -146,6 +160,24 @@ func (x *networkSubscribeServer) Send(m *DeviceStatus) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _Network_GetAllMacAddresses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkServer).GetAllMacAddresses(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/network.network/GetAllMacAddresses",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkServer).GetAllMacAddresses(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Network_ServiceDesc is the grpc.ServiceDesc for Network service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -156,6 +188,10 @@ var Network_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "IsActiveListDevice",
 			Handler:    _Network_IsActiveListDevice_Handler,
+		},
+		{
+			MethodName: "GetAllMacAddresses",
+			Handler:    _Network_GetAllMacAddresses_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

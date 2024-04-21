@@ -1,12 +1,11 @@
 package luminance
 
 import (
-	"backend/internal/entity"
-	"backend/internal/errors"
+	"backend/internal/dbmodel"
+	"backend/internal/validate"
+	"database/sql"
+	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	gmux "github.com/gorilla/mux"
-	"gorm.io/gorm"
 	"io"
 	"log"
 	"net/http"
@@ -19,23 +18,28 @@ import (
 // @Failure	500
 // @Success	200		{object}	bool
 // @Router		/isLowLight/{id} [get]
-func IsLowLighted(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
-	idParam := gmux.Vars(r)["id"]
-	id, err := uuid.Parse(idParam)
+func IsLowLighted(w http.ResponseWriter, r *http.Request, q *dbmodel.Queries) {
+	id, err := validate.UUID(r)
 	if err != nil {
-		errorMessage := errors.ResponseError{StatusCode: http.StatusBadRequest, Message: err.Error()}
-		errorMessage.WriteResponse(w)
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, err)
 		return
 	}
-	device := entity.Device{Id: id}
-	res := db.Find(&device)
-	if res.RowsAffected == 0 {
+	info, err := q.GetCameraInfoByDeviceId(r.Context(), id)
+	switch {
+	case errors.Is(err, sql.ErrNoRows) || info == nil:
 		w.WriteHeader(http.StatusNotFound)
 		return
+	case err != nil:
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, err)
+		return
 	}
-	resp, err := http.Get(fmt.Sprintf("http://streaming-service:8181/isLowLight/?url=%v", device.IpAddress))
+	resp, err := http.Get(fmt.Sprintf("http://0.0.0.0:8181/isLowLight/?url=%v", *info))
 	if err != nil {
-		w.WriteHeader(resp.StatusCode)
+		if resp != nil {
+			w.WriteHeader(resp.StatusCode)
+		}
 		log.Println(err)
 		return
 	}

@@ -1,40 +1,33 @@
 package db
 
 import (
-	"backend/internal/entity"
+	"context"
 	"fmt"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/compose-spec/compose-go/v2/types"
+	"github.com/jackc/pgx/v5"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/pressly/goose/v3"
 )
 
 const (
-	host     = "db"
-	port     = 5432
 	user     = "postgres"
 	password = "postgres"
 	dbname   = "postgres"
 )
 
-func StartupDB() (*gorm.DB, error) {
+func StartupDB(ctx context.Context, info types.ServiceConfig) (*pgx.Conn, error) {
 	dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=disable",
-		host, user, password, dbname, port)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		"0.0.0.0", user, password, dbname, info.Ports[0].Published)
+	db, err := goose.OpenDBWithDriver("pgx", dsn)
 	if err != nil {
 		return nil, err
 	}
-	db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
-	// TODO migrate other entities
-	err = db.AutoMigrate(
-		&entity.User{},
-		&entity.Review{},
-		&entity.Announcement{},
-		&entity.Object{},
-		&entity.LayerForDB{},
-		&entity.Device{},
-	)
-	if err != nil {
+
+	if err = goose.Up(db, "migrations"); err != nil {
 		return nil, err
 	}
-	fmt.Println("Successfully connected!")
-	return db, nil
+	if err = db.Close(); err != nil {
+		return nil, err
+	}
+	return pgx.Connect(ctx, dsn)
 }

@@ -1,14 +1,15 @@
 package streaming
 
 import (
-	"backend/config"
-	"backend/internal/entity"
-	"backend/internal/errors"
+	"backend/internal/dbmodel"
+	"backend/internal/validate"
+	"database/sql"
+	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	gmux "github.com/gorilla/mux"
-	"gorm.io/gorm"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"time"
 )
 
 // @Summary	получить трансляцию
@@ -18,19 +19,38 @@ import (
 // @Param		id path string true "Device ID"
 // @Failure	500
 // @Router		/stream/{id} [get]
-func Get(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
-	idParam := gmux.Vars(r)["id"]
-	id, err := uuid.Parse(idParam)
+func Get(w http.ResponseWriter, r *http.Request, q *dbmodel.Queries, streamUrl string) {
+	id, err := validate.UUID(r)
 	if err != nil {
-		errorMessage := errors.ResponseError{StatusCode: http.StatusBadRequest, Message: err.Error()}
-		errorMessage.WriteResponse(w)
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, err)
 		return
 	}
-	device := entity.Device{Id: id}
-	res := db.Find(&device)
-	if res.RowsAffected == 0 {
+	info, err := q.GetCameraInfoByDeviceId(r.Context(), id)
+	switch {
+	case errors.Is(err, sql.ErrNoRows) || info == nil:
 		w.WriteHeader(http.StatusNotFound)
 		return
+	case err != nil:
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, err)
+		return
 	}
-	http.Redirect(w, r, fmt.Sprintf(config.StreamingURLFmt, device.IpAddress), http.StatusSeeOther)
+	url, err := url.Parse(fmt.Sprintf(streamUrl+"?url=%s", *info))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, err)
+		return
+	}
+
+	proxy := httputil.NewSingleHostReverseProxy(url)
+	fmt.Printf("Request received at %s at %s\n", r.URL.String(), time.Now().UTC())
+	// Update the headers to allow for SSL redirection
+	r.URL = url
+	r.Host = url.Host
+	//trim reverseProxyRoutePrefix
+
+	// Note that ServeHttp is non blocking and uses a go routine under the hood
+	fmt.Printf("Redirecting request to %s at %s\n", r.URL.String(), time.Now().UTC())
+	proxy.ServeHTTP(w, r)
 }

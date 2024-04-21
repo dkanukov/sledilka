@@ -16,235 +16,13 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/announcement": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "announcements"
-                ],
-                "summary": "Возвращает анонсы",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Announcement"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "announcements"
-                ],
-                "summary": "Создает анонс",
-                "parameters": [
-                    {
-                        "description": "тело нового запроса",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.NewAnnouncement"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/entity.Announcement"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/announcement/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "announcements"
-                ],
-                "summary": "Анонс по id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "uuid",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/entity.Announcement"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "announcements"
-                ],
-                "summary": "Изменить анонс",
-                "parameters": [
-                    {
-                        "description": "Измененный анонс",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.NewAnnouncement"
-                        }
-                    },
-                    {
-                        "type": "string",
-                        "description": "uuid",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/entity.Announcement"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "announcements"
-                ],
-                "summary": "Удаляет анонс",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "uuid",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
-            "patch": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "announcements"
-                ],
-                "summary": "Изменить анонс",
-                "parameters": [
-                    {
-                        "description": "Измененный анонс",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.NewAnnouncement"
-                        }
-                    },
-                    {
-                        "type": "string",
-                        "description": "uuid",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/entity.Announcement"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
         "/devices": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -262,7 +40,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.NewDevice"
+                            "$ref": "#/definitions/sledilka.CreateDevice"
                         }
                     }
                 ],
@@ -270,7 +48,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Device"
+                            "$ref": "#/definitions/sledilka.Device"
                         }
                     },
                     "500": {
@@ -281,6 +59,11 @@ const docTemplate = `{
         },
         "/devices/{id}": {
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -298,7 +81,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.NewDevice"
+                            "$ref": "#/definitions/sledilka.UpdateDevice"
                         }
                     },
                     {
@@ -406,55 +189,29 @@ const docTemplate = `{
                 }
             }
         },
-        "/layers/{id}": {
+        "/network": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "layers"
+                    "networking"
                 ],
-                "summary": "Получить слой",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Layer ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
+                "summary": "Получить список адресов в сети",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Layer"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/network.DeviceStatus"
+                            }
                         }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/layers/{id}/newDevices": {
-            "post": {
-                "tags": [
-                    "new"
-                ],
-                "summary": "Новые девайсы для слоя",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Layer ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -480,6 +237,11 @@ const docTemplate = `{
         },
         "/objects": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -496,7 +258,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entity.Object"
+                                "$ref": "#/definitions/sledilka.Object"
                             }
                         }
                     },
@@ -506,6 +268,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -518,12 +285,12 @@ const docTemplate = `{
                 "summary": "Создать объект",
                 "parameters": [
                     {
-                        "description": "Новый отзыв",
+                        "description": "Новый объект",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.NewObject"
+                            "$ref": "#/definitions/sledilka.NewObject"
                         }
                     }
                 ],
@@ -531,7 +298,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Object"
+                            "$ref": "#/definitions/sledilka.Object"
                         }
                     },
                     "500": {
@@ -542,6 +309,11 @@ const docTemplate = `{
         },
         "/objects/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -565,7 +337,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Object"
+                            "$ref": "#/definitions/sledilka.Object"
                         }
                     },
                     "500": {
@@ -574,6 +346,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -591,7 +368,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.NewObject"
+                            "$ref": "#/definitions/sledilka.NewObject"
                         }
                     },
                     {
@@ -606,7 +383,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Object"
+                            "$ref": "#/definitions/sledilka.Object"
                         }
                     },
                     "500": {
@@ -617,6 +394,11 @@ const docTemplate = `{
         },
         "/objects/{id}/layers": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -634,7 +416,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.NewLayer"
+                            "$ref": "#/definitions/sledilka.NewLayer"
                         }
                     },
                     {
@@ -649,7 +431,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Layer"
+                            "$ref": "#/definitions/sledilka.Layer"
                         }
                     },
                     "500": {
@@ -658,8 +440,54 @@ const docTemplate = `{
                 }
             }
         },
-        "/objects/{object_id}/layers/{layer_id}": {
+        "/objects/{object_id}/layers/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "layers"
+                ],
+                "summary": "Получить слой",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Layer ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Object ID",
+                        "name": "object_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sledilka.Layer"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -669,7 +497,7 @@ const docTemplate = `{
                 "tags": [
                     "layers"
                 ],
-                "summary": "Изменить объект",
+                "summary": "Изменить слой",
                 "parameters": [
                     {
                         "description": "Измененный слой",
@@ -677,7 +505,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.NewLayer"
+                            "$ref": "#/definitions/sledilka.NewLayer"
                         }
                     },
                     {
@@ -690,7 +518,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Layer ID",
-                        "name": "layer_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -699,7 +527,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Layer"
+                            "$ref": "#/definitions/sledilka.Layer"
                         }
                     },
                     "500": {
@@ -742,233 +570,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/review": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "reviews"
-                ],
-                "summary": "Возвращает все отзывы",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Review"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "reviews"
-                ],
-                "summary": "Создать отзыв",
-                "parameters": [
-                    {
-                        "description": "Новый отзыв",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.NewReview"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/entity.Review"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/review/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "reviews"
-                ],
-                "summary": "Отзыв по id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "uuid",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/entity.Review"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "reviews"
-                ],
-                "summary": "Изменить отзыв",
-                "parameters": [
-                    {
-                        "description": "Измененный отзыв",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.NewReview"
-                        }
-                    },
-                    {
-                        "type": "string",
-                        "description": "Review ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/entity.Review"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "reviews"
-                ],
-                "summary": "Удалить отзыв",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Review ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
-            "patch": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "reviews"
-                ],
-                "summary": "Изменить отзыв",
-                "parameters": [
-                    {
-                        "description": "Измененный отзыв",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/entity.NewReview"
-                        }
-                    },
-                    {
-                        "type": "string",
-                        "description": "Review ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/entity.Review"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
         "/stream/{id}": {
             "get": {
                 "consumes": [
@@ -991,6 +592,33 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/subscribe-network": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "networking"
+                ],
+                "summary": "Подписаться на обновления из сети. WebSocket",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/network.DeviceStatus"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error"
                     }
@@ -1125,24 +753,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "entity.Announcement": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.Coordinate": {
+        "dbmodel.Coordinate": {
             "type": "object",
             "properties": {
                 "lat": {
@@ -1153,9 +764,28 @@ const docTemplate = `{
                 }
             }
         },
+        "dbmodel.DeviceType": {
+            "type": "string",
+            "enum": [
+                "computer",
+                "camera",
+                "printer"
+            ],
+            "x-enum-varnames": [
+                "DeviceTypeComputer",
+                "DeviceTypeCamera",
+                "DeviceTypePrinter"
+            ]
+        },
         "entity.Device": {
             "type": "object",
             "properties": {
+                "angle": {
+                    "type": "number"
+                },
+                "camera_connection_url": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -1163,7 +793,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "ip": {
-                    "description": "для подключения к камерам и мб для других нужд, хз",
                     "type": "string"
                 },
                 "is_active": {
@@ -1215,7 +844,7 @@ const docTemplate = `{
                 "angles_coordinates": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entity.Coordinate"
+                        "$ref": "#/definitions/dbmodel.Coordinate"
                     }
                 },
                 "created_at": {
@@ -1255,22 +884,248 @@ const docTemplate = `{
                 }
             }
         },
-        "entity.NewAnnouncement": {
+        "entity.NewUser": {
             "type": "object",
             "properties": {
-                "description": {
+                "is_admin": {
+                    "type": "boolean"
+                },
+                "password": {
                     "type": "string"
                 },
-                "title": {
+                "username": {
                     "type": "string"
                 }
             }
         },
-        "entity.NewDevice": {
+        "entity.UserInfo": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "is_admin": {
+                    "type": "boolean"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "network.DeviceStatus": {
+            "type": "object",
+            "properties": {
+                "ipAddress": {
+                    "type": "string"
+                },
+                "isActive": {
+                    "type": "boolean"
+                },
+                "macAddress": {
+                    "type": "string"
+                }
+            }
+        },
+        "sledilka.CreateDevice": {
+            "type": "object",
+            "properties": {
+                "angle": {
+                    "type": "number"
+                },
+                "camera_connection_url": {
+                    "type": "string"
+                },
+                "ip_address": {
+                    "type": "string"
+                },
+                "layer_id": {
+                    "type": "string"
+                },
+                "location_x": {
+                    "type": "number"
+                },
+                "location_y": {
+                    "type": "number"
+                },
+                "mac_address": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/dbmodel.DeviceType"
+                }
+            }
+        },
+        "sledilka.Device": {
+            "type": "object",
+            "properties": {
+                "angle": {
+                    "type": "number"
+                },
+                "camera_connection_url": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
                 "ip": {
-                    "description": "для подключения к камерам и мб для других нужд, хз",
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "layer_id": {
+                    "description": "??",
+                    "type": "string"
+                },
+                "location_x": {
+                    "type": "number"
+                },
+                "location_y": {
+                    "type": "number"
+                },
+                "mac_address": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/entity.DeviceType"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "sledilka.Layer": {
+            "type": "object",
+            "properties": {
+                "angle": {
+                    "type": "number"
+                },
+                "angles_coordinates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dbmodel.Coordinate"
+                    }
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "devices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Device"
+                    }
+                },
+                "floor_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "object_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "sledilka.NewLayer": {
+            "type": "object",
+            "properties": {
+                "angle": {
+                    "type": "number"
+                },
+                "angles_coordinates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dbmodel.Coordinate"
+                    }
+                },
+                "floor_name": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                }
+            }
+        },
+        "sledilka.NewObject": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "lat": {
+                    "type": "number"
+                },
+                "long": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "sledilka.Object": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lat": {
+                    "type": "number"
+                },
+                "layers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Layer"
+                    }
+                },
+                "long": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "sledilka.UpdateDevice": {
+            "type": "object",
+            "properties": {
+                "angle": {
+                    "type": "number"
+                },
+                "camera_connection_url": {
+                    "type": "string"
+                },
+                "ip": {
                     "type": "string"
                 },
                 "layer_id": {
@@ -1291,125 +1146,6 @@ const docTemplate = `{
                 },
                 "type": {
                     "$ref": "#/definitions/entity.DeviceType"
-                }
-            }
-        },
-        "entity.NewLayer": {
-            "type": "object",
-            "properties": {
-                "angle": {
-                    "type": "number"
-                },
-                "angles_coordinates": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Coordinate"
-                    }
-                },
-                "floor_name": {
-                    "type": "string"
-                },
-                "image": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.NewObject": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.NewReview": {
-            "type": "object",
-            "properties": {
-                "comment": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "rating": {
-                    "type": "integer"
-                }
-            }
-        },
-        "entity.NewUser": {
-            "type": "object",
-            "properties": {
-                "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.Object": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "layers": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Layer"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.Review": {
-            "type": "object",
-            "properties": {
-                "comment": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "rating": {
-                    "type": "integer"
-                }
-            }
-        },
-        "entity.UserInfo": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "username": {
-                    "type": "string"
                 }
             }
         },
@@ -1471,7 +1207,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "0.0.0.0:8081",
+	Host:             "192.168.1.75:8081",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Sledilka API",

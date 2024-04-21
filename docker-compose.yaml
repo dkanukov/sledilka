@@ -1,4 +1,4 @@
-version: "1.0"
+version: "3.9"
 
 services:
   db:
@@ -7,18 +7,22 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
       - ./sql:/sql/
+      - ./docker-compose.yaml:/app/docker-compose.yaml
     environment:
       - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
   token-service:
     build: token-service/.
+    volumes:
+      - ./docker-compose.yaml:/app/docker-compose.yaml
     ports:
       - "8082:8082"
   backend:
     build: backend/.
-    ports:
-    - "8081:8081"
+    network_mode: "host"
+    volumes:
+      - ./docker-compose.yaml:/app/docker-compose.yaml
     depends_on: 
     - db
     - token-service
@@ -38,5 +42,10 @@ services:
     build: streaming-service/.
     ports:
       - "8181:8181"
+  networking-service:
+    build: networking-service/.
+    network_mode: "host"
+    volumes:
+      - ./docker-compose.yaml:/app/docker-compose.yaml
 volumes:
   postgres_data:
