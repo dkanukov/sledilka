@@ -14,4 +14,5 @@ export { AddLayerSidebar } from './add-layer-sidebar/add-layer-sidebar'
 export * as CreateObjectForms from './create-object-forms/create-object-forms'
 export { EditSidebar } from './edit-sidebar/edit-sidebar'
 export { FileUpload } from './file-upload/file-upload'
+export { DeviceDrawer } from './device-drawer/device-drawer'
 

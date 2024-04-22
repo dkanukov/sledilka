@@ -1,17 +1,24 @@
 import { create } from 'zustand'
 
-import { ObjectLayer, ObjectStorage } from '@models'
+import { Device, ObjectLayer, ObjectStorage } from '@models'
 import { objectService } from '@api'
 
 interface ObjectsStore {
 	objects: ObjectStorage[]
 	selectedLayer: ObjectLayer | null
+	selectedDevice: Device | null
 	handleSelectedLayerChange: (layerString: string) => void
+	handleDeviceSelect: (id: string) => void
+	handleSelectedDeviceChange: (key: string, value: string) => void
+	updateDevice: (device: Device) => Promise<void>
+	flushSelectedDevice: () => void
 	fetchObjects: () => Promise<void>
 }
+
 export const useObjectsStore = create<ObjectsStore>()((set) => ({
 	objects: [],
 	selectedLayer: null,
+	selectedDevice: null,
 
 	handleSelectedLayerChange: (layerKey: string) => {
 		set((state) => {
@@ -28,6 +35,49 @@ export const useObjectsStore = create<ObjectsStore>()((set) => ({
 				selectedLayer: layerById[layerKey],
 			}
 		})
+	},
+
+	handleDeviceSelect: (id) => {
+		set((state) => {
+			if (!state.selectedLayer) {
+				return {}
+			}
+
+			const device = state.selectedLayer.devices.find((device) => device.id === id)
+
+			if (!device) {
+				return {}
+			}
+
+			return {
+				selectedDevice: device,
+			}
+		})
+	},
+
+	flushSelectedDevice: () => {
+		set(() => ({
+			selectedDevice: null,
+		}))
+	},
+
+	handleSelectedDeviceChange: (key, value) => {
+		set((state) => {
+			if (!state.selectedDevice) {
+				return {}
+			}
+
+			return {
+				selectedDevice: {
+					...state.selectedDevice,
+					[key]: value,
+				},
+			}
+		})
+	},
+
+	updateDevice: async (device) => {
+		await objectService.updateDevice(device)
 	},
 
 	fetchObjects: async () => {

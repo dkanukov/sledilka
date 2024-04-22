@@ -30,8 +30,13 @@ export const createLayer = async (objectId: string, newLayer: ObjectLayer) => {
 
 export const updateDevice = async (device: Device) => {
 	const { data } = await CustomedApi.devices.devicesPartialUpdate(device.id, {
-		location_x: device.locationX,
-		location_y: device.locationY,
+		ip: device.id,
+		location_y: device.coordinates[0],
+		location_x: device.coordinates[1],
+		layer_id: device.layerId,
+		mac_address: device.macAddress,
+		name: device.name,
+		type: device.type,
 	})
 
 	return new Device(data)

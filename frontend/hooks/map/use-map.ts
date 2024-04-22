@@ -7,10 +7,14 @@ import { message } from 'antd'
 //@ts-expect-error no types
 import Transform from 'ol-ext/interaction/Transform'
 import { Point } from 'ol/geom'
+import { Select } from 'ol/interaction'
+import { click, pointerMove } from 'ol/events/condition'
+import { boundingExtent } from 'ol/extent'
+import { fromExtent } from 'ol/geom/Polygon'
 
 import { MapLayer, PointsLayer, PolygonLayer, SchemeLayer } from '.'
 
-import { degreeToRadian, getImgParams, getRectCenter, loadImage, radianToDegree } from '@helpers'
+import { degreeToRadian, getImgParams, getRectCenter, getScaleByResolution, loadImage, pointStyleHovered, pointStyleSelected, radianToDegree } from '@helpers'
 import { Area } from '@typos'
 import { Device } from '@models'
 
@@ -31,13 +35,19 @@ const LAT_RATIO = 0.02
 const DEFAULT_CENTER = fromLonLat([37.619965, 55.754585])
 const DEFAULT_ZOOM = 17.4
 const DEFAULT_ROTATION = 0
+const CAMERA_HIT_ZONE_PX = 10
+const CLUSTER_EXTENT_SCALE = 10
 
 type LayerKeys = 'tile' | 'points' | 'scheme' | 'polygon'
 
 export const useMap = ({
 	onPolygonChange,
+	onFeatureSelect,
+	clustering,
 }: {
+	clustering?: boolean
 	onPolygonChange?: (coordinates: Area, angle: number) => void
+	onFeatureSelect?: (e: any) => void
 }) => {
 	const mapRootElement = useRef<HTMLDivElement | null>(null)
 	const [map, setMap] = useState<MapOl | null>(null)
@@ -45,6 +55,8 @@ export const useMap = ({
 	const polygonTransform = useRef<typeof Transform>()
 	const polygonLayer = useRef<PolygonLayer | null>(null)
 	const pointsLayer = useRef<PointsLayer | null>(null)
+	const featureClick = useRef<Select | null>(null)
+	const featurePointerMove = useRef<Select | null>(null)
 
 	const initializeMap = (center?: Coordinate) => {
 		if (!mapRootElement.current) {
@@ -172,16 +184,83 @@ export const useMap = ({
 			feature.set('rotation', device.angle * (Math.PI / 180))
 			feature.set('id', device.id)
 			feature.set('type', device.type)
+			feature.set('active', device.isActive)
 
 			return feature
 		})
 
-		const createdPointsLayer = new PointsLayer(features, /* this.clusteringEnabled */ false)
+		const createdPointsLayer = new PointsLayer(features, clustering)
 
 		createdPointsLayer.getSource()?.addFeatures(features)
 		map?.addLayer(createdPointsLayer)
 		layersDict.current.set('points', createdPointsLayer)
 		pointsLayer.current = createdPointsLayer
+	}
+
+	const addInteractionToDevices = () => {
+		if (!map || !onFeatureSelect) {
+			return
+		}
+
+		featureClick.current = new Select({
+			addCondition: click,
+			style: (feature, resolution) => {
+				const scale = getScaleByResolution(resolution)
+				const style = pointStyleSelected(feature)
+				const image = style?.getImage()
+
+				image?.setScale(scale)
+
+				return style
+
+			},
+		})
+
+		featurePointerMove.current = new Select({
+			condition: pointerMove,
+			style: (feature, resolution) => {
+				const scale = getScaleByResolution(resolution, 0.1)
+				const style = pointStyleHovered(feature)
+				const image = style?.getImage()
+
+				const clusterSize = feature.get('features')?.length
+
+				if (clusterSize === 1) {
+					image?.setScale(scale)
+				}
+
+				return style
+			},
+			hitTolerance: CAMERA_HIT_ZONE_PX,
+		})
+
+		featureClick.current.on('select', onFeatureSelect)
+
+		map.addInteraction(featureClick.current)
+		map.addInteraction(featurePointerMove.current)
+	}
+
+	const removeInteractionFromDevices = () => {
+		if (!map || !onFeatureSelect || !featureClick.current || !featurePointerMove.current) {
+			return
+		}
+
+		featureClick.current.un('select', onFeatureSelect)
+
+		map.removeInteraction(featureClick.current)
+		map.removeInteraction(featurePointerMove.current)
+	}
+
+	const toggleClustering = (clusteringEnabled: boolean) => {
+		if (!pointsLayer.current) {
+			return
+		}
+
+		if (clusteringEnabled) {
+			pointsLayer.current.disableClustering()
+		} else {
+			pointsLayer.current.enableClustering()
+		}
 	}
 
 	const clearScheme = () => {
@@ -256,6 +335,22 @@ export const useMap = ({
 		tileLayer?.setVisible(value)
 	}
 
+	const zoomToCluster = (cluster: Feature) => {
+		const features = cluster.get('features')
+		if (!map || !features) {
+			return
+		}
+
+		const extent = boundingExtent(features.map((feature: Feature<Point>) => feature.getGeometry()?.getCoordinates()))
+		const geom = fromExtent(extent)
+		geom.scale(CLUSTER_EXTENT_SCALE)
+
+		map?.getView().fit(geom, {
+			duration: 1000,
+			padding: [100, 100, 100, 100],
+		})
+	}
+
 	const setCenterByArea = (area: Area) => {
 		if (!map) {
 			return
@@ -279,10 +374,14 @@ export const useMap = ({
 		drawScheme,
 		drawPolygon,
 		drawDevices,
+		addInteractionToDevices,
 		clearScheme,
 		clearPolygon,
+		removeInteractionFromDevices,
+		zoomToCluster,
 		setCenterByArea,
 		toggleTileVisibility,
+		toggleClustering,
 	}
 }
 

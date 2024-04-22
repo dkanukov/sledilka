@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { use, useEffect } from 'react'
 import { Button, Switch } from 'antd'
 import { DoubleLeftOutlined, DoubleRightOutlined, EditOutlined, SaveOutlined } from '@ant-design/icons'
 
@@ -15,12 +15,35 @@ interface Props {
 	coordinates?: Area
 	devices?: Device[]
 	angle?: number
+	isClickOnDeviceNeeded?: boolean
+	isDevicesTranslateNeeded?: boolean
 	whenPolygonChange?: (coordinates: Area, angle: number) => void
 	whenLayerEditStart?: () => void
 	whenLayerSave?: () => void
+	whenFeatureSelect?: (id: string) => void
 }
 
 export const Map = (props: Props) => {
+	const handleFeatureSelect = (e: any) => {
+		const [feature] = e.selected
+
+		if (!feature) {
+			return
+		} else if (feature.get('features')?.length > 1) {
+			zoomToCluster(feature)
+			return
+		}
+
+		const deviceId = feature.get('features')?.[0]?.get('id')
+
+		if (deviceId && props.whenFeatureSelect) {
+			props.whenFeatureSelect(deviceId)
+		}
+	}
+	const { state: tileLayerVisible, updateState: setTileLayerVisible } = usePersistState('toggle-tile-layer', true)
+	const { state: showMapControls, updateState: setShowMapControls } = usePersistState('show-map-controls', true)
+	const { state: clusterDevices, updateState: setClusterDevices } = usePersistState('clustering', true)
+
 	const {
 		map,
 		mapRootElement,
@@ -29,15 +52,24 @@ export const Map = (props: Props) => {
 		drawScheme,
 		drawPolygon,
 		drawDevices,
+		addInteractionToDevices,
 		clearScheme,
 		clearPolygon,
+		removeInteractionFromDevices,
+		zoomToCluster,
 		setCenterByArea,
+		toggleClustering,
 		toggleTileVisibility,
 	} = useMap({
+		clustering: clusterDevices,
 		onPolygonChange: props.whenPolygonChange,
+		onFeatureSelect: handleFeatureSelect,
 	})
-	const { state: tileLayerVisible, updateState: setTileLayerVisible } = usePersistState('toggle-tile-layer', true)
-	const { state: showMapControls, updateState: setShowMapControls } = usePersistState('show-map-controls', true)
+
+	const handleClusteringToggle = () => {
+		setClusterDevices(!clusterDevices)
+		toggleClustering(clusterDevices)
+	}
 
 	const redrawScheme = async () => {
 		if (map && props.image && props.coordinates && props.angle !== undefined) {
@@ -75,6 +107,10 @@ export const Map = (props: Props) => {
 		if (props.devices) {
 			drawDevices(props.devices)
 		}
+
+		if (props.isClickOnDeviceNeeded) {
+			addInteractionToDevices()
+		}
 	}, [map])
 
 	useEffect(() => {
@@ -95,6 +131,15 @@ export const Map = (props: Props) => {
 			drawPolygon(props.coordinates || [], props.angle || 0)
 		}
 	}, [props.image, props.coordinates])
+
+	useEffect(() => {
+		if (props.isClickOnDeviceNeeded) {
+			addInteractionToDevices()
+			return
+		}
+
+		removeInteractionFromDevices()
+	}, [props.isClickOnDeviceNeeded])
 
 	return (
 		<>
@@ -122,6 +167,15 @@ export const Map = (props: Props) => {
 								onClick={props.whenLayerSave}
 							/>
 						)}
+						<div
+							className={styles.territoryControl}
+						>
+							<Switch
+								value={clusterDevices}
+								onChange={handleClusteringToggle}
+							/>
+							<p>Кластеризация</p>
+						</div>
 						<div
 							className={styles.territoryControl}
 						>
