@@ -65,7 +65,6 @@ export default function Admin() {
 			{objectsStore.selectedLayer && (
 				<Map
 					isClickOnDeviceNeeded
-					isPolygonNeed={false}
 					image={objectsStore.selectedLayer.image}
 					coordinates={objectsStore.selectedLayer.coordinates}
 					angle={objectsStore.selectedLayer.angle}
@@ -78,8 +77,6 @@ export default function Admin() {
 				<DeviceDrawer
 					device={objectsStore.selectedDevice}
 					whenClose={objectsStore.flushSelectedDevice}
-					whenChange={objectsStore.handleSelectedDeviceChange}
-					whenSave={handleDeviceSave}
 				/>
 			)}
 		</div>

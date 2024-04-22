@@ -1,7 +1,7 @@
 'use client'
 import { use, useEffect } from 'react'
 import { Button, Switch } from 'antd'
-import { DoubleLeftOutlined, DoubleRightOutlined, EditOutlined, SaveOutlined } from '@ant-design/icons'
+import { DoubleLeftOutlined, DoubleRightOutlined, EditOutlined, SaveOutlined, VideoCameraAddOutlined } from '@ant-design/icons'
 
 import styles from './map.module.css'
 
@@ -17,10 +17,11 @@ interface Props {
 	angle?: number
 	isClickOnDeviceNeeded?: boolean
 	isDevicesTranslateNeeded?: boolean
+	isEdit?: boolean
 	whenPolygonChange?: (coordinates: Area, angle: number) => void
 	whenLayerEditStart?: () => void
-	whenLayerSave?: () => void
 	whenFeatureSelect?: (id: string) => void
+	whenAddNewDevice?: () => void
 }
 
 export const Map = (props: Props) => {
@@ -141,6 +142,12 @@ export const Map = (props: Props) => {
 		removeInteractionFromDevices()
 	}, [props.isClickOnDeviceNeeded])
 
+	useEffect(() => {
+		if (props.devices) {
+			drawDevices(props.devices)
+		}
+	}, [props.devices])
+
 	return (
 		<>
 			<div className={styles.mapControl}>
@@ -151,20 +158,20 @@ export const Map = (props: Props) => {
 				/>
 				{showMapControls && (
 					<>
-						{!props.isPolygonNeed && (
+						{props.whenAddNewDevice && (
+							<Button
+								ghost
+								type={'primary'}
+								icon={<VideoCameraAddOutlined/>}
+								onClick={props.whenAddNewDevice}
+							/>
+						)}
+						{!props.isEdit && (
 							<Button
 								ghost
 								type={'primary'}
 								icon={<EditOutlined/>}
 								onClick={props.whenLayerEditStart}
-							/>
-						)}
-						{props.whenLayerSave && (
-							<Button
-								ghost
-								type={'primary'}
-								icon={<SaveOutlined/>}
-								onClick={props.whenLayerSave}
 							/>
 						)}
 						<div

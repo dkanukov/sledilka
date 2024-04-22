@@ -4,22 +4,17 @@ import { Drawer, Input } from 'antd'
 
 import styles from './id.module.css'
 
-import { EditSidebar, FileUpload, Map } from '@components'
+import { DeviceDrawer, EditSidebar, FileUpload, Map } from '@components'
 import { useLayerEdit, useCreateNewLayer, useDrawer } from '@hooks'
 
-const enum Mode {
-	ADD_LAYER = 'ADD_LAYER',
-	ADD_CAMERA = 'ADD_CAMERA',
-	CAMERA_INFO = 'CAMERA_INFO',
-	EDIT_LAYER = 'EDIT_LAYER',
-}
-
 export default function Id({ params } : { params: { id: string } }) {
-	const [mode, setMode] = useState<Mode>(Mode.EDIT_LAYER)
-	const { show, open, close } = useDrawer()
+	const [showLayerDrawer, openLayerDrawer, closeLayerDrawer] = useDrawer()
+	const [mode, setMode] = useState<'edit-layer' | 'edit-devices'>('edit-devices')
 	const {
 		layerStore,
 		handleLayerSave,
+		handleLayerChange,
+		handleAddDevice,
 	} = useLayerEdit(params.id ?? '')
 	const {
 		layer,
@@ -32,25 +27,36 @@ export default function Id({ params } : { params: { id: string } }) {
 
 	const handleCreateNewLayer = () => {
 		createNewLayer()
-		setMode(Mode.ADD_LAYER)
-		open()
+		openLayerDrawer()
 	}
 
 	const handleCreateNewLayerDrawerClose = () => {
 		removeNewLayer(),
-		close()
+		closeLayerDrawer()
 	}
 
 	const handleLayerCreate = async () => {
 		await createLayer()
-		close()
+		closeLayerDrawer()
+	}
+
+	const handleDeviceClick = (id: string) => {
+		layerStore.selectDevice(id)
+	}
+
+	const handleDeviceSave = () => {
+		if (!layerStore.device) {
+			return
+		}
+
+		layerStore.updateDevice(layerStore.device)
 	}
 
 	const renderAddLayerDrawer = () => (
 		<Drawer
 			closable
 			title={'Добавление слоя'}
-			open={show}
+			open={showLayerDrawer}
 			onClose={handleCreateNewLayerDrawerClose}
 			mask={false}
 			placement={'bottom'}
@@ -80,21 +86,33 @@ export default function Id({ params } : { params: { id: string } }) {
 				<EditSidebar
 					object={layerStore.object}
 					selectedItem={layerStore.layer?.id ?? ''}
-					whenClick={layerStore.handleSelectedLayerChange}
+					whenClick={handleLayerChange}
 					whenCreateNewLayerClick={handleCreateNewLayer}
 				/>
 			)}
 			{layerStore.layer && (
 				<Map
-					isPolygonNeed
+					isEdit
+					isPolygonNeed={mode === 'edit-layer'}
+					isClickOnDeviceNeeded={mode === 'edit-devices'}
 					angle={layerStore.layer.angle}
 					image={layerStore.layer.image}
+					devices={layerStore.layer.devices}
 					coordinates={layerStore.layer.coordinates}
-					whenLayerSave={handleLayerSave}
 					whenPolygonChange={layerStore.handlePolygonChange}
+					whenAddNewDevice={handleAddDevice}
+					whenFeatureSelect={handleDeviceClick}
 				/>
 			)}
 			{renderAddLayerDrawer()}
+			{layerStore.device && (
+				<DeviceDrawer
+					whenSave={handleDeviceSave}
+					whenChange={layerStore.handleSelectedDeviceChange}
+					whenClose={() => layerStore.selectDevice(null)}
+					device={layerStore.device}
+				/>
+			)}
 		</div>
 	)
 }

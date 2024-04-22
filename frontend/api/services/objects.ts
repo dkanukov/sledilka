@@ -42,6 +42,20 @@ export const updateDevice = async (device: Device) => {
 	return new Device(data)
 }
 
+export const createDevice = async (device: Device) => {
+	const { data } = await CustomedApi.devices.devicesCreate({
+		layer_id: device.layerId,
+		location_y: device.coordinates[0],
+		location_x: device.coordinates[1],
+		name: device.name,
+		type: device.type,
+		//TODO: remove hardcode
+		mac_address: '7c:50:4e:62:88:1e',
+	})
+
+	return new Device(data)
+}
+
 export const updateLayer = async (layer: ObjectLayer) => {
 	const response = await CustomedApi.objects.layersPartialUpdate(layer.objectId, layer.id, {
 		angle: layer.angle,

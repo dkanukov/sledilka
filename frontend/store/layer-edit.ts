@@ -1,18 +1,23 @@
 import { create } from 'zustand'
 
-import { ObjectLayer, ObjectStorage } from '@models'
-import { Area } from '@typos'
+import { Device, ObjectLayer, ObjectStorage } from '@models'
+import { Area, DeviceKeys } from '@typos'
 import { imageService, objectService } from '@api'
 
 interface LayerEdit{
 	layer: ObjectLayer | null
 	object: ObjectStorage | null
+	device: Device | null
 	uploadFile: (file: File) => Promise<void>
 	handlePolygonChange: (coordinates: Area, angle: number) => void
 	handleLayerUpdate: (layer: ObjectLayer) => Promise<boolean>
 	handleSelectedLayerChange: (layerId: string) => void
 	handleLayerNameChange: (value: string) => void
 	handleLayerCreate: (objectId: string, layer: ObjectLayer) => Promise<void>
+	handleSelectedDeviceChange: (key: DeviceKeys, value: string) => void
+	updateDevice: (device: Device) => Promise<void>
+	addNewDevice: (device: Device) => void
+	selectDevice: (id: string | null) => void
 	createNewLayer: () => void
 	removeNewLayer: () => void
 	fetchLayerById: (id: string) => Promise<ObjectLayer>
@@ -22,6 +27,7 @@ interface LayerEdit{
 export const useLayerEditStore = create<LayerEdit>()((set) => ({
 	layer: null,
 	object: null,
+	device: null,
 
 	uploadFile: async (file: File) => {
 		await imageService.uploadImage(file)
@@ -114,6 +120,39 @@ export const useLayerEditStore = create<LayerEdit>()((set) => ({
 		})
 	},
 
+	handleSelectedDeviceChange: (key, value) => {
+		set((state) => {
+			if (!state.device) {
+				return {}
+			}
+
+			if (key === 'lon') {
+				return {
+					device: {
+						...state.device,
+						coordinates: [Number(value), state.device.coordinates[1]],
+					},
+				}
+			}
+
+			if (key === 'lat') {
+				return {
+					device: {
+						...state.device,
+						coordinates: [state.device.coordinates[0], Number(value)],
+					},
+				}
+			}
+
+			return {
+				device: {
+					...state.device,
+					[key]: value,
+				},
+			}
+		})
+	},
+
 	createNewLayer: () => {
 		set((state) => {
 			if (!state.object) {
@@ -160,14 +199,53 @@ export const useLayerEditStore = create<LayerEdit>()((set) => ({
 			}
 			const layers = state.object.layers.slice(0, -1)
 
-			console.log(layers)
-
 			return {
 				object: {
 					...state.object,
 					layers,
 				},
 				layer: null,
+			}
+		})
+	},
+
+	addNewDevice: (device) => {
+		set((state) => {
+			if (!state.layer) {
+				return {}
+			}
+
+			return {
+				layer: {
+					...state.layer,
+					devices: [...state.layer.devices, device],
+				},
+			}
+		})
+	},
+
+	updateDevice: async (device) => {
+		await objectService.updateDevice(device)
+	},
+
+	selectDevice: (id) => {
+		if (!id) {
+			set(() => ({ device: null }))
+		}
+
+		set((state) => {
+			if (!state.layer) {
+				return {}
+			}
+
+			const deviceToSelect = state.layer.devices.find((device) => device.id === id)
+
+			if (!deviceToSelect) {
+				return {}
+			}
+
+			return {
+				device: deviceToSelect,
 			}
 		})
 	},

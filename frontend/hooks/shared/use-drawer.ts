@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export const useDrawer = () => {
+export const useDrawer = (): [boolean, () => void, () => void] => {
 	const [show, setShow] = useState(false)
 
 	const open = () => {
@@ -11,9 +11,9 @@ export const useDrawer = () => {
 		setShow(false)
 	}
 
-	return {
+	return [
 		show,
 		open,
 		close,
-	}
+	]
 }

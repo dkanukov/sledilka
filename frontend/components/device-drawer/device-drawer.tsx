@@ -10,8 +10,8 @@ import { DeviceKeys } from '@typos'
 interface Props {
 	device: Device
 	whenClose: () => void
-	whenChange: (key: DeviceKeys, value: string) => void
-	whenSave: () => void
+	whenChange?: (key: DeviceKeys, value: string) => void
+	whenSave?: () => void
 }
 
 const { Text } = Typography
@@ -31,6 +31,13 @@ const DEVICE_TYPES = [
 ]
 
 export const DeviceDrawer = (props: Props) => {
+	const handleDeviceChange = (key: DeviceKeys, value: string) => {
+		if (!props.whenChange) {
+			return
+		}
+
+		props.whenChange(key, value)
+	}
 	return (
 		<Drawer
 			title={`Устройство ${props.device.name}`}
@@ -47,9 +54,9 @@ export const DeviceDrawer = (props: Props) => {
 					<div className={styles.inputWithLabel}>
 						<Text>Название</Text>
 						<Input
-							placeholder={'IP'}
 							value={props.device.name}
-							onChange={({ target }) => props.whenChange('name', target.value)}
+							onChange={({ target }) => handleDeviceChange('name', target.value)}
+							readOnly={!props.whenChange}
 						/>
 					</div>
 					<div className={styles.inputWithLabel}>
@@ -57,7 +64,8 @@ export const DeviceDrawer = (props: Props) => {
 						<InputNumber
 							className={styles.inputNumber}
 							value={props.device.coordinates[0]}
-							onChange={(value) => props.whenChange('lon', String(value))}
+							onChange={(value) => handleDeviceChange('lon', String(value))}
+							readOnly={!props.whenChange}
 						/>
 					</div>
 					<div className={styles.inputWithLabel}>
@@ -65,21 +73,24 @@ export const DeviceDrawer = (props: Props) => {
 						<InputNumber
 							className={styles.inputNumber}
 							value={props.device.coordinates[1]}
-							onChange={(value) => props.whenChange('lat', String(value))}
+							onChange={(value) => handleDeviceChange('lat', String(value))}
+							readOnly={!props.whenChange}
 						/>
 					</div>
 					<div className={styles.inputWithLabel}>
 						<Text>IP</Text>
 						<Input
 							value={props.device.ip}
-							onChange={({ target }) => props.whenChange('ip', target.value)}
+							onChange={({ target }) => handleDeviceChange('ip', target.value)}
+							readOnly={!props.whenChange}
 						/>
 					</div>
 					<div className={styles.inputWithLabel}>
 						<Text>MAC address</Text>
 						<Input
 							value={props.device.macAddress}
-							onChange={({ target }) => props.whenChange('ip', target.value)}
+							onChange={({ target }) => handleDeviceChange('ip', target.value)}
+							readOnly={!props.whenChange}
 						/>
 					</div>
 					<div className={styles.inputWithLabel}>
@@ -87,15 +98,18 @@ export const DeviceDrawer = (props: Props) => {
 						<Select
 							value={props.device.type}
 							options={DEVICE_TYPES}
-							onSelect={(value) => props.whenChange('type', value)}
+							onSelect={(value) => handleDeviceChange('type', value)}
+							disabled={!props.whenChange}
 						/>
 					</div>
 				</div>
-				<Button
-					onClick={props.whenSave}
-				>
-					Сохранить
-				</Button>
+				{props.whenSave && (
+					<Button
+						onClick={props.whenSave}
+					>
+						Сохранить
+					</Button>
+				)}
 			</div>
 		</Drawer>
 	)
