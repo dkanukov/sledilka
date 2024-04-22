@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { Drawer, Input } from 'antd'
+import { Button, Drawer, Input } from 'antd'
 
 import styles from './id.module.css'
 
@@ -24,6 +24,15 @@ export default function Id({ params } : { params: { id: string } }) {
 		handleFileUpload,
 		createLayer,
 	} = useCreateNewLayer()
+
+	const handleModeToggle = () => {
+		if (mode === 'edit-layer') {
+			setMode('edit-devices')
+			return
+		}
+
+		setMode('edit-layer')
+	}
 
 	const handleCreateNewLayer = () => {
 		createNewLayer()
@@ -91,18 +100,30 @@ export default function Id({ params } : { params: { id: string } }) {
 				/>
 			)}
 			{layerStore.layer && (
-				<Map
-					isEdit
-					isPolygonNeed={mode === 'edit-layer'}
-					isClickOnDeviceNeeded={mode === 'edit-devices'}
-					angle={layerStore.layer.angle}
-					image={layerStore.layer.image}
-					devices={layerStore.layer.devices}
-					coordinates={layerStore.layer.coordinates}
-					whenPolygonChange={layerStore.handlePolygonChange}
-					whenAddNewDevice={handleAddDevice}
-					whenFeatureSelect={handleDeviceClick}
-				/>
+				<div
+					className={styles.mapWrapper}
+				>
+					<Map
+						isEdit
+						isPolygonNeed={mode === 'edit-layer'}
+						isClickOnDeviceNeeded={mode === 'edit-devices'}
+						angle={layerStore.layer.angle}
+						image={layerStore.layer.image}
+						devices={layerStore.layer.devices}
+						coordinates={layerStore.layer.coordinates}
+						whenPolygonChange={layerStore.handlePolygonChange}
+						whenAddNewDevice={handleAddDevice}
+						whenFeatureSelect={handleDeviceClick}
+					/>
+					<div className={styles.editModeController}>
+						<Button
+							type={'primary'}
+							onClick={handleModeToggle}
+						>
+							Редактирование: {mode === 'edit-layer' ? 'Слоя' : 'Устройств'}
+						</Button>
+					</div>
+				</div>
 			)}
 			{renderAddLayerDrawer()}
 			{layerStore.device && (

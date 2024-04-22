@@ -3,6 +3,21 @@
     height: calc(100vh - 63px);
 }
 
+.mapWrapper {
+	position: relative;
+	height: 100%;
+	width: 100%;
+}
+
+.editModeController {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: var(--z-index-max-overlay);
+	padding: 8px;
+	border-radius: 8px;
+}
+
 .emptyMessage {
 	justify-content: center;
 	margin-top: 40px;
