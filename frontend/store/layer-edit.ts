@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { Coordinate } from 'ol/coordinate'
 
 import { Device, ObjectLayer, ObjectStorage } from '@models'
 import { Area, DeviceKeys } from '@typos'
@@ -15,6 +16,7 @@ interface LayerEdit{
 	handleLayerNameChange: (value: string) => void
 	handleLayerCreate: (objectId: string, layer: ObjectLayer) => Promise<void>
 	handleSelectedDeviceChange: (key: DeviceKeys, value: string) => void
+	handleSelectedDeviceTranslate: (newCoords: { coords: Coordinate; deviceId: string }) => void
 	updateDevice: (device: Device) => Promise<void>
 	addNewDevice: (device: Device) => void
 	selectDevice: (id: string | null) => void
@@ -115,6 +117,21 @@ export const useLayerEditStore = create<LayerEdit>()((set) => ({
 				object: {
 					...state.object,
 					layers,
+				},
+			}
+		})
+	},
+
+	handleSelectedDeviceTranslate: ({ coords, deviceId }) => {
+		set((state) => {
+			if (!state.device) {
+				return {}
+			}
+			console.log(coords)
+			return {
+				device: {
+					...state.device,
+					coordinates: [coords[0], coords[1]],
 				},
 			}
 		})

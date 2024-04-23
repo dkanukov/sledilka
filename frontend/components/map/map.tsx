@@ -2,6 +2,8 @@
 import { use, useEffect } from 'react'
 import { Button, Switch } from 'antd'
 import { DoubleLeftOutlined, DoubleRightOutlined, EditOutlined, SaveOutlined, VideoCameraAddOutlined } from '@ant-design/icons'
+import { Coordinate } from 'ol/coordinate'
+import { debounce } from 'lodash'
 
 import styles from './map.module.css'
 
@@ -22,6 +24,8 @@ interface Props {
 	whenLayerEditStart?: () => void
 	whenFeatureSelect?: (id: string) => void
 	whenAddNewDevice?: () => void
+	whenDeviceTranslating: (newCoords: { coords: Coordinate; deviceId: string }) => void
+	whenDeviceRotating: (newRotation: { rotation: number; deviceId: string }) => void
 }
 
 export const Map = (props: Props) => {
@@ -41,6 +45,16 @@ export const Map = (props: Props) => {
 			props.whenFeatureSelect(deviceId)
 		}
 	}
+
+	const handleDeviceTranslating = (newCoords: { coords: Coordinate; deviceId: string }) => {
+		if (!props.whenDeviceTranslating) {
+			return
+		}
+
+		props.whenDeviceTranslating(newCoords)
+		// setTimeout(() => props.whenDeviceTranslating(newCoords), 0)
+		// debounce(() => props.whenDeviceTranslating(newCoords), 500)
+	}
 	const { state: tileLayerVisible, updateState: setTileLayerVisible } = usePersistState('toggle-tile-layer', true)
 	const { state: showMapControls, updateState: setShowMapControls } = usePersistState('show-map-controls', true)
 	const { state: clusterDevices, updateState: setClusterDevices } = usePersistState('clustering', true)
@@ -54,8 +68,10 @@ export const Map = (props: Props) => {
 		drawPolygon,
 		drawDevices,
 		addInteractionToDevices,
+		addTransformToDevices,
 		clearScheme,
 		clearPolygon,
+		clearPoints,
 		removeInteractionFromDevices,
 		zoomToCluster,
 		setCenterByArea,
@@ -143,7 +159,14 @@ export const Map = (props: Props) => {
 	}, [props.isClickOnDeviceNeeded])
 
 	useEffect(() => {
+		if (props.isDevicesTranslateNeeded) {
+			addTransformToDevices(handleDeviceTranslating)
+		}
+	})
+
+	useEffect(() => {
 		if (props.devices) {
+			clearPoints()
 			drawDevices(props.devices)
 		}
 	}, [props.devices])

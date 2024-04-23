@@ -107,6 +107,7 @@ export default function Id({ params } : { params: { id: string } }) {
 						isEdit
 						isPolygonNeed={mode === 'edit-layer'}
 						isClickOnDeviceNeeded={mode === 'edit-devices'}
+						isDevicesTranslateNeeded={mode === 'edit-devices'}
 						angle={layerStore.layer.angle}
 						image={layerStore.layer.image}
 						devices={layerStore.layer.devices}
@@ -114,6 +115,7 @@ export default function Id({ params } : { params: { id: string } }) {
 						whenPolygonChange={layerStore.handlePolygonChange}
 						whenAddNewDevice={handleAddDevice}
 						whenFeatureSelect={handleDeviceClick}
+						whenDeviceTranslating={layerStore.handleSelectedDeviceTranslate}
 					/>
 					<div className={styles.editModeController}>
 						<Button

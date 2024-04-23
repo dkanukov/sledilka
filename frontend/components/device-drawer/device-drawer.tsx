@@ -59,7 +59,7 @@ export const DeviceDrawer = (props: Props) => {
 							readOnly={!props.whenChange}
 						/>
 					</div>
-					<div className={styles.inputWithLabel}>
+					 <div className={styles.inputWithLabel}>
 						<Text>Долгота</Text>
 						<InputNumber
 							className={styles.inputNumber}

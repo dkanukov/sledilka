@@ -57,6 +57,18 @@ export const useMap = ({
 	const pointsLayer = useRef<PointsLayer | null>(null)
 	const featureClick = useRef<Select | null>(null)
 	const featurePointerMove = useRef<Select | null>(null)
+	const transformDevice = new Transform({
+		features: layersDict.current.get('points'),
+		rotate: true,
+		translate: true,
+		scale: false,
+		pointRadius: 0,
+		translateFeature: true,
+		filter: (features: Feature) => {
+			const feature = features.get('features')
+			return Boolean(feature) && !(feature.length > 1)
+		},
+	})
 
 	const initializeMap = (center?: Coordinate) => {
 		if (!mapRootElement.current) {
@@ -197,6 +209,70 @@ export const useMap = ({
 		pointsLayer.current = createdPointsLayer
 	}
 
+	const addTransformToDevices = (
+		whenCameraTranslating?: (newCoords: { coords: Coordinate; deviceId: string }) => void,
+		whenCameraRotating?: (newRotation: { rotation: number; deviceId: string }) => void,
+	) => {
+		if (
+			!map ||
+			!onFeatureSelect
+		) {
+			return
+		}
+
+		transformDevice.on(['select', 'rotatestart', 'translatestart'], (e: BasicTransformEvent) => {
+			const features = e.feature?.get('features')
+			if (!features || !featurePointerMove.current || !featureClick.current || !map || features.length > 1) {
+				return
+			}
+			map.removeInteraction(featurePointerMove.current)
+		})
+
+		transformDevice.on('translating', (e: BasicTransformEvent) => {
+			if (!whenCameraTranslating || !featureClick.current || !featurePointerMove.current || !map) {
+				return
+			}
+
+			const coords = toLonLat(e.coordinate)
+			const deviceId = e.feature.get('features')[0].get('id')
+
+			map.removeInteraction(featurePointerMove.current)
+			map.removeInteraction(featureClick.current)
+
+			whenCameraTranslating({
+				coords,
+				deviceId,
+			})
+		})
+
+		transformDevice.on('rotating', (e: RotatingTransformEvent) => {
+			if (!whenCameraRotating || !featureClick.current || !featurePointerMove.current || !map) {
+				return
+			}
+
+			map.removeInteraction(featurePointerMove.current)
+			map.removeInteraction(featureClick.current)
+			const deviceId = e.feature.get('features')[0].get('id')
+
+			const normalizeAngle = 360 - (radianToDegree(e.angle) + 130) % 360
+
+			whenCameraRotating({
+				rotation: normalizeAngle,
+				deviceId,
+			})
+		})
+
+		transformDevice.on(['rotateend', 'translateend'], () => {
+			if (!featurePointerMove.current || !featureClick.current || !map) {
+				return
+			}
+			map.addInteraction(featurePointerMove.current)
+			map.addInteraction(featureClick.current)
+		})
+
+		map.addInteraction(transformDevice)
+	}
+
 	const addInteractionToDevices = () => {
 		if (!map || !onFeatureSelect) {
 			return
@@ -249,6 +325,16 @@ export const useMap = ({
 
 		map.removeInteraction(featureClick.current)
 		map.removeInteraction(featurePointerMove.current)
+	}
+
+	const clearPoints = () => {
+		const pointsLayer = layersDict.current.get('points') as PointsLayer
+		if (!pointsLayer) {
+			return
+		}
+
+		layersDict.current.delete('points')
+		map?.removeLayer(pointsLayer)
 	}
 
 	const toggleClustering = (clusteringEnabled: boolean) => {
@@ -375,8 +461,10 @@ export const useMap = ({
 		drawPolygon,
 		drawDevices,
 		addInteractionToDevices,
+		addTransformToDevices,
 		clearScheme,
 		clearPolygon,
+		clearPoints,
 		removeInteractionFromDevices,
 		zoomToCluster,
 		setCenterByArea,
