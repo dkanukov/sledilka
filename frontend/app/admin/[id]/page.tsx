@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { Button, Drawer, Input } from 'antd'
+import { Button, Drawer, Input, message } from 'antd'
 
 import styles from './id.module.css'
 
@@ -53,12 +53,19 @@ export default function Id({ params } : { params: { id: string } }) {
 		layerStore.selectDevice(id)
 	}
 
-	const handleDeviceSave = () => {
+	const handleDeviceSave = async () => {
 		if (!layerStore.device) {
 			return
 		}
 
-		layerStore.updateDevice(layerStore.device)
+		const response = await layerStore.updateDevice(layerStore.device)
+
+		if (response) {
+			await message.success({ content: 'Устройство обновлено' })
+			return
+		}
+
+		await message.error({ content: 'Устройство не обновлено' })
 	}
 
 	const renderAddLayerDrawer = () => (
@@ -116,6 +123,7 @@ export default function Id({ params } : { params: { id: string } }) {
 						whenAddNewDevice={handleAddDevice}
 						whenFeatureSelect={handleDeviceClick}
 						whenDeviceTranslating={layerStore.handleSelectedDeviceTranslate}
+						whenDeviceRotating={layerStore.handleDeviceRotating}
 					/>
 					<div className={styles.editModeController}>
 						<Button

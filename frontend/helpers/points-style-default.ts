@@ -50,6 +50,7 @@ export const pointStyleDefault = (cluster: FeatureLike) => {
 		return style
 	}
 
+	console.log(rotation)
 	const createdStyle = new Style({
 		image: new Icon({
 			src,

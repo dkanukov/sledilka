@@ -17,7 +17,8 @@ interface LayerEdit{
 	handleLayerCreate: (objectId: string, layer: ObjectLayer) => Promise<void>
 	handleSelectedDeviceChange: (key: DeviceKeys, value: string) => void
 	handleSelectedDeviceTranslate: (newCoords: { coords: Coordinate; deviceId: string }) => void
-	updateDevice: (device: Device) => Promise<void>
+	handleDeviceRotating: (newRotation: { rotation: number; deviceId: string }) => void
+	updateDevice: (device: Device) => Promise<boolean>
 	addNewDevice: (device: Device) => void
 	selectDevice: (id: string | null) => void
 	createNewLayer: () => void
@@ -127,11 +128,26 @@ export const useLayerEditStore = create<LayerEdit>()((set) => ({
 			if (!state.device) {
 				return {}
 			}
-			console.log(coords)
+
 			return {
 				device: {
 					...state.device,
 					coordinates: [coords[0], coords[1]],
+				},
+			}
+		})
+	},
+
+	handleDeviceRotating: ({ rotation }) => {
+		set((state) => {
+			if (!state.device) {
+				return {}
+			}
+
+			return {
+				device: {
+					...state.device,
+					angle: rotation,
 				},
 			}
 		})
@@ -142,6 +158,8 @@ export const useLayerEditStore = create<LayerEdit>()((set) => ({
 			if (!state.device) {
 				return {}
 			}
+
+			// const device = state.device
 
 			if (key === 'lon') {
 				return {
@@ -242,7 +260,8 @@ export const useLayerEditStore = create<LayerEdit>()((set) => ({
 	},
 
 	updateDevice: async (device) => {
-		await objectService.updateDevice(device)
+		const response = await objectService.updateDevice(device)
+		return response
 	},
 
 	selectDevice: (id) => {

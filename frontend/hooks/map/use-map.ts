@@ -255,6 +255,7 @@ export const useMap = ({
 			const deviceId = e.feature.get('features')[0].get('id')
 
 			const normalizeAngle = 360 - (radianToDegree(e.angle) + 130) % 360
+			console.log(normalizeAngle)
 
 			whenCameraRotating({
 				rotation: normalizeAngle,

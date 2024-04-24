@@ -29,8 +29,8 @@ export const createLayer = async (objectId: string, newLayer: ObjectLayer) => {
 }
 
 export const updateDevice = async (device: Device) => {
-	const { data } = await CustomedApi.devices.devicesPartialUpdate(device.id, {
-		ip: device.id,
+	const response = await CustomedApi.devices.devicesPartialUpdate(device.id, {
+		ip: device.ip,
 		location_y: device.coordinates[0],
 		location_x: device.coordinates[1],
 		layer_id: device.layerId,
@@ -39,7 +39,7 @@ export const updateDevice = async (device: Device) => {
 		type: device.type,
 	})
 
-	return new Device(data)
+	return response.status === 200
 }
 
 export const createDevice = async (device: Device) => {

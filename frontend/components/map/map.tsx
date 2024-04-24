@@ -1,5 +1,5 @@
 'use client'
-import { use, useEffect } from 'react'
+import { useEffect } from 'react'
 import { Button, Switch } from 'antd'
 import { DoubleLeftOutlined, DoubleRightOutlined, EditOutlined, SaveOutlined, VideoCameraAddOutlined } from '@ant-design/icons'
 import { Coordinate } from 'ol/coordinate'
@@ -24,11 +24,13 @@ interface Props {
 	whenLayerEditStart?: () => void
 	whenFeatureSelect?: (id: string) => void
 	whenAddNewDevice?: () => void
-	whenDeviceTranslating: (newCoords: { coords: Coordinate; deviceId: string }) => void
-	whenDeviceRotating: (newRotation: { rotation: number; deviceId: string }) => void
+	whenDeviceTranslating?: (newCoords: { coords: Coordinate; deviceId: string }) => void
+	whenDeviceRotating?: (newRotation: { rotation: number; deviceId: string }) => void
 }
 
 export const Map = (props: Props) => {
+	const debouncedWhenTranslater = debounce((newCoords: { coords: Coordinate; deviceId: string }) => props.whenDeviceTranslating?.(newCoords), 500)
+
 	const handleFeatureSelect = (e: any) => {
 		const [feature] = e.selected
 
@@ -51,9 +53,15 @@ export const Map = (props: Props) => {
 			return
 		}
 
-		props.whenDeviceTranslating(newCoords)
-		// setTimeout(() => props.whenDeviceTranslating(newCoords), 0)
-		// debounce(() => props.whenDeviceTranslating(newCoords), 500)
+		debouncedWhenTranslater(newCoords)
+	}
+
+	const handleDeviceRotating = (newRotation: { rotation: number; deviceId: string }) => {
+		if (!props.whenDeviceRotating) {
+			return
+		}
+
+		props.whenDeviceRotating(newRotation)
 	}
 	const { state: tileLayerVisible, updateState: setTileLayerVisible } = usePersistState('toggle-tile-layer', true)
 	const { state: showMapControls, updateState: setShowMapControls } = usePersistState('show-map-controls', true)
@@ -160,7 +168,7 @@ export const Map = (props: Props) => {
 
 	useEffect(() => {
 		if (props.isDevicesTranslateNeeded) {
-			addTransformToDevices(handleDeviceTranslating)
+			addTransformToDevices(handleDeviceTranslating, handleDeviceRotating)
 		}
 	})
 
