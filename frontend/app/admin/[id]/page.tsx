@@ -4,21 +4,19 @@ import { Button, Drawer, Input, message } from 'antd'
 
 import styles from './id.module.css'
 
-import { DeviceDrawer, EditSidebar, FileUpload, Map } from '@components'
+import { DeviceDrawer, EditSidebar, FileUpload, LayerDrawer, Map } from '@components'
 import { useLayerEdit, useCreateNewLayer, useDrawer } from '@hooks'
 
 export default function Id({ params } : { params: { id: string } }) {
 	const [showLayerDrawer, openLayerDrawer, closeLayerDrawer] = useDrawer()
-	const [mode, setMode] = useState<'edit-layer' | 'edit-devices'>('edit-devices')
+	const [mode, setMode] = useState<'edit-layer' | 'edit-devices' | 'add-layer'>('edit-devices')
 	const {
 		layerStore,
-		handleLayerSave,
 		handleLayerChange,
 		handleAddDevice,
 	} = useLayerEdit(params.id ?? '')
 	const {
 		layer,
-		createNewLayer,
 		removeNewLayer,
 		handleLayerNameChange,
 		handleFileUpload,
@@ -35,8 +33,9 @@ export default function Id({ params } : { params: { id: string } }) {
 	}
 
 	const handleCreateNewLayer = () => {
-		createNewLayer()
+		layerStore.createNewLayer()
 		openLayerDrawer()
+		setMode('add-layer')
 	}
 
 	const handleCreateNewLayerDrawerClose = () => {
@@ -47,6 +46,7 @@ export default function Id({ params } : { params: { id: string } }) {
 	const handleLayerCreate = async () => {
 		await createLayer()
 		closeLayerDrawer()
+		setMode('edit-devices')
 	}
 
 	const handleDeviceClick = (id: string) => {
@@ -66,6 +66,20 @@ export default function Id({ params } : { params: { id: string } }) {
 		}
 
 		await message.error({ content: 'Устройство не обновлено' })
+	}
+
+	const handleLayerUpdate = async () => {
+		if (!layerStore.layer) {
+			return
+		}
+
+		const response = await layerStore.handleLayerUpdate(layerStore.layer)
+		if (response) {
+			await message.success({ content: 'Слой обновлен' })
+			return
+		}
+
+		await message.error({ content: 'Слой не был обновлен' })
 	}
 
 	const renderAddLayerDrawer = () => (
@@ -112,7 +126,7 @@ export default function Id({ params } : { params: { id: string } }) {
 				>
 					<Map
 						isEdit
-						isPolygonNeed={mode === 'edit-layer'}
+						isPolygonNeed={mode === 'edit-layer' || mode === 'add-layer'}
 						isClickOnDeviceNeeded={mode === 'edit-devices'}
 						isDevicesTranslateNeeded={mode === 'edit-devices'}
 						angle={layerStore.layer.angle}
@@ -142,6 +156,15 @@ export default function Id({ params } : { params: { id: string } }) {
 					whenChange={layerStore.handleSelectedDeviceChange}
 					whenClose={() => layerStore.selectDevice(null)}
 					device={layerStore.device}
+				/>
+			)}
+			{layerStore.layer && mode === 'edit-layer' && (
+				<LayerDrawer
+					layer={layerStore.layer}
+					whenClose={() => setMode('edit-devices')}
+					whenChange={layerStore.handleLayerChange}
+					whenSave={handleLayerUpdate}
+					whenFileUpload={layerStore.handleFileUpload}
 				/>
 			)}
 		</div>

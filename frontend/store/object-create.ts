@@ -59,7 +59,7 @@ export const useObjectCreateStore = create<ObjectCreateStore>()((set) => ({
 
 		const isOk = status === 200
 
-		if (isOk) {
+		/* if (isOk) {
 			set((state) => {
 				if (!state.createdObject) {
 					return state
@@ -85,7 +85,7 @@ export const useObjectCreateStore = create<ObjectCreateStore>()((set) => ({
 					},
 				}
 			})
-		}
+		} */
 
 		return isOk
 	},

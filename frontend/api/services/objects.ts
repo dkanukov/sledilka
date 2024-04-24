@@ -63,8 +63,8 @@ export const updateLayer = async (layer: ObjectLayer) => {
 			long: area[0],
 			lat: area[1],
 		})),
-		// floor_name?: string;
-		// image?: string;
+		floor_name: layer.floorName,
+		image: layer.image,
 	})
 
 	return response.status === 200

@@ -3,10 +3,6 @@ import { useLayerEditStore } from '@store'
 export const useCreateNewLayer = () => {
 	const layerStore = useLayerEditStore()
 
-	const createNewLayer = () => {
-		layerStore.createNewLayer()
-	}
-
 	const removeNewLayer = () => {
 		layerStore.removeNewLayer()
 	}
@@ -28,7 +24,6 @@ export const useCreateNewLayer = () => {
 	}
 
 	return {
-		createNewLayer,
 		removeNewLayer,
 		handleLayerNameChange,
 		handleFileUpload,

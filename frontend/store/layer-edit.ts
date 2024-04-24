@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { Coordinate } from 'ol/coordinate'
 
 import { Device, ObjectLayer, ObjectStorage } from '@models'
-import { Area, DeviceKeys } from '@typos'
+import { Area, DeviceKeys, LayerKeys } from '@typos'
 import { imageService, objectService } from '@api'
 
 interface LayerEdit{
@@ -18,6 +18,8 @@ interface LayerEdit{
 	handleSelectedDeviceChange: (key: DeviceKeys, value: string) => void
 	handleSelectedDeviceTranslate: (newCoords: { coords: Coordinate; deviceId: string }) => void
 	handleDeviceRotating: (newRotation: { rotation: number; deviceId: string }) => void
+	handleLayerChange: (key: LayerKeys, value: string) => void
+	handleFileUpload: (file: File) => Promise<void>
 	updateDevice: (device: Device) => Promise<boolean>
 	addNewDevice: (device: Device) => void
 	selectDevice: (id: string | null) => void
@@ -123,16 +125,25 @@ export const useLayerEditStore = create<LayerEdit>()((set) => ({
 		})
 	},
 
-	handleSelectedDeviceTranslate: ({ coords, deviceId }) => {
+	handleSelectedDeviceTranslate: ({ coords }) => {
 		set((state) => {
-			if (!state.device) {
+			if (!state.device || !state.layer) {
 				return {}
 			}
 
+			const device = state.device
+			const devices = state.layer.devices
+
+			device.coordinates = coords as [number, number]
+
+			const deviceIndex = devices.findIndex((d) => d.id === device.id)
+			devices[deviceIndex] = device
+
 			return {
-				device: {
-					...state.device,
-					coordinates: [coords[0], coords[1]],
+				device,
+				layer: {
+					...state.layer,
+					devices: [...devices],
 				},
 			}
 		})
@@ -155,34 +166,67 @@ export const useLayerEditStore = create<LayerEdit>()((set) => ({
 
 	handleSelectedDeviceChange: (key, value) => {
 		set((state) => {
-			if (!state.device) {
+			if (!state.device || !state.layer) {
 				return {}
 			}
 
-			// const device = state.device
+			let device = state.device
+			const devices = state.layer.devices
 
 			if (key === 'lon') {
-				return {
-					device: {
-						...state.device,
-						coordinates: [Number(value), state.device.coordinates[1]],
-					},
+				device.coordinates[0] = Number(value)
+			} else if (key === 'lat') {
+				device.coordinates[1] = Number(value)
+			} else {
+				device = {
+					...device,
+					[key]: value,
 				}
 			}
 
-			if (key === 'lat') {
-				return {
-					device: {
-						...state.device,
-						coordinates: [state.device.coordinates[0], Number(value)],
-					},
-				}
+			const deviceIndex = devices.findIndex((d) => d.id === device.id)
+			devices[deviceIndex] = device
+
+			return {
+				device,
+				layer: {
+					...state.layer,
+					devices: [...devices],
+				},
+			}
+		})
+	},
+
+	handleLayerChange: (key, value) => {
+		set((state) => {
+			if (!state.layer) {
+				return {}
+			}
+
+			const layer = state.layer
+
+			switch (key) {
+			case 'floorName': layer.floorName = value; break
+			case 'angle': layer.angle = Number(value); break
 			}
 
 			return {
-				device: {
-					...state.device,
-					[key]: value,
+				layer,
+			}
+		})
+	},
+
+	handleFileUpload: async (file) => {
+		await imageService.uploadImage(file)
+		set((state) => {
+			if (!state.layer) {
+				return {}
+			}
+
+			return {
+				layer: {
+					...state.layer,
+					image: file.name,
 				},
 			}
 		})
@@ -196,6 +240,7 @@ export const useLayerEditStore = create<LayerEdit>()((set) => ({
 
 			const newLayer = new ObjectLayer({
 				floor_name: 'Новый слой',
+				image: '',
 				angle: 0,
 				angles_coordinates: [
 					{

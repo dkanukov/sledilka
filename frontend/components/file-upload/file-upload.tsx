@@ -2,6 +2,8 @@ import { InboxOutlined } from '@ant-design/icons'
 import { Button, Upload, UploadFile, UploadProps, message } from 'antd'
 import { useEffect, useState } from 'react'
 
+import styles from './file-upload.module.css'
+
 const { Dragger } = Upload
 
 interface Props {
@@ -52,6 +54,7 @@ export const FileUpload = (props: Props) => {
 				</p>
 			</Dragger>
 			<Button
+				className={styles.createButton}
 				type={'primary'}
 				onClick={props.whenLayerCreate}
 			>

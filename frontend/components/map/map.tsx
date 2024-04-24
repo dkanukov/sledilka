@@ -97,11 +97,11 @@ export const Map = (props: Props) => {
 	}
 
 	const redrawScheme = async () => {
-		if (map && props.image && props.coordinates && props.angle !== undefined) {
+		if (map && props.image && props.coordinates) {
 			clearScheme()
 			await drawScheme(
 				props.image,
-				props.angle,
+				props.angle || 0,
 				props.coordinates,
 			)
 		}

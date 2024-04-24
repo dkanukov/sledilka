@@ -20,21 +20,6 @@ export const useLayerEdit = (id: string) => {
 		fetchLayerById().catch(() => {})
 	}, [])
 
-	const handleLayerSave = async () => {
-		if (!layerStore.layer) {
-			return
-		}
-
-		const response = await layerStore.handleLayerUpdate(layerStore.layer)
-
-		if (response) {
-			await message.success({ content: 'Слой сохранен' })
-			return
-		}
-
-		await message.error({ content: 'Слой не был сохранен' })
-	}
-
 	const handleLayerChange = (id: string) => {
 		layerStore.handleSelectedLayerChange(id)
 		customRouter.push({
@@ -61,7 +46,6 @@ export const useLayerEdit = (id: string) => {
 
 	return {
 		layerStore,
-		handleLayerSave,
 		handleLayerChange,
 		handleAddDevice,
 	}

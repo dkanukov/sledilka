@@ -45,10 +45,10 @@ export const pointStyleDefault = (cluster: FeatureLike) => {
 	const isActive: Device['isActive'] = feature.get('active')
 	const src = getSrcFunctionByTypesMap[type](isActive)
 
-	const style = cacheDefault.get(featureId)
+	/* const style = cacheDefault.get(featureId)
 	if (style && style?.getImage()?.getRotation() === rotation) {
 		return style
-	}
+	} */
 
 	console.log(rotation)
 	const createdStyle = new Style({
