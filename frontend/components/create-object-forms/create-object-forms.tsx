@@ -65,6 +65,7 @@ export const FirstStep = (props: FirstStepProps) => {
 			>
 				<Map
 					hideControls
+					center={fromLonLat(MOSCOW_COORDINATE)}
 					markerCoordiante={fromLonLat(MOSCOW_COORDINATE)}
 					whenMarkerMove={handleMarkerMove}
 				/>

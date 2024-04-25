@@ -14,7 +14,6 @@ import { useObjectCreateStore } from '@store'
 
 export default function ObjectCreate() {
 	const objectCreateStore = useObjectCreateStore()
-	const router = useRouter()
 	const [currentStep, setCurrentStep] = useState(0)
 	const [isFetching, setIsFetching] = useState(false)
 
@@ -22,16 +21,6 @@ export default function ObjectCreate() {
 		{
 			title: 'Информация об объекте',
 			disabled: currentStep !== 0,
-			icon: isFetching && <LoadingOutlined/>,
-		},
-		{
-			title: 'Добавление слоев',
-			disabled: currentStep !== 1,
-			icon: isFetching && <LoadingOutlined/>,
-		},
-		{
-			title: 'Редактирование схемы',
-			disabled: currentStep !== 2,
 			icon: isFetching && <LoadingOutlined/>,
 		},
 	]
@@ -47,53 +36,11 @@ export default function ObjectCreate() {
 		setIsFetching(false)
 	}
 
-	const handleUploadImage = async (file: File) => {
-		setIsFetching(true)
-		await objectCreateStore.uploadImage(file)
-		nextStep()
-		setIsFetching(false)
-	}
-
-	const handleLayerDrag = (southWest:[number, number], northEast: [number, number]) => {
-		objectCreateStore.whenLayerLanLotChange(southWest, northEast)
-	}
-
-	const handleCreateNewLayer = async (name: string) => {
-		if (!objectCreateStore.createdObject) {
-			return
-		}
-
-		setIsFetching(true)
-		const response = await objectCreateStore.createNewLayer(objectCreateStore.createdObject.id, objectCreateStore.createdObject.layers[0], name)
-		setIsFetching(false)
-		if (response.success) {
-			router.push(`/admin?layerId=${response.id}`)
-		}
-	}
-
 	const renderStepContent = () => {
 		if (currentStep === 0) {
 			return (
 				<CreateObjectForms.FirstStep
 					whenNextStepClick={handleCreateNewObject}
-				/>
-			)
-		}
-
-		if (currentStep === 1) {
-			return (
-				<CreateObjectForms.SecondStep
-					whenNextStepClick={handleUploadImage}
-				/>
-			)
-		}
-
-		if (currentStep === 2 && objectCreateStore.createdObject?.layers[0]) {
-			return (
-				<CreateObjectForms.ThirdStep
-					selectedLayer={objectCreateStore.createdObject.layers[0]}
-					handleLayerDrag={handleLayerDrag}
-					whenNextStepClick={handleCreateNewLayer}
 				/>
 			)
 		}

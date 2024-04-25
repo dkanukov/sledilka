@@ -15,6 +15,7 @@ interface Props {
 	isPolygonNeed?: boolean
 	image?: string
 	coordinates?: Area
+	center?: Coordinate
 	markerCoordiante?: Coordinate
 	devices?: Device[]
 	angle?: number
@@ -120,7 +121,7 @@ export const Map = (props: Props) => {
 	}
 
 	useEffect(() => {
-		initializeMap()
+		initializeMap(props.center)
 	}, [])
 
 	useEffect(() => {
