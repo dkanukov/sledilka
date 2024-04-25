@@ -1,31 +1,34 @@
 import { Button, Input, Upload, UploadProps, message, UploadFile } from 'antd'
 import { useState } from 'react'
 import { InboxOutlined } from '@ant-design/icons'
-import * as L from 'leaflet'
+import { fromLonLat } from 'ol/proj'
+import { Coordinate } from 'ol/coordinate'
 
 import { EntityNewObject } from '../../api/generated/api'
 
 import styles from './create-objects-form.module.css'
 
 import { Map } from '@components'
-import { ObjectLayer } from '@models'
 
 const { TextArea } = Input
+const MOSCOW_COORDINATE = [37.61905400772136, 55.750549228458084]
 
 interface FirstStepProps {
 	whenNextStepClick: (newObject: EntityNewObject) => void
 }
 
-const { Dragger } = Upload
-
 export const FirstStep = (props: FirstStepProps) => {
-	const [form, setForm] = useState<Required<EntityNewObject>>({
+	const [form, setForm] = useState({
 		name: '',
 		address: '',
 		description: '',
 	})
 
 	const isButtonDisabled = Boolean(!form.name || !form.address || !form.description)
+
+	const handleMarkerMove = (coordinate: Coordinate) => {
+		console.log(coordinate)
+	}
 
 	const handleSendForm = () => {
 		props.whenNextStepClick(form)
@@ -57,109 +60,22 @@ export const FirstStep = (props: FirstStepProps) => {
 					address: e.target.value,
 				})}
 			/>
-			<div>
-				<Button
-					disabled={isButtonDisabled}
-					onClick={handleSendForm}
-				>
-					Далее
-				</Button>
-			</div>
-		</div>
-	)
-}
-
-interface SecondStepProps {
-	whenNextStepClick: (file: File) => Promise<void>
-}
-export const SecondStep = (props: SecondStepProps) => {
-	const [fileList, setFileList] = useState<UploadFile[]>([])
-
-	const handleUploadImage = async () => {
-		//NOTE: проблема с типизацией файл формата
-		// @ts-expect-error
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const response = await props.whenNextStepClick(fileList[0])
-	}
-
-	const handleBeforeFileUpload: UploadProps['beforeUpload'] = (file) => {
-		const isCorrectFileType = file.type === 'image/png'
-
-		if (!isCorrectFileType) {
-			message.error('Формат файла должен быть PNG')
-		}
-
-		if (isCorrectFileType) {
-			setFileList([file])
-		}
-	}
-
-	const handleFileRemove = () => {
-		setFileList([])
-	}
-
-	const LoadFileConfig: UploadProps = {
-		onRemove: handleFileRemove,
-		beforeUpload: handleBeforeFileUpload,
-	}
-
-	return (
-		<div>
-			<Dragger
-				{...LoadFileConfig}
-				fileList={fileList}
-				maxCount={1}
+			<div
+				className={styles.mapWrapper}
 			>
-				<p className="ant-upload-drag-icon">
-					<InboxOutlined />
-				</p>
-				<p className="ant-upload-text">
-					Нажмите или перетащите на эту область, чтобы загрузить файл
-				</p>
-				<p className="ant-upload-hint">
-					Выберите 1 файл в формате PNG
-				</p>
-			</Dragger>
-			<div className={styles.bottomControls}>
-				<Button
-					disabled={!fileList.length}
-					onClick={handleUploadImage}
-				>
-					Далее
-				</Button>
+				<Map
+					hideControls
+					center={fromLonLat(MOSCOW_COORDINATE)}
+					markerCoordiante={fromLonLat(MOSCOW_COORDINATE)}
+					whenMarkerMove={handleMarkerMove}
+				/>
 			</div>
-		</div>
-	)
-}
-
-interface ThirdStepProps {
-	selectedLayer: ObjectLayer
-	handleLayerDrag: (southWest:[number, number], northEast: [number, number]) => void
-	whenNextStepClick: (name: string) => Promise<void>
-}
-
-export const ThirdStep = (props: ThirdStepProps) => {
-	const [floorName, setFloorName] = useState('')
-
-	return (
-		<div className={styles.map}>
-			<Input
-				className={styles.floorNameInput}
-				placeholder={'Название слоя'}
-				value={floorName}
-				onChange={(e) => setFloorName(e.target.value)}
-			/>
-			<Map
-				selectedLayer={props.selectedLayer}
-			/>
-			<div className={styles.bottomControls}>
-				<Button
-					disabled={!floorName}
-					onClick={() => props.whenNextStepClick(floorName)}
-				>
-					Далее
-				</Button>
-			</div>
+			<Button
+				disabled={isButtonDisabled}
+				onClick={handleSendForm}
+			>
+				Далее
+			</Button>
 		</div>
 	)
 }

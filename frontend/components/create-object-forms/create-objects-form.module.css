@@ -1,7 +1,9 @@
 .form {
+	margin-top: 12px;
+	height: calc(100% - 32px);
 	display: flex;
-	gap: 12px;
 	flex-direction: column;
+	gap: 12px;
 }
 
 .bottomControls {
@@ -16,4 +18,10 @@
 
 .floorNameInput {
 	margin-bottom: 10px;
+}
+
+.mapWrapper {
+	position: relative;
+	height: 100%;
+	width: 100%;
 }

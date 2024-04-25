@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import styles from './admin.module.css'
 
-import { Sidebar, Map } from '@components'
+import { Sidebar, Map, DeviceDrawer } from '@components'
 import { useObjectsStore } from '@store'
 import { useCustomRouter } from '@hooks'
 
@@ -43,6 +43,18 @@ export default function Admin() {
 		})
 	}
 
+	const handleFeatureSelect = (id: string) => {
+		objectsStore.handleDeviceSelect(id)
+	}
+
+	const handleDeviceSave = () => {
+		if (!objectsStore.selectedDevice) {
+			return
+		}
+
+		objectsStore.updateDevice(objectsStore.selectedDevice)
+	}
+
 	return (
 		<div className={styles.root}>
 			<Sidebar
@@ -52,11 +64,19 @@ export default function Admin() {
 			/>
 			{objectsStore.selectedLayer && (
 				<Map
-					isPolygonNeed={false}
+					isClickOnDeviceNeeded
 					image={objectsStore.selectedLayer.image}
 					coordinates={objectsStore.selectedLayer.coordinates}
 					angle={objectsStore.selectedLayer.angle}
+					devices={objectsStore.selectedLayer.devices}
 					whenLayerEditStart={handleRedirectToEditPage}
+					whenFeatureSelect={handleFeatureSelect}
+				/>
+			)}
+			{objectsStore.selectedDevice && (
+				<DeviceDrawer
+					device={objectsStore.selectedDevice}
+					whenClose={objectsStore.flushSelectedDevice}
 				/>
 			)}
 		</div>

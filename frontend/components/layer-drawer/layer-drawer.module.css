@@ -1,0 +1,20 @@
+.drawerRoot {
+	width: 40%;
+}
+
+.content {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	gap: 12px;
+}
+
+.inputWithLabel {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.inputNumber {
+	width: 180px !important;
+}

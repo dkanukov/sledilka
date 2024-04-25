@@ -1,8 +1,7 @@
 'use client'
 
-import { Layout, Menu, Tabs } from 'antd'
+import { Layout, Menu } from 'antd'
 import { usePathname, useRouter } from 'next/navigation'
-import { useState } from 'react'
 
 import styles from './admin-header.module.css'
 
@@ -17,6 +16,10 @@ export const AdminHeader = () => {
 		{
 			label: 'Объекты',
 			key: '/admin',
+		},
+		{
+			label: 'Устройства',
+			key: '/admin/devices',
 		},
 		{
 			label: 'Добавить объект',

@@ -4,13 +4,21 @@ import { fromLonLat, toLonLat, transform } from 'ol/proj'
 import { Coordinate } from 'ol/coordinate'
 import { Layer } from 'ol/layer'
 import { message } from 'antd'
-//@ts-expect-error
+//@ts-expect-error no types
 import Transform from 'ol-ext/interaction/Transform'
+import { Point } from 'ol/geom'
+import { Select, Translate } from 'ol/interaction'
+import { click, pointerMove } from 'ol/events/condition'
+import { boundingExtent } from 'ol/extent'
+import { fromExtent } from 'ol/geom/Polygon'
+import VectorSource from 'ol/source/Vector'
+import VectorLayer from 'ol/layer/Vector'
 
-import { MapLayer, PolygonLayer, SchemeLayer } from '.'
+import { MapLayer, PointsLayer, PolygonLayer, SchemeLayer } from '.'
 
-import { degreeToRadian, getImgParams, getRectCenter, loadImage, radianToDegree } from '@helpers'
-import { Area } from '@typos'
+import { degreeToRadian, getImgParams, getMarkerStyle, getRectCenter, getScaleByResolution, loadImage, pointStyleHovered, pointStyleSelected, radianToDegree } from '@helpers'
+import { Area, Marker } from '@typos'
+import { Device } from '@models'
 
 interface BasicTransformEvent {
 	coordinate: Coordinate
@@ -29,19 +37,41 @@ const LAT_RATIO = 0.02
 const DEFAULT_CENTER = fromLonLat([37.619965, 55.754585])
 const DEFAULT_ZOOM = 17.4
 const DEFAULT_ROTATION = 0
+const CAMERA_HIT_ZONE_PX = 10
+const CLUSTER_EXTENT_SCALE = 10
 
 type LayerKeys = 'tile' | 'points' | 'scheme' | 'polygon'
 
 export const useMap = ({
 	onPolygonChange,
+	onFeatureSelect,
+	clustering,
 }: {
+	clustering?: boolean
 	onPolygonChange?: (coordinates: Area, angle: number) => void
+	onFeatureSelect?: (e: any) => void
 }) => {
 	const mapRootElement = useRef<HTMLDivElement | null>(null)
 	const [map, setMap] = useState<MapOl | null>(null)
 	const layersDict = useRef<Map<LayerKeys, Layer>>(new Map())
 	const polygonTransform = useRef<typeof Transform>()
 	const polygonLayer = useRef<PolygonLayer | null>(null)
+	const pointsLayer = useRef<PointsLayer | null>(null)
+	const featureClick = useRef<Select | null>(null)
+	const featurePointerMove = useRef<Select | null>(null)
+	const transformDevice = new Transform({
+		features: layersDict.current.get('points'),
+		rotate: true,
+		translate: true,
+		scale: false,
+		pointRadius: 0,
+		translateFeature: true,
+		filter: (features: Feature) => {
+			const feature = features.get('features')
+			return Boolean(feature) && !(feature.length > 1)
+		},
+	})
+	const markers: Map<Feature, Marker> = new Map()
 
 	const initializeMap = (center?: Coordinate) => {
 		if (!mapRootElement.current) {
@@ -156,6 +186,213 @@ export const useMap = ({
 		// handlePolygonChange(createdPolygonLayer.feature)
 	}
 
+	const drawDevices = (devices: Device[]) => {
+		if (!devices.length) {
+			return
+		}
+
+		const features = devices.map((device) => {
+			const feature = new Feature({
+				geometry: new Point(fromLonLat(device.coordinates)),
+			})
+
+			feature.set('rotation', device.angle * (Math.PI / 180))
+			feature.set('id', device.id)
+			feature.set('type', device.type)
+			feature.set('active', device.isActive)
+
+			return feature
+		})
+
+		const createdPointsLayer = new PointsLayer(features, clustering)
+
+		createdPointsLayer.getSource()?.addFeatures(features)
+		map?.addLayer(createdPointsLayer)
+		layersDict.current.set('points', createdPointsLayer)
+		pointsLayer.current = createdPointsLayer
+	}
+
+	const addTransformToDevices = (
+		whenCameraTranslating?: (newCoords: { coords: Coordinate; deviceId: string }) => void,
+		whenCameraRotating?: (newRotation: { rotation: number; deviceId: string }) => void,
+	) => {
+		if (
+			!map ||
+			!onFeatureSelect
+		) {
+			return
+		}
+
+		transformDevice.on(['select', 'rotatestart', 'translatestart'], (e: BasicTransformEvent) => {
+			const features = e.feature?.get('features')
+			if (!features || !featurePointerMove.current || !featureClick.current || !map || features.length > 1) {
+				return
+			}
+			map.removeInteraction(featurePointerMove.current)
+		})
+
+		transformDevice.on('translating', (e: BasicTransformEvent) => {
+			if (!whenCameraTranslating || !featureClick.current || !featurePointerMove.current || !map) {
+				return
+			}
+
+			const coords = toLonLat(e.coordinate)
+			const deviceId = e.feature.get('features')[0].get('id')
+
+			map.removeInteraction(featurePointerMove.current)
+			map.removeInteraction(featureClick.current)
+
+			whenCameraTranslating({
+				coords,
+				deviceId,
+			})
+		})
+
+		transformDevice.on('rotating', (e: RotatingTransformEvent) => {
+			if (!whenCameraRotating || !featureClick.current || !featurePointerMove.current || !map) {
+				return
+			}
+
+			map.removeInteraction(featurePointerMove.current)
+			map.removeInteraction(featureClick.current)
+			const deviceId = e.feature.get('features')[0].get('id')
+
+			const normalizeAngle = 360 - (radianToDegree(e.angle) + 130) % 360
+			console.log(normalizeAngle)
+
+			whenCameraRotating({
+				rotation: normalizeAngle,
+				deviceId,
+			})
+		})
+
+		transformDevice.on(['rotateend', 'translateend'], () => {
+			if (!featurePointerMove.current || !featureClick.current || !map) {
+				return
+			}
+			map.addInteraction(featurePointerMove.current)
+			map.addInteraction(featureClick.current)
+		})
+
+		map.addInteraction(transformDevice)
+	}
+
+	const addInteractionToDevices = () => {
+		if (!map || !onFeatureSelect) {
+			return
+		}
+
+		featureClick.current = new Select({
+			addCondition: click,
+			style: (feature, resolution) => {
+				const scale = getScaleByResolution(resolution)
+				const style = pointStyleSelected(feature)
+				const image = style?.getImage()
+
+				image?.setScale(scale)
+
+				return style
+
+			},
+		})
+
+		featurePointerMove.current = new Select({
+			condition: pointerMove,
+			style: (feature, resolution) => {
+				const scale = getScaleByResolution(resolution, 0.1)
+				const style = pointStyleHovered(feature)
+				const image = style?.getImage()
+
+				const clusterSize = feature.get('features')?.length
+
+				if (clusterSize === 1) {
+					image?.setScale(scale)
+				}
+
+				return style
+			},
+			hitTolerance: CAMERA_HIT_ZONE_PX,
+		})
+
+		featureClick.current.on('select', onFeatureSelect)
+
+		map.addInteraction(featureClick.current)
+		map.addInteraction(featurePointerMove.current)
+	}
+
+	const removeInteractionFromDevices = () => {
+		if (!map || !onFeatureSelect || !featureClick.current || !featurePointerMove.current) {
+			return
+		}
+
+		featureClick.current.un('select', onFeatureSelect)
+
+		map.removeInteraction(featureClick.current)
+		map.removeInteraction(featurePointerMove.current)
+	}
+
+	const drawMarker = (coords: Coordinate): Marker => {
+		const feature = new Feature({
+			type: 'marker',
+			geometry: new Point(coords),
+		})
+
+		const source = new VectorSource({
+			features: [feature],
+		})
+
+		const layer = new VectorLayer({
+			source,
+			style: getMarkerStyle(),
+		})
+
+		const translate = new Translate({
+			layers: [layer],
+			hitTolerance: 10,
+		})
+
+		map?.addInteraction(translate)
+		map?.addLayer(layer)
+
+		const marker = {
+			layer,
+			translate,
+			feature,
+		}
+
+		markers.set(feature, marker)
+
+		return marker
+	}
+
+	const removeMarker = (marker: Marker) => {
+		markers.delete(marker.feature)
+		map?.removeInteraction(marker.translate)
+		map?.removeLayer(marker.layer)
+	}
+
+	const clearPoints = () => {
+		const pointsLayer = layersDict.current.get('points') as PointsLayer
+		if (!pointsLayer) {
+			return
+		}
+
+		layersDict.current.delete('points')
+		map?.removeLayer(pointsLayer)
+	}
+
+	const toggleClustering = (clusteringEnabled: boolean) => {
+		if (!pointsLayer.current) {
+			return
+		}
+
+		if (clusteringEnabled) {
+			pointsLayer.current.disableClustering()
+		} else {
+			pointsLayer.current.enableClustering()
+		}
+	}
+
 	const clearScheme = () => {
 		const schemeLayer = layersDict.current.get('scheme')
 
@@ -228,6 +465,22 @@ export const useMap = ({
 		tileLayer?.setVisible(value)
 	}
 
+	const zoomToCluster = (cluster: Feature) => {
+		const features = cluster.get('features')
+		if (!map || !features) {
+			return
+		}
+
+		const extent = boundingExtent(features.map((feature: Feature<Point>) => feature.getGeometry()?.getCoordinates()))
+		const geom = fromExtent(extent)
+		geom.scale(CLUSTER_EXTENT_SCALE)
+
+		map?.getView().fit(geom, {
+			duration: 1000,
+			padding: [100, 100, 100, 100],
+		})
+	}
+
 	const setCenterByArea = (area: Area) => {
 		if (!map) {
 			return
@@ -250,10 +503,19 @@ export const useMap = ({
 		drawTile,
 		drawScheme,
 		drawPolygon,
+		drawMarker,
+		drawDevices,
+		addInteractionToDevices,
+		addTransformToDevices,
 		clearScheme,
 		clearPolygon,
+		clearPoints,
+		removeMarker,
+		removeInteractionFromDevices,
+		zoomToCluster,
 		setCenterByArea,
 		toggleTileVisibility,
+		toggleClustering,
 	}
 }
 
