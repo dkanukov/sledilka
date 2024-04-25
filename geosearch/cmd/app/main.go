@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	_ "geosearch/docs"
 	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 
