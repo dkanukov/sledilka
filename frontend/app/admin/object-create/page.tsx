@@ -100,16 +100,12 @@ export default function ObjectCreate() {
 	}
 
 	return (
-		<div
-			className={styles.container}
-		>
+		<div className={styles.root}>
 			<Steps
 				current={currentStep}
 				items={STEP_ITEMS}
 			/>
-			<div className={styles.content}>
-				{renderStepContent()}
-			</div>
+			{renderStepContent()}
 		</div>
 	)
 }

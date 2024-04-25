@@ -7,15 +7,17 @@ import { message } from 'antd'
 //@ts-expect-error no types
 import Transform from 'ol-ext/interaction/Transform'
 import { Point } from 'ol/geom'
-import { Select } from 'ol/interaction'
+import { Select, Translate } from 'ol/interaction'
 import { click, pointerMove } from 'ol/events/condition'
 import { boundingExtent } from 'ol/extent'
 import { fromExtent } from 'ol/geom/Polygon'
+import VectorSource from 'ol/source/Vector'
+import VectorLayer from 'ol/layer/Vector'
 
 import { MapLayer, PointsLayer, PolygonLayer, SchemeLayer } from '.'
 
-import { degreeToRadian, getImgParams, getRectCenter, getScaleByResolution, loadImage, pointStyleHovered, pointStyleSelected, radianToDegree } from '@helpers'
-import { Area } from '@typos'
+import { degreeToRadian, getImgParams, getMarkerStyle, getRectCenter, getScaleByResolution, loadImage, pointStyleHovered, pointStyleSelected, radianToDegree } from '@helpers'
+import { Area, Marker } from '@typos'
 import { Device } from '@models'
 
 interface BasicTransformEvent {
@@ -69,6 +71,7 @@ export const useMap = ({
 			return Boolean(feature) && !(feature.length > 1)
 		},
 	})
+	const markers: Map<Feature, Marker> = new Map()
 
 	const initializeMap = (center?: Coordinate) => {
 		if (!mapRootElement.current) {
@@ -328,6 +331,46 @@ export const useMap = ({
 		map.removeInteraction(featurePointerMove.current)
 	}
 
+	const drawMarker = (coords: Coordinate): Marker => {
+		const feature = new Feature({
+			type: 'marker',
+			geometry: new Point(coords),
+		})
+
+		const source = new VectorSource({
+			features: [feature],
+		})
+
+		const layer = new VectorLayer({
+			source,
+			style: getMarkerStyle(),
+		})
+
+		const translate = new Translate({
+			layers: [layer],
+			hitTolerance: 10,
+		})
+
+		map?.addInteraction(translate)
+		map?.addLayer(layer)
+
+		const marker = {
+			layer,
+			translate,
+			feature,
+		}
+
+		markers.set(feature, marker)
+
+		return marker
+	}
+
+	const removeMarker = (marker: Marker) => {
+		markers.delete(marker.feature)
+		map?.removeInteraction(marker.translate)
+		map?.removeLayer(marker.layer)
+	}
+
 	const clearPoints = () => {
 		const pointsLayer = layersDict.current.get('points') as PointsLayer
 		if (!pointsLayer) {
@@ -460,12 +503,14 @@ export const useMap = ({
 		drawTile,
 		drawScheme,
 		drawPolygon,
+		drawMarker,
 		drawDevices,
 		addInteractionToDevices,
 		addTransformToDevices,
 		clearScheme,
 		clearPolygon,
 		clearPoints,
+		removeMarker,
 		removeInteractionFromDevices,
 		zoomToCluster,
 		setCenterByArea,

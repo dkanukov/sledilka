@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Button, Switch } from 'antd'
 import { DoubleLeftOutlined, DoubleRightOutlined, EditOutlined, SaveOutlined, VideoCameraAddOutlined } from '@ant-design/icons'
 import { Coordinate } from 'ol/coordinate'
@@ -8,24 +8,27 @@ import { debounce } from 'lodash'
 import styles from './map.module.css'
 
 import { useMap, usePersistState } from '@hooks'
-import { Area } from '@typos'
+import { Area, Marker } from '@typos'
 import { Device } from '@models'
 
 interface Props {
 	isPolygonNeed?: boolean
 	image?: string
 	coordinates?: Area
+	markerCoordiante?: Coordinate
 	devices?: Device[]
 	angle?: number
 	isClickOnDeviceNeeded?: boolean
 	isDevicesTranslateNeeded?: boolean
 	isEdit?: boolean
+	hideControls?: boolean
 	whenPolygonChange?: (coordinates: Area, angle: number) => void
 	whenLayerEditStart?: () => void
 	whenFeatureSelect?: (id: string) => void
 	whenAddNewDevice?: () => void
 	whenDeviceTranslating?: (newCoords: { coords: Coordinate; deviceId: string }) => void
 	whenDeviceRotating?: (newRotation: { rotation: number; deviceId: string }) => void
+	whenMarkerMove?: (coordinate: Coordinate) => void
 }
 
 export const Map = (props: Props) => {
@@ -67,12 +70,15 @@ export const Map = (props: Props) => {
 	const { state: showMapControls, updateState: setShowMapControls } = usePersistState('show-map-controls', true)
 	const { state: clusterDevices, updateState: setClusterDevices } = usePersistState('clustering', true)
 
+	const marker = useRef<Marker | null>(null)
+
 	const {
 		map,
 		mapRootElement,
 		initializeMap,
 		drawTile,
 		drawScheme,
+		drawMarker,
 		drawPolygon,
 		drawDevices,
 		addInteractionToDevices,
@@ -80,6 +86,7 @@ export const Map = (props: Props) => {
 		clearScheme,
 		clearPolygon,
 		clearPoints,
+		removeMarker,
 		removeInteractionFromDevices,
 		zoomToCluster,
 		setCenterByArea,
@@ -179,53 +186,89 @@ export const Map = (props: Props) => {
 		}
 	}, [props.devices])
 
+	useEffect(() => {
+		if (!map) {
+			return
+		}
+
+		if (!props.markerCoordiante && marker.current) {
+			removeMarker(marker.current)
+			return
+		}
+
+		if (marker.current && props.markerCoordiante) {
+			marker.current.feature.getGeometry()?.setCoordinates(props.markerCoordiante)
+			return
+		}
+
+		if (props.markerCoordiante) {
+			marker.current = drawMarker(props.markerCoordiante)
+			marker.current.translate.on('translateend', () => {
+				if (!props.whenMarkerMove || !marker.current) {
+					return
+				}
+
+				const point = marker.current.feature.getGeometry()
+				const coordinates = point?.getCoordinates()
+
+				if (!coordinates) {
+					return
+				}
+
+				props.whenMarkerMove(coordinates)
+			})
+		}
+	})
+
 	return (
 		<>
-			<div className={styles.mapControl}>
-				<Button
-					type={'primary'}
-					icon={showMapControls ? <DoubleRightOutlined/> : <DoubleLeftOutlined/>}
-					onClick={() => setShowMapControls(!showMapControls)}
-				/>
-				{showMapControls && (
-					<>
-						{props.whenAddNewDevice && (
-							<Button
-								ghost
-								type={'primary'}
-								icon={<VideoCameraAddOutlined/>}
-								onClick={props.whenAddNewDevice}
-							/>
-						)}
-						{!props.isEdit && (
-							<Button
-								ghost
-								type={'primary'}
-								icon={<EditOutlined/>}
-								onClick={props.whenLayerEditStart}
-							/>
-						)}
-						<div
-							className={styles.territoryControl}
-						>
-							<Switch
-								value={clusterDevices}
-								onChange={handleClusteringToggle}
-							/>
-							<p>Кластеризация</p>
-						</div>
-						<div
-							className={styles.territoryControl}
-						>
-							<Switch
-								value={tileLayerVisible}
-								onChange={handleToggleTileLayer}
-							/>
-							<p>Территория</p>
-						</div>
-					</>
-				)}
-			</div>
+			{!props.hideControls && (
+				<div className={styles.mapControl}>
+					<Button
+						type={'primary'}
+						icon={showMapControls ? <DoubleRightOutlined/> : <DoubleLeftOutlined/>}
+						onClick={() => setShowMapControls(!showMapControls)}
+					/>
+					{showMapControls && (
+						<>
+							{props.whenAddNewDevice && (
+								<Button
+									ghost
+									type={'primary'}
+									icon={<VideoCameraAddOutlined/>}
+									onClick={props.whenAddNewDevice}
+								/>
+							)}
+							{!props.isEdit && (
+								<Button
+									ghost
+									type={'primary'}
+									icon={<EditOutlined/>}
+									onClick={props.whenLayerEditStart}
+								/>
+							)}
+							<div
+								className={styles.territoryControl}
+							>
+								<Switch
+									value={clusterDevices}
+									onChange={handleClusteringToggle}
+								/>
+								<p>Кластеризация</p>
+							</div>
+							<div
+								className={styles.territoryControl}
+							>
+								<Switch
+									value={tileLayerVisible}
+									onChange={handleToggleTileLayer}
+								/>
+								<p>Территория</p>
+							</div>
+						</>
+					)}
+				</div>
+			)}
 			<div
 				className={styles.map}
 				ref={mapRootElement}
