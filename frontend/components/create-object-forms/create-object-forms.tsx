@@ -1,14 +1,16 @@
-import { Button, Input, Upload, UploadProps, message, UploadFile } from 'antd'
-import { useState } from 'react'
-import { InboxOutlined } from '@ant-design/icons'
+import { Button, Input, AutoComplete, Empty } from 'antd'
+import { useCallback, useEffect, useState } from 'react'
 import { fromLonLat } from 'ol/proj'
 import { Coordinate } from 'ol/coordinate'
+import { debounce } from 'lodash'
 
 import { EntityNewObject } from '../../api/generated/api'
 
 import styles from './create-objects-form.module.css'
 
+import { Location } from '@models'
 import { Map } from '@components'
+import { geosearchService } from '@api'
 
 const { TextArea } = Input
 const MOSCOW_COORDINATE = [37.61905400772136, 55.750549228458084]
@@ -23,11 +25,47 @@ export const FirstStep = (props: FirstStepProps) => {
 		address: '',
 		description: '',
 	})
+	const [locations, setLocationts] = useState<Location[]>([])
+	const [markerCoordiante, setMarkerCoordinate] = useState(fromLonLat(MOSCOW_COORDINATE))
+
+	const debouncedGeosearchRequest = useCallback(
+		debounce(async (value: string) => {
+			const locations = await geosearchService.search(value)
+			setLocationts(locations)
+		}, 500),
+		[],
+	)
 
 	const isButtonDisabled = Boolean(!form.name || !form.address || !form.description)
 
 	const handleMarkerMove = (coordinate: Coordinate) => {
-		console.log(coordinate)
+		setMarkerCoordinate(coordinate)
+	}
+
+	const handleAddressSelect = (id: string) => {
+		const selectedLocation = locations.find((loc) => loc.id === id)
+
+		if (!selectedLocation) {
+			return
+		}
+
+		setMarkerCoordinate(fromLonLat(selectedLocation.coordinates))
+		setForm({
+			...form,
+			address: selectedLocation.address,
+		})
+	}
+
+	const handleAddressChange = (value: string) => {
+		setForm({
+			...form,
+			address: value,
+		})
+
+		if (!value) {
+			return
+		}
+		debouncedGeosearchRequest(value)
 	}
 
 	const handleSendForm = () => {
@@ -52,21 +90,41 @@ export const FirstStep = (props: FirstStepProps) => {
 					description: e.target.value,
 				})}
 			/>
-			<Input
+			{/* <Input
 				placeholder={'Адрес'}
 				value={form.address}
-				onChange={(e) => setForm({
-					...form,
-					address: e.target.value,
-				})}
-			/>
+				onChange={(e) => handleAddressChange(e.target.value)}
+			/> */}
+			<AutoComplete
+				placeholder={'Адрес'}
+				value={form.address}
+				onChange={(value: string) => handleAddressChange(value)}
+				onSelect={(id) => handleAddressSelect(id)}
+			>
+				{locations.length > 0 ? (
+					locations.map((loc) => (
+						<AutoComplete.Option
+							key={loc.id}
+							value={loc.id}
+						>
+							{`${loc.address}-${loc.description}`}
+						</AutoComplete.Option>
+					))
+				) : (
+					<AutoComplete.Option
+						value={null}
+					>
+						<Empty/>
+					</AutoComplete.Option>
+				)}
+			</AutoComplete>
 			<div
 				className={styles.mapWrapper}
 			>
 				<Map
 					hideControls
-					center={fromLonLat(MOSCOW_COORDINATE)}
-					markerCoordiante={fromLonLat(MOSCOW_COORDINATE)}
+					center={markerCoordiante}
+					markerCoordiante={markerCoordiante}
 					whenMarkerMove={handleMarkerMove}
 				/>
 			</div>
