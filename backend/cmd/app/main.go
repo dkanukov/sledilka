@@ -1,17 +1,18 @@
 package main
 
 import (
-	"backend/internal/db"
-	"backend/internal/tokener"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"context"
+	"fmt"
 	"log"
-	"net/http"
 
 	_ "backend/docs"
-	"backend/internal/handlers"
-	"github.com/rs/cors"
-	httpSwagger "github.com/swaggo/http-swagger"
+	"backend/internal/app/sledilka"
+	"backend/internal/db"
+	"backend/internal/network"
+	"backend/internal/tokener"
+	"github.com/compose-spec/compose-go/v2/cli"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 //	@title			Sledilka API
@@ -19,7 +20,7 @@ import (
 //	@description	API for Sledilka service
 //	@termsOfService	http://swagger.io/terms/
 
-// @host      0.0.0.0:8081
+// @host      192.168.1.75:8081
 
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
@@ -29,26 +30,73 @@ import (
 // @scope.admin Grants read and write access to administrative information
 
 func main() {
-	DBConnection, err := db.StartupDB()
+	ctx := context.Background()
+
+	composeFilePath := "docker-compose.yaml"
+	projectName := "sledilka"
+
+	options, err := cli.NewProjectOptions(
+		[]string{composeFilePath},
+		cli.WithOsEnv,
+		cli.WithDotEnv,
+		cli.WithName(projectName),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
-	conn, err := grpc.Dial("token-service:8082", grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	project, err := options.LoadProject(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dbInfo, err := project.GetService("db")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	tokenerInfo, err := project.GetService("token-service")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//networkerInfo, err := project.GetService("networking-service")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+
+	//streamingInfo, err := project.GetService("streaming-service")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+
+	DBConnection, err := db.StartupDB(ctx, dbInfo)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("DB started")
+
+	conn, err := grpc.Dial(
+		fmt.Sprintf("%s:%v", "0.0.0.0", tokenerInfo.Ports[0].Published),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
 	tokenerClient := tokener.NewTokenerClient(conn)
-	router := handlers.GetHandlers(DBConnection, tokenerClient)
-	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
-	router.HandleFunc("/swagger", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/swagger/", http.StatusSeeOther)
-	})
-	cors.AllowAll()
-	corsOpt := cors.AllowAll()
-	app := http.Server{
-		Addr:    "0.0.0.0:8081",
-		Handler: corsOpt.Handler(router),
-	}
 
-	log.Fatal(app.ListenAndServe())
+	conn, err = grpc.Dial(
+		fmt.Sprintf("%s:%v", "0.0.0.0", 8282),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+
+	networkerClient := network.NewNetworkClient(conn)
+
+	app := sledilka.New(
+		DBConnection,
+		tokenerClient,
+		networkerClient,
+		fmt.Sprintf("http://0.0.0.0:%v/", 8181),
+		fmt.Sprintf(":%v", 8081))
+	log.Fatal(app.Run())
 }

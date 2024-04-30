@@ -1,30 +1,32 @@
 definitions:
-  entity.Announcement:
-    properties:
-      createdAt:
-        type: string
-      description:
-        type: string
-      id:
-        type: string
-      title:
-        type: string
-    type: object
-  entity.Coordinate:
+  dbmodel.Coordinate:
     properties:
       lat:
         type: number
       long:
         type: number
     type: object
+  dbmodel.DeviceType:
+    enum:
+    - computer
+    - camera
+    - printer
+    type: string
+    x-enum-varnames:
+    - DeviceTypeComputer
+    - DeviceTypeCamera
+    - DeviceTypePrinter
   entity.Device:
     properties:
+      angle:
+        type: number
+      camera_connection_url:
+        type: string
       created_at:
         type: string
       id:
         type: string
       ip:
-        description: для подключения к камерам и мб для других нужд, хз
         type: string
       is_active:
         type: boolean
@@ -60,7 +62,7 @@ definitions:
         type: number
       angles_coordinates:
         items:
-          $ref: '#/definitions/entity.Coordinate'
+          $ref: '#/definitions/dbmodel.Coordinate'
         type: array
       created_at:
         type: string
@@ -86,17 +88,167 @@ definitions:
       username:
         type: string
     type: object
-  entity.NewAnnouncement:
+  entity.NewUser:
     properties:
-      description:
+      is_admin:
+        type: boolean
+      password:
         type: string
-      title:
+      username:
         type: string
     type: object
-  entity.NewDevice:
+  entity.UserInfo:
     properties:
+      id:
+        type: string
+      is_admin:
+        type: boolean
+      username:
+        type: string
+    type: object
+  sledilka.CreateDevice:
+    properties:
+      angle:
+        type: number
+      camera_connection_url:
+        type: string
+      ip_address:
+        type: string
+      layer_id:
+        type: string
+      location_x:
+        type: number
+      location_y:
+        type: number
+      mac_address:
+        type: string
+      name:
+        type: string
+      type:
+        $ref: '#/definitions/dbmodel.DeviceType'
+    type: object
+  sledilka.Device:
+    properties:
+      angle:
+        type: number
+      camera_connection_url:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
       ip:
-        description: для подключения к камерам и мб для других нужд, хз
+        type: string
+      is_active:
+        type: boolean
+      layer_id:
+        description: ??
+        type: string
+      location_x:
+        type: number
+      location_y:
+        type: number
+      mac_address:
+        type: string
+      name:
+        type: string
+      type:
+        $ref: '#/definitions/entity.DeviceType'
+      updated_at:
+        type: string
+    type: object
+  sledilka.DeviceStatus:
+    properties:
+      ipAddress:
+        type: string
+      is_busy:
+        type: boolean
+      isActive:
+        type: boolean
+      macAddress:
+        type: string
+    type: object
+  sledilka.Layer:
+    properties:
+      angle:
+        type: number
+      angles_coordinates:
+        items:
+          $ref: '#/definitions/dbmodel.Coordinate'
+        type: array
+      created_at:
+        type: string
+      devices:
+        items:
+          $ref: '#/definitions/entity.Device'
+        type: array
+      floor_name:
+        type: string
+      id:
+        type: string
+      image:
+        type: string
+      object_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  sledilka.NewLayer:
+    properties:
+      angle:
+        type: number
+      angles_coordinates:
+        items:
+          $ref: '#/definitions/dbmodel.Coordinate'
+        type: array
+      floor_name:
+        type: string
+      image:
+        type: string
+    type: object
+  sledilka.NewObject:
+    properties:
+      address:
+        type: string
+      description:
+        type: string
+      lat:
+        type: number
+      long:
+        type: number
+      name:
+        type: string
+    type: object
+  sledilka.Object:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      lat:
+        type: number
+      layers:
+        items:
+          $ref: '#/definitions/entity.Layer'
+        type: array
+      long:
+        type: number
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  sledilka.UpdateDevice:
+    properties:
+      angle:
+        type: number
+      camera_connection_url:
+        type: string
+      ip:
         type: string
       layer_id:
         description: ??
@@ -111,83 +263,6 @@ definitions:
         type: string
       type:
         $ref: '#/definitions/entity.DeviceType'
-    type: object
-  entity.NewLayer:
-    properties:
-      angle:
-        type: number
-      angles_coordinates:
-        items:
-          $ref: '#/definitions/entity.Coordinate'
-        type: array
-      floor_name:
-        type: string
-      image:
-        type: string
-    type: object
-  entity.NewObject:
-    properties:
-      address:
-        type: string
-      description:
-        type: string
-      name:
-        type: string
-    type: object
-  entity.NewReview:
-    properties:
-      comment:
-        type: string
-      name:
-        type: string
-      rating:
-        type: integer
-    type: object
-  entity.NewUser:
-    properties:
-      password:
-        type: string
-      username:
-        type: string
-    type: object
-  entity.Object:
-    properties:
-      address:
-        type: string
-      created_at:
-        type: string
-      description:
-        type: string
-      id:
-        type: string
-      layers:
-        items:
-          $ref: '#/definitions/entity.Layer'
-        type: array
-      name:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  entity.Review:
-    properties:
-      comment:
-        type: string
-      createdAt:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      rating:
-        type: integer
-    type: object
-  entity.UserInfo:
-    properties:
-      id:
-        type: integer
-      username:
-        type: string
     type: object
   timestamppb.Timestamp:
     properties:
@@ -223,7 +298,7 @@ definitions:
       refresh_token:
         type: string
     type: object
-host: 0.0.0.0:8081
+host: 192.168.1.75:8081
 info:
   contact: {}
   description: API for Sledilka service
@@ -231,149 +306,6 @@ info:
   title: Sledilka API
   version: "1.0"
 paths:
-  /announcement:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/entity.Announcement'
-            type: array
-        "500":
-          description: Internal Server Error
-      summary: Возвращает анонсы
-      tags:
-      - announcements
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: тело нового запроса
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/entity.NewAnnouncement'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Announcement'
-        "500":
-          description: Internal Server Error
-      summary: Создает анонс
-      tags:
-      - announcements
-  /announcement/{id}:
-    delete:
-      consumes:
-      - application/json
-      parameters:
-      - description: uuid
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Удаляет анонс
-      tags:
-      - announcements
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: uuid
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Announcement'
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Анонс по id
-      tags:
-      - announcements
-    patch:
-      consumes:
-      - application/json
-      parameters:
-      - description: Измененный анонс
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/entity.NewAnnouncement'
-      - description: uuid
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Announcement'
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Изменить анонс
-      tags:
-      - announcements
-    put:
-      consumes:
-      - application/json
-      parameters:
-      - description: Измененный анонс
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/entity.NewAnnouncement'
-      - description: uuid
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Announcement'
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Изменить анонс
-      tags:
-      - announcements
   /devices:
     post:
       consumes:
@@ -384,16 +316,18 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/entity.NewDevice'
+          $ref: '#/definitions/sledilka.CreateDevice'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Device'
+            $ref: '#/definitions/sledilka.Device'
         "500":
           description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
       summary: Создать девайс
       tags:
       - devices
@@ -407,7 +341,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/entity.NewDevice'
+          $ref: '#/definitions/sledilka.UpdateDevice'
       - description: Device ID
         in: path
         name: id
@@ -422,6 +356,8 @@ paths:
             $ref: '#/definitions/entity.Device'
         "500":
           description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
       summary: Изменить девайс
       tags:
       - devices
@@ -479,42 +415,24 @@ paths:
       summary: получить трансляцию
       tags:
       - isLowLight
-  /layers/{id}:
+  /network:
     get:
-      parameters:
-      - description: Layer ID
-        in: path
-        name: id
-        required: true
-        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Layer'
+            items:
+              $ref: '#/definitions/sledilka.DeviceStatus'
+            type: array
         "500":
           description: Internal Server Error
-      summary: Получить слой
+      security:
+      - ApiKeyAuth: []
+      summary: Получить список адресов в сети
       tags:
-      - layers
-  /layers/{id}/newDevices:
-    post:
-      parameters:
-      - description: Layer ID
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-        "500":
-          description: Internal Server Error
-      summary: Новые девайсы для слоя
-      tags:
-      - new
+      - networking
   /new:
     post:
       responses:
@@ -536,10 +454,12 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/entity.Object'
+              $ref: '#/definitions/sledilka.Object'
             type: array
         "500":
           description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
       summary: Возвращает все объекты
       tags:
       - objects
@@ -547,21 +467,23 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: Новый отзыв
+      - description: Новый объект
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/entity.NewObject'
+          $ref: '#/definitions/sledilka.NewObject'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Object'
+            $ref: '#/definitions/sledilka.Object'
         "500":
           description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
       summary: Создать объект
       tags:
       - objects
@@ -581,9 +503,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Object'
+            $ref: '#/definitions/sledilka.Object'
         "500":
           description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
       summary: Объект по id
       tags:
       - objects
@@ -596,7 +520,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/entity.NewObject'
+          $ref: '#/definitions/sledilka.NewObject'
       - description: Object ID
         in: path
         name: id
@@ -608,9 +532,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Object'
+            $ref: '#/definitions/sledilka.Object'
         "500":
           description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
       summary: Изменить объект
       tags:
       - objects
@@ -624,7 +550,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/entity.NewLayer'
+          $ref: '#/definitions/sledilka.NewLayer'
       - description: Object ID
         in: path
         name: id
@@ -636,13 +562,41 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Layer'
+            $ref: '#/definitions/sledilka.Layer'
         "500":
           description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
       summary: Создать слой
       tags:
       - layers
-  /objects/{object_id}/layers/{layer_id}:
+  /objects/{object_id}/layers/{id}:
+    get:
+      parameters:
+      - description: Layer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Object ID
+        in: path
+        name: object_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sledilka.Layer'
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Получить слой
+      tags:
+      - layers
     patch:
       consumes:
       - application/json
@@ -652,7 +606,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/entity.NewLayer'
+          $ref: '#/definitions/sledilka.NewLayer'
       - description: Object ID
         in: path
         name: object_id
@@ -660,7 +614,7 @@ paths:
         type: string
       - description: Layer ID
         in: path
-        name: layer_id
+        name: id
         required: true
         type: string
       produces:
@@ -669,10 +623,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Layer'
+            $ref: '#/definitions/sledilka.Layer'
         "500":
           description: Internal Server Error
-      summary: Изменить объект
+      security:
+      - ApiKeyAuth: []
+      summary: Изменить слой
       tags:
       - layers
   /refresh:
@@ -697,149 +653,6 @@ paths:
       summary: Обновить токен
       tags:
       - token
-  /review:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/entity.Review'
-            type: array
-        "500":
-          description: Internal Server Error
-      summary: Возвращает все отзывы
-      tags:
-      - reviews
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: Новый отзыв
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/entity.NewReview'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Review'
-        "500":
-          description: Internal Server Error
-      summary: Создать отзыв
-      tags:
-      - reviews
-  /review/{id}:
-    delete:
-      consumes:
-      - application/json
-      parameters:
-      - description: Review ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Удалить отзыв
-      tags:
-      - reviews
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: uuid
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Review'
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Отзыв по id
-      tags:
-      - reviews
-    patch:
-      consumes:
-      - application/json
-      parameters:
-      - description: Измененный отзыв
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/entity.NewReview'
-      - description: Review ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Review'
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Изменить отзыв
-      tags:
-      - reviews
-    put:
-      consumes:
-      - application/json
-      parameters:
-      - description: Измененный отзыв
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/entity.NewReview'
-      - description: Review ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.Review'
-        "500":
-          description: Internal Server Error
-      security:
-      - ApiKeyAuth: []
-      summary: Изменить отзыв
-      tags:
-      - reviews
   /stream/{id}:
     get:
       consumes:
@@ -858,6 +671,22 @@ paths:
       summary: получить трансляцию
       tags:
       - stream
+  /subscribe-network:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sledilka.Device'
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Подписаться на обновления из сети. WebSocket
+      tags:
+      - networking
   /token:
     post:
       consumes:

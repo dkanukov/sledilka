@@ -1,54 +1,25 @@
 package utils
 
 import (
+	"backend/internal/dbmodel"
 	"backend/internal/entity"
-	"backend/internal/errors"
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 	"io"
-	"math/rand"
 	"net/http"
-	"time"
 )
 
-func ValidateBody[T any](r *http.Request) (T, *errors.ResponseError) {
-	b, err := io.ReadAll(r.Body)
+func ValidateBody[T any](r io.Reader) (T, error) {
+	b, err := io.ReadAll(r)
 	var newObj T
 	if err != nil {
-		return newObj, &errors.ResponseError{StatusCode: http.StatusBadRequest, Message: err.Error()}
+		return newObj, err
 	}
 	if err = json.Unmarshal(b, &newObj); err != nil {
-		return newObj, &errors.ResponseError{StatusCode: http.StatusBadRequest, Message: err.Error()}
+		return newObj, err
 	}
 	return newObj, nil
-}
-
-func SetLayers(db *gorm.DB, object *entity.Object) {
-	var layersDB []entity.LayerForDB
-	db.Find(&layersDB, &entity.LayerForDB{ObjectID: object.ID})
-	layers := make([]entity.Layer, len(layersDB))
-	for i := range layersDB {
-		layers[i] = DBFormatToLayer(layersDB[i])
-		SetDevices(db, &layers[i])
-	}
-	object.Layers = layers
-}
-
-func SetDevices(db *gorm.DB, layer *entity.Layer) {
-	var devices []entity.Device
-	db.Find(&devices, &entity.Device{LayerID: layer.ID})
-	for i := range devices {
-		devices[i].IsActive = RandBool()
-	}
-	layer.Devices = devices
-}
-
-func RandBool() bool {
-	rand.Seed(time.Now().UnixNano())
-	return rand.Intn(2) == 1
 }
 
 // @Summary	Новые сущности
@@ -78,7 +49,7 @@ func NewEntities() {
 		Image:     "capybara.jpg",
 		FloorName: "1",
 		Angle:     0,
-		AnglesCoordinates: []entity.Coordinate{
+		AnglesCoordinates: dbmodel.AnglesCoordinates{
 			{
 				Lat:  56.127655,
 				Long: 37.210096,
@@ -126,68 +97,10 @@ func NewEntities() {
 	)
 }
 
-// @Summary	Новые девайсы для слоя
-// @Tags		new
-// @Success	200
-// @Param		id path string true "Layer ID"
-// @Failure	500
-// @Router		/layers/{id}/newDevices [post]
-func NewDevices(layerID uuid.UUID) {
-	newDevs := []entity.NewDevice{
-		{
-			Name:       "комп-" + uuid.NewString(),
-			Type:       entity.Computer,
-			LayerID:    layerID,
-			LocationX:  0,
-			LocationY:  0,
-			IpAddress:  "127.0.0.1",
-			MacAddress: "00:1b:63:84:45:e6",
-		},
-		{
-			Name:       "камера-" + uuid.NewString(),
-			Type:       entity.Camera,
-			LayerID:    layerID,
-			LocationX:  0,
-			LocationY:  0,
-			IpAddress:  "pipipi.mp4",
-			MacAddress: "00:1b:63:84:45:e6",
-		},
+func MustJSON(obj any) string {
+	b, err := json.Marshal(obj)
+	if err != nil {
+		panic(err)
 	}
-	for _, dev := range newDevs {
-		body, _ := json.Marshal(dev)
-		http.Post(
-			"http://localhost:8081/devices",
-			"application/json",
-			bytes.NewReader(body),
-		)
-	}
-}
-
-func LayerToDBFormat(layer entity.Layer) entity.LayerForDB {
-	b, _ := json.Marshal(&layer.AnglesCoordinates)
-	return entity.LayerForDB{
-		ID:                layer.ID,
-		ObjectID:          layer.ObjectID,
-		FloorName:         layer.FloorName,
-		Image:             layer.Image,
-		Angle:             layer.Angle,
-		AnglesCoordinates: string(b),
-		CreatedAt:         layer.CreatedAt,
-		UpdatedAt:         layer.UpdatedAt,
-	}
-}
-
-func DBFormatToLayer(layer entity.LayerForDB) entity.Layer {
-	var coors []entity.Coordinate
-	_ = json.Unmarshal([]byte(layer.AnglesCoordinates), &coors)
-	return entity.Layer{
-		ID:                layer.ID,
-		ObjectID:          layer.ObjectID,
-		FloorName:         layer.FloorName,
-		Image:             layer.Image,
-		Angle:             layer.Angle,
-		AnglesCoordinates: coors,
-		CreatedAt:         layer.CreatedAt,
-		UpdatedAt:         layer.UpdatedAt,
-	}
+	return string(b)
 }

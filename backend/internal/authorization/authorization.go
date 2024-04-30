@@ -1,28 +1,28 @@
 package authorization
 
 import (
+	"backend/internal/dbmodel"
 	"backend/internal/entity"
 	"backend/internal/tokener"
 	"backend/internal/utils"
+	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/context"
+	"github.com/google/uuid"
+	gcontext "github.com/gorilla/context"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 	"net/http"
 )
 
-func Auth(username string, password string, db *gorm.DB) (UserID int64, ok bool) {
-	user := entity.User{}
-
-	if res := db.Where(&entity.User{Username: username}).First(&user); res.RowsAffected == 0 {
-		return 0, false
+func Auth(ctx context.Context, username string, password string, q *dbmodel.Queries) (UserID uuid.UUID, ok bool) {
+	user, err := q.GetUserByUsername(ctx, username)
+	if err != nil {
+		return uuid.Nil, false
 	}
-
 	if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)) != nil {
-		return user.Id, false
+		return user.ID, false
 	}
-	return user.Id, true
+	return user.ID, true
 }
 
 func JwtAuthMiddleware(next http.HandlerFunc, client tokener.TokenerClient) http.HandlerFunc {
@@ -37,7 +37,7 @@ func JwtAuthMiddleware(next http.HandlerFunc, client tokener.TokenerClient) http
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		context.Set(r, "x-user-id", userID.GetUserId())
+		gcontext.Set(r, "x-user-id", userID.GetUserId())
 		next(w, r)
 	}
 }
@@ -50,18 +50,18 @@ func JwtAuthMiddleware(next http.HandlerFunc, client tokener.TokenerClient) http
 // @Success	200		{object}	tokener.CreateTokenResponse
 // @Failure	500
 // @Router		/token [post]
-func Token(w http.ResponseWriter, r *http.Request, db *gorm.DB, client tokener.TokenerClient) {
-	loginData, respErr := utils.ValidateBody[entity.LoginInfo](r)
-	if respErr != nil {
-		respErr.WriteResponse(w)
+func Token(w http.ResponseWriter, r *http.Request, q *dbmodel.Queries, client tokener.TokenerClient) {
+	loginData, err := utils.ValidateBody[entity.LoginInfo](r.Body)
+	if err != nil {
+		fmt.Fprint(w, err)
 		return
 	}
-	userId, ok := Auth(loginData.Username, loginData.Password, db)
+	userId, ok := Auth(r.Context(), loginData.Username, loginData.Password, q)
 	if !ok {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	if userId == 0 {
+	if userId == uuid.Nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
