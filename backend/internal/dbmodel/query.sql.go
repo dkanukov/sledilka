@@ -503,6 +503,21 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 	return i, err
 }
 
+const isMacAddressBusy = `-- name: IsMacAddressBusy :one
+SELECT EXISTS(
+    SELECT id, name, type, layer_id, location_x, location_y, angle, ip_address, camera_connection_url, mac_address, created_at, updated_at
+    from devices
+    WHERE mac_address = $1
+) as is_busy
+`
+
+func (q *Queries) IsMacAddressBusy(ctx context.Context, macAddress string) (bool, error) {
+	row := q.db.QueryRow(ctx, isMacAddressBusy, macAddress)
+	var is_busy bool
+	err := row.Scan(&is_busy)
+	return is_busy, err
+}
+
 const updateDevice = `-- name: UpdateDevice :one
 UPDATE devices
 SET name=$2, type=$3, layer_id=$4, location_x=$5, location_y=$6, angle=$7, ip_address=$8, mac_address=$9, camera_connection_url=$10, updated_at=now()

@@ -209,7 +209,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/network.DeviceStatus"
+                                "$ref": "#/definitions/sledilka.DeviceStatus"
                             }
                         }
                     },
@@ -616,7 +616,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/network.DeviceStatus"
+                            "$ref": "#/definitions/sledilka.Device"
                         }
                     },
                     "500": {
@@ -912,20 +912,6 @@ const docTemplate = `{
                 }
             }
         },
-        "network.DeviceStatus": {
-            "type": "object",
-            "properties": {
-                "ipAddress": {
-                    "type": "string"
-                },
-                "isActive": {
-                    "type": "boolean"
-                },
-                "macAddress": {
-                    "type": "string"
-                }
-            }
-        },
         "sledilka.CreateDevice": {
             "type": "object",
             "properties": {
@@ -999,6 +985,23 @@ const docTemplate = `{
                     "$ref": "#/definitions/entity.DeviceType"
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "sledilka.DeviceStatus": {
+            "type": "object",
+            "properties": {
+                "ipAddress": {
+                    "type": "string"
+                },
+                "isActive": {
+                    "type": "boolean"
+                },
+                "is_busy": {
+                    "type": "boolean"
+                },
+                "macAddress": {
                     "type": "string"
                 }
             }

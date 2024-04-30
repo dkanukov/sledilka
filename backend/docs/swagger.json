@@ -202,7 +202,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/network.DeviceStatus"
+                                "$ref": "#/definitions/sledilka.DeviceStatus"
                             }
                         }
                     },
@@ -609,7 +609,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/network.DeviceStatus"
+                            "$ref": "#/definitions/sledilka.Device"
                         }
                     },
                     "500": {
@@ -905,20 +905,6 @@
                 }
             }
         },
-        "network.DeviceStatus": {
-            "type": "object",
-            "properties": {
-                "ipAddress": {
-                    "type": "string"
-                },
-                "isActive": {
-                    "type": "boolean"
-                },
-                "macAddress": {
-                    "type": "string"
-                }
-            }
-        },
         "sledilka.CreateDevice": {
             "type": "object",
             "properties": {
@@ -992,6 +978,23 @@
                     "$ref": "#/definitions/entity.DeviceType"
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "sledilka.DeviceStatus": {
+            "type": "object",
+            "properties": {
+                "ipAddress": {
+                    "type": "string"
+                },
+                "isActive": {
+                    "type": "boolean"
+                },
+                "is_busy": {
+                    "type": "boolean"
+                },
+                "macAddress": {
                     "type": "string"
                 }
             }

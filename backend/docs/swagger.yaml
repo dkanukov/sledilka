@@ -106,15 +106,6 @@ definitions:
       username:
         type: string
     type: object
-  network.DeviceStatus:
-    properties:
-      ipAddress:
-        type: string
-      isActive:
-        type: boolean
-      macAddress:
-        type: string
-    type: object
   sledilka.CreateDevice:
     properties:
       angle:
@@ -164,6 +155,17 @@ definitions:
       type:
         $ref: '#/definitions/entity.DeviceType'
       updated_at:
+        type: string
+    type: object
+  sledilka.DeviceStatus:
+    properties:
+      ipAddress:
+        type: string
+      is_busy:
+        type: boolean
+      isActive:
+        type: boolean
+      macAddress:
         type: string
     type: object
   sledilka.Layer:
@@ -422,7 +424,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/network.DeviceStatus'
+              $ref: '#/definitions/sledilka.DeviceStatus'
             type: array
         "500":
           description: Internal Server Error
@@ -677,7 +679,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/network.DeviceStatus'
+            $ref: '#/definitions/sledilka.Device'
         "500":
           description: Internal Server Error
       security:

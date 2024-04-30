@@ -108,3 +108,10 @@ WHERE id = $1;
 -- name: GetAllDevicesMacs :many
 SELECT mac_address
 FROM devices;
+
+-- name: IsMacAddressBusy :one
+SELECT EXISTS(
+    SELECT *
+    from devices
+    WHERE mac_address = $1
+) as is_busy;

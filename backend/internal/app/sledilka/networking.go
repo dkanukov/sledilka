@@ -2,8 +2,12 @@ package sledilka
 
 import (
 	"backend/internal/authorization"
+	"backend/internal/conv"
+	"backend/internal/handlers/devices"
 	"backend/internal/network"
 	"backend/internal/utils"
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -18,6 +22,13 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
+type DeviceStatus struct {
+	MacAddress string  `json:"macAddress,omitempty"`
+	IsActive   bool    `json:"isActive,omitempty"`
+	IsBusy     bool    `json:"is_busy"`
+	IpAddress  *string `json:"ipAddress,omitempty"`
+}
+
 func (s *Sledilka) addNetworkingHandlers(router *mux.Router) {
 	router.HandleFunc("/network", authorization.JwtAuthMiddleware(s.handleNetworkFunc, s.tokener)).Methods(http.MethodGet)
 	router.HandleFunc("/subscribe-network", authorization.JwtAuthMiddleware(s.handleSubscribeFunc, s.tokener)).Methods(http.MethodGet)
@@ -26,7 +37,7 @@ func (s *Sledilka) addNetworkingHandlers(router *mux.Router) {
 // @Summary	Получить список адресов в сети
 // @Tags		networking
 // @Produce	json
-// @Success	200		{object}	[]network.DeviceStatus
+// @Success	200		{object}	[]DeviceStatus
 // @Failure	500
 // @Security ApiKeyAuth
 // @Router		/network [get]
@@ -37,25 +48,34 @@ func (s *Sledilka) handleNetworkFunc(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, err)
 		return
 	}
-	macsMap := macSliceToMap(m.GetDevices())
-	dbMacs, err := s.q.GetAllDevicesMacs(r.Context())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, err)
 		return
 	}
-
-	for _, mac := range dbMacs {
-		delete(macsMap, mac)
+	res := make([]DeviceStatus, 0, len(m.GetDevices()))
+	for _, dev := range m.GetDevices() {
+		isBusy, err := s.q.IsMacAddressBusy(r.Context(), dev.GetMacAddress())
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, err)
+			return
+		}
+		res = append(res, DeviceStatus{
+			MacAddress: dev.GetMacAddress(),
+			IsActive:   dev.GetIsActive(),
+			IsBusy:     isBusy,
+			IpAddress:  conv.StringToStringp(dev.GetIpAddress()),
+		})
 	}
-	fmt.Fprint(w, utils.MustJSON(macMapToSlice(macsMap)))
+	fmt.Fprint(w, utils.MustJSON(res))
 
 }
 
 // @Summary	Подписаться на обновления из сети. WebSocket
 // @Tags		networking
 // @Produce	json
-// @Success	200		{object}	network.DeviceStatus
+// @Success	200		{object}	Device
 // @Failure	500
 // @Security ApiKeyAuth
 // @Router		/subscribe-network [get]
@@ -84,8 +104,20 @@ func (s *Sledilka) handleSubscribeFunc(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err)
 			return
 		}
+		dev, err := s.q.GetDeviceByMacAddress(r.Context(), resp.GetMacAddress())
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			continue
+		case err != nil:
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, err)
+			return
+		}
+		toSend := devices.ToApi(dev)
+		toSend.IsActive = resp.GetIsActive()
+		toSend.IpAddress = resp.GetIpAddress()
 		if resp != nil {
-			ws.WriteJSON(resp)
+			ws.WriteJSON(toSend)
 		}
 	}
 

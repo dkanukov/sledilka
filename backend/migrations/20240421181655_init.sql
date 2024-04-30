@@ -46,7 +46,7 @@ CREATE TABLE devices
 
 CREATE TABLE users
 (
-    id uuid UNIQUE references devices (id) NOT NULL,
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     username varchar UNIQUE NOT NULL,
     password_hash varchar NOT NULL,
     is_admin bool default false NOT NULL
