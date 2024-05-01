@@ -183,7 +183,6 @@ export const useMap = ({
 
 		polygonLayer.current = createdPolygonLayer
 		polygonTransform.current.select(createdPolygonLayer.feature, true)
-		// handlePolygonChange(createdPolygonLayer.feature)
 	}
 
 	const drawDevices = (devices: Device[]) => {

@@ -9,7 +9,7 @@ import { EntityNewObject } from '../../api/generated/api'
 import styles from './create-objects-form.module.css'
 
 import { Location } from '@models'
-import { Map } from '@components'
+import { EmptyMessage, Map } from '@components'
 import { geosearchService } from '@api'
 
 const { TextArea } = Input
@@ -69,6 +69,7 @@ export const FirstStep = (props: FirstStepProps) => {
 	}
 
 	const handleSendForm = () => {
+		//TODO: добавить передачу координат
 		props.whenNextStepClick(form)
 	}
 
@@ -90,11 +91,6 @@ export const FirstStep = (props: FirstStepProps) => {
 					description: e.target.value,
 				})}
 			/>
-			{/* <Input
-				placeholder={'Адрес'}
-				value={form.address}
-				onChange={(e) => handleAddressChange(e.target.value)}
-			/> */}
 			<AutoComplete
 				placeholder={'Адрес'}
 				value={form.address}
@@ -114,7 +110,9 @@ export const FirstStep = (props: FirstStepProps) => {
 					<AutoComplete.Option
 						value={null}
 					>
-						<Empty/>
+						<EmptyMessage
+							message={form.address.length < 3 ? 'Начните вводить адрес' : 'Ничего не найдено'}
+						/>
 					</AutoComplete.Option>
 				)}
 			</AutoComplete>
