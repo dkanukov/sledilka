@@ -115,3 +115,8 @@ SELECT EXISTS(
     from devices
     WHERE mac_address = $1
 ) as is_busy;
+
+-- name: GetRandomDevice :one
+SELECT * FROM devices
+ORDER BY RANDOM()
+LIMIT 1;

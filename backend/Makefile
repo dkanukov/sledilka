@@ -18,3 +18,7 @@ generate-proto:
 			api/network.proto
 	mv internal/network/api/* internal/network/
 	rm -rf internal/network/api
+
+generate-mock:
+	GOBIN=$(pwd) go install github.com/golang/mock/mockgen@v1.6.0
+	./mockgen -destination ./internal/mocks/mock_networking/network_client.go backend/internal/network NetworkClient

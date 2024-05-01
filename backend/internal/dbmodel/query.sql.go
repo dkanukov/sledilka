@@ -467,6 +467,32 @@ func (q *Queries) GetObjectById(ctx context.Context, id uuid.UUID) (Object, erro
 	return i, err
 }
 
+const getRandomDevice = `-- name: GetRandomDevice :one
+SELECT id, name, type, layer_id, location_x, location_y, angle, ip_address, camera_connection_url, mac_address, created_at, updated_at FROM devices
+ORDER BY RANDOM()
+LIMIT 1
+`
+
+func (q *Queries) GetRandomDevice(ctx context.Context) (Device, error) {
+	row := q.db.QueryRow(ctx, getRandomDevice)
+	var i Device
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Type,
+		&i.LayerID,
+		&i.LocationX,
+		&i.LocationY,
+		&i.Angle,
+		&i.IpAddress,
+		&i.CameraConnectionUrl,
+		&i.MacAddress,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getUserById = `-- name: GetUserById :one
 SELECT id, username, password_hash, is_admin
 FROM users

@@ -27,6 +27,17 @@ type NewObject struct {
 	Long        float64 `json:"long"`
 }
 
+type (
+	CreateDevice dbmodel.CreateDeviceParams
+)
+
+type DeviceStatus struct {
+	MacAddress string  `json:"macAddress,omitempty"`
+	IsActive   bool    `json:"isActive,omitempty"`
+	IsBusy     bool    `json:"is_busy"`
+	IpAddress  *string `json:"ipAddress,omitempty"`
+}
+
 type Layer struct {
 	ID                uuid.UUID                 `json:"id"`
 	ObjectID          uuid.UUID                 `json:"object_id"`

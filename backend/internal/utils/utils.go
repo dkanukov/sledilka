@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
 )
 
@@ -103,4 +104,8 @@ func MustJSON(obj any) string {
 		panic(err)
 	}
 	return string(b)
+}
+
+func RandBool() bool {
+	return rand.Int()%2 == 1
 }

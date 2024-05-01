@@ -15,11 +15,6 @@ import (
 	"net/http"
 )
 
-type (
-	Object    entity.Object
-	NewObject entity.NewObject
-)
-
 func (s *Sledilka) addObjectHandler(router *mux.Router) {
 	router.HandleFunc("/objects", authorization.JwtAuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -101,7 +96,7 @@ func (s *Sledilka) addObjectHandler(router *mux.Router) {
 // @Tags		objects
 // @Accept		json
 // @Produce	json
-// @Success	200	{object}	[]Object
+// @Success	200	{object}	[]entity.Object
 // @Failure	500
 // @Security ApiKeyAuth
 // @Router		/objects [get]
@@ -128,7 +123,7 @@ func (s *Sledilka) getAllObjects(ctx context.Context) ([]entity.Object, int, err
 // @Tags		objects
 // @Accept		json
 // @Produce	json
-// @Success	200	{object}	Object
+// @Success	200	{object}	entity.Object
 // @Failure	500
 // @Security ApiKeyAuth
 // @Router		/objects/{id} [get]
@@ -191,9 +186,9 @@ func (s *Sledilka) collectObj(ctx context.Context, obj dbmodel.Object) (entity.O
 // @Tags		objects
 // @Accept		json
 // @Produce	json
-// @Param		request	body	NewObject	true	"Измененный Объект"
+// @Param		request	body	entity.NewObject	true	"Измененный Объект"
 // @Param		id path string true "Object ID"
-// @Success	200	{object}	Object
+// @Success	200	{object}	entity.Object
 // @Security ApiKeyAuth
 // @Failure	500
 // @Router		/objects/{id} [patch]
@@ -213,8 +208,8 @@ func (s *Sledilka) updateObject(ctx context.Context, uObj dbmodel.UpdateObjectPa
 // @Tags		objects
 // @Accept		json
 // @Produce	json
-// @Param		request	body		NewObject true "Новый объект"
-// @Success	200		{object}	Object
+// @Param		request	body		entity.NewObject true "Новый объект"
+// @Success	200		{object}	entity.Object
 // @Security ApiKeyAuth
 // @Failure	500
 // @Router		/objects [post]

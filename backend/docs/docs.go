@@ -40,7 +40,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/sledilka.CreateDevice"
+                            "$ref": "#/definitions/backend_internal_entity.CreateDevice"
                         }
                     }
                 ],
@@ -48,7 +48,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/sledilka.Device"
+                            "$ref": "#/definitions/backend_internal_entity.Device"
                         }
                     },
                     "500": {
@@ -81,7 +81,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/sledilka.UpdateDevice"
+                            "$ref": "#/definitions/backend_internal_entity.NewDevice"
                         }
                     },
                     {
@@ -96,7 +96,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.Device"
+                            "$ref": "#/definitions/backend_internal_entity.Device"
                         }
                     },
                     "500": {
@@ -209,7 +209,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/sledilka.DeviceStatus"
+                                "$ref": "#/definitions/backend_internal_entity.DeviceStatus"
                             }
                         }
                     },
@@ -258,7 +258,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/sledilka.Object"
+                                "$ref": "#/definitions/backend_internal_entity.Object"
                             }
                         }
                     },
@@ -290,7 +290,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/sledilka.NewObject"
+                            "$ref": "#/definitions/backend_internal_entity.NewObject"
                         }
                     }
                 ],
@@ -298,7 +298,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/sledilka.Object"
+                            "$ref": "#/definitions/backend_internal_entity.Object"
                         }
                     },
                     "500": {
@@ -337,7 +337,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/sledilka.Object"
+                            "$ref": "#/definitions/backend_internal_entity.Object"
                         }
                     },
                     "500": {
@@ -368,7 +368,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/sledilka.NewObject"
+                            "$ref": "#/definitions/backend_internal_entity.NewObject"
                         }
                     },
                     {
@@ -383,7 +383,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/sledilka.Object"
+                            "$ref": "#/definitions/backend_internal_entity.Object"
                         }
                     },
                     "500": {
@@ -416,7 +416,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/sledilka.NewLayer"
+                            "$ref": "#/definitions/backend_internal_entity.NewLayer"
                         }
                     },
                     {
@@ -431,7 +431,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/sledilka.Layer"
+                            "$ref": "#/definitions/backend_internal_entity.Layer"
                         }
                     },
                     "500": {
@@ -474,7 +474,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/sledilka.Layer"
+                            "$ref": "#/definitions/backend_internal_entity.Layer"
                         }
                     },
                     "500": {
@@ -505,7 +505,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/sledilka.NewLayer"
+                            "$ref": "#/definitions/backend_internal_entity.NewLayer"
                         }
                     },
                     {
@@ -527,7 +527,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/sledilka.Layer"
+                            "$ref": "#/definitions/backend_internal_entity.Layer"
                         }
                     },
                     "500": {
@@ -561,7 +561,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/tokener.RefreshTokenResponse"
+                            "$ref": "#/definitions/backend_internal_tokener.RefreshTokenResponse"
                         }
                     },
                     "500": {
@@ -616,7 +616,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/sledilka.Device"
+                            "$ref": "#/definitions/backend_internal_entity.Device"
                         }
                     },
                     "500": {
@@ -644,7 +644,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.LoginInfo"
+                            "$ref": "#/definitions/backend_internal_entity.LoginInfo"
                         }
                     }
                 ],
@@ -652,7 +652,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/tokener.CreateTokenResponse"
+                            "$ref": "#/definitions/backend_internal_tokener.CreateTokenResponse"
                         }
                     },
                     "500": {
@@ -676,7 +676,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entity.UserInfo"
+                                "$ref": "#/definitions/backend_internal_entity.UserInfo"
                             }
                         }
                     },
@@ -703,7 +703,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.NewUser"
+                            "$ref": "#/definitions/backend_internal_entity.NewUser"
                         }
                     }
                 ],
@@ -711,7 +711,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.UserInfo"
+                            "$ref": "#/definitions/backend_internal_entity.UserInfo"
                         }
                     },
                     "500": {
@@ -742,7 +742,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.UserInfo"
+                            "$ref": "#/definitions/backend_internal_entity.UserInfo"
                         }
                     },
                     "500": {
@@ -753,7 +753,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dbmodel.Coordinate": {
+        "backend_internal_dbmodel.Coordinate": {
             "type": "object",
             "properties": {
                 "lat": {
@@ -764,7 +764,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dbmodel.DeviceType": {
+        "backend_internal_dbmodel.DeviceType": {
             "type": "string",
             "enum": [
                 "computer",
@@ -777,142 +777,7 @@ const docTemplate = `{
                 "DeviceTypePrinter"
             ]
         },
-        "entity.Device": {
-            "type": "object",
-            "properties": {
-                "angle": {
-                    "type": "number"
-                },
-                "camera_connection_url": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "ip": {
-                    "type": "string"
-                },
-                "is_active": {
-                    "type": "boolean"
-                },
-                "layer_id": {
-                    "description": "??",
-                    "type": "string"
-                },
-                "location_x": {
-                    "type": "number"
-                },
-                "location_y": {
-                    "type": "number"
-                },
-                "mac_address": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "type": {
-                    "$ref": "#/definitions/entity.DeviceType"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.DeviceType": {
-            "type": "string",
-            "enum": [
-                "computer",
-                "camera",
-                "printer"
-            ],
-            "x-enum-varnames": [
-                "Computer",
-                "Camera",
-                "Printer"
-            ]
-        },
-        "entity.Layer": {
-            "type": "object",
-            "properties": {
-                "angle": {
-                    "type": "number"
-                },
-                "angles_coordinates": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dbmodel.Coordinate"
-                    }
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "devices": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Device"
-                    }
-                },
-                "floor_name": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "image": {
-                    "type": "string"
-                },
-                "object_id": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.LoginInfo": {
-            "type": "object",
-            "properties": {
-                "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.NewUser": {
-            "type": "object",
-            "properties": {
-                "is_admin": {
-                    "type": "boolean"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "entity.UserInfo": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "is_admin": {
-                    "type": "boolean"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "sledilka.CreateDevice": {
+        "backend_internal_entity.CreateDevice": {
             "type": "object",
             "properties": {
                 "angle": {
@@ -940,11 +805,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "$ref": "#/definitions/dbmodel.DeviceType"
+                    "$ref": "#/definitions/backend_internal_dbmodel.DeviceType"
                 }
             }
         },
-        "sledilka.Device": {
+        "backend_internal_entity.Device": {
             "type": "object",
             "properties": {
                 "angle": {
@@ -982,14 +847,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "$ref": "#/definitions/entity.DeviceType"
+                    "$ref": "#/definitions/backend_internal_entity.DeviceType"
                 },
                 "updated_at": {
                     "type": "string"
                 }
             }
         },
-        "sledilka.DeviceStatus": {
+        "backend_internal_entity.DeviceStatus": {
             "type": "object",
             "properties": {
                 "ipAddress": {
@@ -1006,7 +871,20 @@ const docTemplate = `{
                 }
             }
         },
-        "sledilka.Layer": {
+        "backend_internal_entity.DeviceType": {
+            "type": "string",
+            "enum": [
+                "computer",
+                "camera",
+                "printer"
+            ],
+            "x-enum-varnames": [
+                "Computer",
+                "Camera",
+                "Printer"
+            ]
+        },
+        "backend_internal_entity.Layer": {
             "type": "object",
             "properties": {
                 "angle": {
@@ -1015,7 +893,7 @@ const docTemplate = `{
                 "angles_coordinates": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dbmodel.Coordinate"
+                        "$ref": "#/definitions/backend_internal_dbmodel.Coordinate"
                     }
                 },
                 "created_at": {
@@ -1024,7 +902,7 @@ const docTemplate = `{
                 "devices": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entity.Device"
+                        "$ref": "#/definitions/backend_internal_entity.Device"
                     }
                 },
                 "floor_name": {
@@ -1044,82 +922,18 @@ const docTemplate = `{
                 }
             }
         },
-        "sledilka.NewLayer": {
+        "backend_internal_entity.LoginInfo": {
             "type": "object",
             "properties": {
-                "angle": {
-                    "type": "number"
-                },
-                "angles_coordinates": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dbmodel.Coordinate"
-                    }
-                },
-                "floor_name": {
+                "password": {
                     "type": "string"
                 },
-                "image": {
+                "username": {
                     "type": "string"
                 }
             }
         },
-        "sledilka.NewObject": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "lat": {
-                    "type": "number"
-                },
-                "long": {
-                    "type": "number"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "sledilka.Object": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "lat": {
-                    "type": "number"
-                },
-                "layers": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/entity.Layer"
-                    }
-                },
-                "long": {
-                    "type": "number"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "sledilka.UpdateDevice": {
+        "backend_internal_entity.NewDevice": {
             "type": "object",
             "properties": {
                 "angle": {
@@ -1148,7 +962,138 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "$ref": "#/definitions/entity.DeviceType"
+                    "$ref": "#/definitions/backend_internal_entity.DeviceType"
+                }
+            }
+        },
+        "backend_internal_entity.NewLayer": {
+            "type": "object",
+            "properties": {
+                "angle": {
+                    "type": "number"
+                },
+                "angles_coordinates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/backend_internal_dbmodel.Coordinate"
+                    }
+                },
+                "floor_name": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                }
+            }
+        },
+        "backend_internal_entity.NewObject": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "lat": {
+                    "type": "number"
+                },
+                "long": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "backend_internal_entity.NewUser": {
+            "type": "object",
+            "properties": {
+                "is_admin": {
+                    "type": "boolean"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "backend_internal_entity.Object": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lat": {
+                    "type": "number"
+                },
+                "layers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/backend_internal_entity.Layer"
+                    }
+                },
+                "long": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "backend_internal_entity.UserInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "is_admin": {
+                    "type": "boolean"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "backend_internal_tokener.CreateTokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "backend_internal_tokener.RefreshTokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
+                "refresh_token": {
+                    "type": "string"
                 }
             }
         },
@@ -1162,34 +1107,6 @@ const docTemplate = `{
                 "seconds": {
                     "description": "Represents seconds of UTC time since Unix epoch\n1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to\n9999-12-31T23:59:59Z inclusive.",
                     "type": "integer"
-                }
-            }
-        },
-        "tokener.CreateTokenResponse": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "expires_at": {
-                    "$ref": "#/definitions/timestamppb.Timestamp"
-                },
-                "refresh_token": {
-                    "type": "string"
-                }
-            }
-        },
-        "tokener.RefreshTokenResponse": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "expires_at": {
-                    "$ref": "#/definitions/timestamppb.Timestamp"
-                },
-                "refresh_token": {
-                    "type": "string"
                 }
             }
         }
@@ -1210,7 +1127,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "192.168.1.75:8081",
+	Host:             "0.0.0.0:8081",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Sledilka API",

@@ -18,11 +18,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type (
-	Layer    entity.Layer
-	NewLayer entity.NewLayer
-)
-
 func (s *Sledilka) addLayerHandlers(router *mux.Router) {
 	router.HandleFunc("/objects/{id}/layers", authorization.JwtAuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -120,7 +115,7 @@ func (s *Sledilka) addLayerHandlers(router *mux.Router) {
 // @Produce	json
 // @Param		id path string true "Layer ID"
 // @Param		object_id path string true "Object ID"
-// @Success	200		{object}	Layer
+// @Success	200		{object}	entity.Layer
 // @Security ApiKeyAuth
 // @Failure	500
 // @Router		/objects/{object_id}/layers/{id} [get]
@@ -172,9 +167,9 @@ func (s *Sledilka) collectDevice(ctx context.Context, id uuid.UUID) ([]entity.De
 // @Tags		layers
 // @Accept		json
 // @Produce	json
-// @Param		request	body		NewLayer true "Новый слой"
+// @Param		request	body		entity.NewLayer true "Новый слой"
 // @Param		id path string true "Object ID"
-// @Success	200		{object}	Layer
+// @Success	200		{object}	entity.Layer
 // @Security ApiKeyAuth
 // @Failure	500
 // @Router		/objects/{id}/layers [post]
@@ -204,10 +199,10 @@ func (s *Sledilka) createLayers(ctx context.Context, params dbmodel.CreateLayerP
 // @Tags		layers
 // @Accept		json
 // @Produce	json
-// @Param		request	body	NewLayer	true	"Измененный слой"
+// @Param		request	body	entity.NewLayer	true	"Измененный слой"
 // @Param		object_id path string true "Object ID"
 // @Param		id path string true "Layer ID"
-// @Success	200	{object}	Layer
+// @Success	200	{object}	entity.Layer
 // @Security ApiKeyAuth
 // @Failure	500
 // @Router		/objects/{object_id}/layers/{id} [patch]

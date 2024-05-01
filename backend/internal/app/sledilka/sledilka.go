@@ -21,7 +21,6 @@ type Sledilka struct {
 	tokener      tokener.TokenerClient
 	networker    network.NetworkClient
 	StreamingURL string
-	SledilkaURL  string
 }
 
 func (s *Sledilka) Run() error {
@@ -35,13 +34,12 @@ func New(db *pgx.Conn, client tokener.TokenerClient, networkClient network.Netwo
 		tokener:      client,
 		networker:    networkClient,
 		StreamingURL: streamingUrl,
-		SledilkaURL:  sledilkaURL,
 	}
-	sledilka.createServer()
+	sledilka.createServer(sledilkaURL)
 	return sledilka
 }
 
-func (s *Sledilka) createServer() {
+func (s *Sledilka) createServer(url string) {
 	router := gmux.NewRouter()
 
 	s.addUserHandlers(router)
@@ -71,10 +69,9 @@ func (s *Sledilka) createServer() {
 	router.HandleFunc("/swagger", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/swagger/", http.StatusSeeOther)
 	})
-	cors.AllowAll()
 	corsOpt := cors.AllowAll()
 	s.server = &http.Server{
-		Addr:    s.SledilkaURL,
+		Addr:    url,
 		Handler: corsOpt.Handler(router),
 	}
 }

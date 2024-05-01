@@ -1,12 +1,12 @@
 definitions:
-  dbmodel.Coordinate:
+  backend_internal_dbmodel.Coordinate:
     properties:
       lat:
         type: number
       long:
         type: number
     type: object
-  dbmodel.DeviceType:
+  backend_internal_dbmodel.DeviceType:
     enum:
     - computer
     - camera
@@ -16,97 +16,7 @@ definitions:
     - DeviceTypeComputer
     - DeviceTypeCamera
     - DeviceTypePrinter
-  entity.Device:
-    properties:
-      angle:
-        type: number
-      camera_connection_url:
-        type: string
-      created_at:
-        type: string
-      id:
-        type: string
-      ip:
-        type: string
-      is_active:
-        type: boolean
-      layer_id:
-        description: ??
-        type: string
-      location_x:
-        type: number
-      location_y:
-        type: number
-      mac_address:
-        type: string
-      name:
-        type: string
-      type:
-        $ref: '#/definitions/entity.DeviceType'
-      updated_at:
-        type: string
-    type: object
-  entity.DeviceType:
-    enum:
-    - computer
-    - camera
-    - printer
-    type: string
-    x-enum-varnames:
-    - Computer
-    - Camera
-    - Printer
-  entity.Layer:
-    properties:
-      angle:
-        type: number
-      angles_coordinates:
-        items:
-          $ref: '#/definitions/dbmodel.Coordinate'
-        type: array
-      created_at:
-        type: string
-      devices:
-        items:
-          $ref: '#/definitions/entity.Device'
-        type: array
-      floor_name:
-        type: string
-      id:
-        type: string
-      image:
-        type: string
-      object_id:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  entity.LoginInfo:
-    properties:
-      password:
-        type: string
-      username:
-        type: string
-    type: object
-  entity.NewUser:
-    properties:
-      is_admin:
-        type: boolean
-      password:
-        type: string
-      username:
-        type: string
-    type: object
-  entity.UserInfo:
-    properties:
-      id:
-        type: string
-      is_admin:
-        type: boolean
-      username:
-        type: string
-    type: object
-  sledilka.CreateDevice:
+  backend_internal_entity.CreateDevice:
     properties:
       angle:
         type: number
@@ -125,9 +35,9 @@ definitions:
       name:
         type: string
       type:
-        $ref: '#/definitions/dbmodel.DeviceType'
+        $ref: '#/definitions/backend_internal_dbmodel.DeviceType'
     type: object
-  sledilka.Device:
+  backend_internal_entity.Device:
     properties:
       angle:
         type: number
@@ -153,11 +63,11 @@ definitions:
       name:
         type: string
       type:
-        $ref: '#/definitions/entity.DeviceType'
+        $ref: '#/definitions/backend_internal_entity.DeviceType'
       updated_at:
         type: string
     type: object
-  sledilka.DeviceStatus:
+  backend_internal_entity.DeviceStatus:
     properties:
       ipAddress:
         type: string
@@ -168,19 +78,29 @@ definitions:
       macAddress:
         type: string
     type: object
-  sledilka.Layer:
+  backend_internal_entity.DeviceType:
+    enum:
+    - computer
+    - camera
+    - printer
+    type: string
+    x-enum-varnames:
+    - Computer
+    - Camera
+    - Printer
+  backend_internal_entity.Layer:
     properties:
       angle:
         type: number
       angles_coordinates:
         items:
-          $ref: '#/definitions/dbmodel.Coordinate'
+          $ref: '#/definitions/backend_internal_dbmodel.Coordinate'
         type: array
       created_at:
         type: string
       devices:
         items:
-          $ref: '#/definitions/entity.Device'
+          $ref: '#/definitions/backend_internal_entity.Device'
         type: array
       floor_name:
         type: string
@@ -193,56 +113,14 @@ definitions:
       updated_at:
         type: string
     type: object
-  sledilka.NewLayer:
+  backend_internal_entity.LoginInfo:
     properties:
-      angle:
-        type: number
-      angles_coordinates:
-        items:
-          $ref: '#/definitions/dbmodel.Coordinate'
-        type: array
-      floor_name:
+      password:
         type: string
-      image:
+      username:
         type: string
     type: object
-  sledilka.NewObject:
-    properties:
-      address:
-        type: string
-      description:
-        type: string
-      lat:
-        type: number
-      long:
-        type: number
-      name:
-        type: string
-    type: object
-  sledilka.Object:
-    properties:
-      address:
-        type: string
-      created_at:
-        type: string
-      description:
-        type: string
-      id:
-        type: string
-      lat:
-        type: number
-      layers:
-        items:
-          $ref: '#/definitions/entity.Layer'
-        type: array
-      long:
-        type: number
-      name:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  sledilka.UpdateDevice:
+  backend_internal_entity.NewDevice:
     properties:
       angle:
         type: number
@@ -262,7 +140,92 @@ definitions:
       name:
         type: string
       type:
-        $ref: '#/definitions/entity.DeviceType'
+        $ref: '#/definitions/backend_internal_entity.DeviceType'
+    type: object
+  backend_internal_entity.NewLayer:
+    properties:
+      angle:
+        type: number
+      angles_coordinates:
+        items:
+          $ref: '#/definitions/backend_internal_dbmodel.Coordinate'
+        type: array
+      floor_name:
+        type: string
+      image:
+        type: string
+    type: object
+  backend_internal_entity.NewObject:
+    properties:
+      address:
+        type: string
+      description:
+        type: string
+      lat:
+        type: number
+      long:
+        type: number
+      name:
+        type: string
+    type: object
+  backend_internal_entity.NewUser:
+    properties:
+      is_admin:
+        type: boolean
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  backend_internal_entity.Object:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      lat:
+        type: number
+      layers:
+        items:
+          $ref: '#/definitions/backend_internal_entity.Layer'
+        type: array
+      long:
+        type: number
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  backend_internal_entity.UserInfo:
+    properties:
+      id:
+        type: string
+      is_admin:
+        type: boolean
+      username:
+        type: string
+    type: object
+  backend_internal_tokener.CreateTokenResponse:
+    properties:
+      access_token:
+        type: string
+      expires_at:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      refresh_token:
+        type: string
+    type: object
+  backend_internal_tokener.RefreshTokenResponse:
+    properties:
+      access_token:
+        type: string
+      expires_at:
+        $ref: '#/definitions/timestamppb.Timestamp'
+      refresh_token:
+        type: string
     type: object
   timestamppb.Timestamp:
     properties:
@@ -280,25 +243,7 @@ definitions:
           9999-12-31T23:59:59Z inclusive.
         type: integer
     type: object
-  tokener.CreateTokenResponse:
-    properties:
-      access_token:
-        type: string
-      expires_at:
-        $ref: '#/definitions/timestamppb.Timestamp'
-      refresh_token:
-        type: string
-    type: object
-  tokener.RefreshTokenResponse:
-    properties:
-      access_token:
-        type: string
-      expires_at:
-        $ref: '#/definitions/timestamppb.Timestamp'
-      refresh_token:
-        type: string
-    type: object
-host: 192.168.1.75:8081
+host: 0.0.0.0:8081
 info:
   contact: {}
   description: API for Sledilka service
@@ -316,14 +261,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/sledilka.CreateDevice'
+          $ref: '#/definitions/backend_internal_entity.CreateDevice'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/sledilka.Device'
+            $ref: '#/definitions/backend_internal_entity.Device'
         "500":
           description: Internal Server Error
       security:
@@ -341,7 +286,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/sledilka.UpdateDevice'
+          $ref: '#/definitions/backend_internal_entity.NewDevice'
       - description: Device ID
         in: path
         name: id
@@ -353,7 +298,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.Device'
+            $ref: '#/definitions/backend_internal_entity.Device'
         "500":
           description: Internal Server Error
       security:
@@ -424,7 +369,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/sledilka.DeviceStatus'
+              $ref: '#/definitions/backend_internal_entity.DeviceStatus'
             type: array
         "500":
           description: Internal Server Error
@@ -454,7 +399,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/sledilka.Object'
+              $ref: '#/definitions/backend_internal_entity.Object'
             type: array
         "500":
           description: Internal Server Error
@@ -472,14 +417,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/sledilka.NewObject'
+          $ref: '#/definitions/backend_internal_entity.NewObject'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/sledilka.Object'
+            $ref: '#/definitions/backend_internal_entity.Object'
         "500":
           description: Internal Server Error
       security:
@@ -503,7 +448,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/sledilka.Object'
+            $ref: '#/definitions/backend_internal_entity.Object'
         "500":
           description: Internal Server Error
       security:
@@ -520,7 +465,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/sledilka.NewObject'
+          $ref: '#/definitions/backend_internal_entity.NewObject'
       - description: Object ID
         in: path
         name: id
@@ -532,7 +477,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/sledilka.Object'
+            $ref: '#/definitions/backend_internal_entity.Object'
         "500":
           description: Internal Server Error
       security:
@@ -550,7 +495,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/sledilka.NewLayer'
+          $ref: '#/definitions/backend_internal_entity.NewLayer'
       - description: Object ID
         in: path
         name: id
@@ -562,7 +507,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/sledilka.Layer'
+            $ref: '#/definitions/backend_internal_entity.Layer'
         "500":
           description: Internal Server Error
       security:
@@ -589,7 +534,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/sledilka.Layer'
+            $ref: '#/definitions/backend_internal_entity.Layer'
         "500":
           description: Internal Server Error
       security:
@@ -606,7 +551,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/sledilka.NewLayer'
+          $ref: '#/definitions/backend_internal_entity.NewLayer'
       - description: Object ID
         in: path
         name: object_id
@@ -623,7 +568,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/sledilka.Layer'
+            $ref: '#/definitions/backend_internal_entity.Layer'
         "500":
           description: Internal Server Error
       security:
@@ -647,7 +592,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/tokener.RefreshTokenResponse'
+            $ref: '#/definitions/backend_internal_tokener.RefreshTokenResponse'
         "500":
           description: Internal Server Error
       summary: Обновить токен
@@ -679,7 +624,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/sledilka.Device'
+            $ref: '#/definitions/backend_internal_entity.Device'
         "500":
           description: Internal Server Error
       security:
@@ -697,14 +642,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/entity.LoginInfo'
+          $ref: '#/definitions/backend_internal_entity.LoginInfo'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/tokener.CreateTokenResponse'
+            $ref: '#/definitions/backend_internal_tokener.CreateTokenResponse'
         "500":
           description: Internal Server Error
       summary: Авторизоваться
@@ -719,7 +664,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/entity.UserInfo'
+              $ref: '#/definitions/backend_internal_entity.UserInfo'
             type: array
         "500":
           description: Internal Server Error
@@ -735,14 +680,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/entity.NewUser'
+          $ref: '#/definitions/backend_internal_entity.NewUser'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.UserInfo'
+            $ref: '#/definitions/backend_internal_entity.UserInfo'
         "500":
           description: Internal Server Error
       summary: Зарегистрировать
@@ -762,7 +707,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/entity.UserInfo'
+            $ref: '#/definitions/backend_internal_entity.UserInfo'
         "500":
           description: Internal Server Error
       summary: Получить информацию о пользователе по id

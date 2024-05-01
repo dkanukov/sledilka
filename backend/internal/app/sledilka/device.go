@@ -18,12 +18,6 @@ import (
 	"backend/internal/validate"
 )
 
-type (
-	CreateDevice dbmodel.CreateDeviceParams
-	Device       entity.Device
-	UpdateDevice entity.NewDevice
-)
-
 func (s *Sledilka) addDeviceHandlers(router *mux.Router) {
 	router.HandleFunc("/devices", authorization.JwtAuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -60,8 +54,8 @@ func (s *Sledilka) addDeviceHandlers(router *mux.Router) {
 // @Tags		devices
 // @Accept		json
 // @Produce	json
-// @Param		request	body		CreateDevice true "Новый девайс"
-// @Success	200		{object}	Device
+// @Param		request	body		entity.CreateDevice true "Новый девайс"
+// @Success	200		{object}	entity.Device
 // @Security ApiKeyAuth
 // @Failure	500
 // @Router		/devices [post]
@@ -110,7 +104,7 @@ func (s *Sledilka) createDevice(r *http.Request) (entity.Device, error) {
 // @Tags		devices
 // @Accept		json
 // @Produce	json
-// @Param		request	body	UpdateDevice	true	"Измененный девайс"
+// @Param		request	body	entity.NewDevice	true	"Измененный девайс"
 // @Param		id path string true "Device ID"
 // @Success	200	{object}	entity.Device
 // @Security ApiKeyAuth
