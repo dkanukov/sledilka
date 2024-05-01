@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/rs/cors"
+	httpSwagger "github.com/swaggo/http-swagger"
 
 	handlers "geosearch/internal"
 )
@@ -25,6 +26,11 @@ import (
 func main() {
 	corsOpt := cors.AllowAll()
 	router := handlers.GetHandlers()
+
+	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
+	router.HandleFunc("/swagger", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/swagger/", http.StatusSeeOther)
+	})
 
 	app := http.Server{
 		Addr:    "0.0.0.0:8083",
