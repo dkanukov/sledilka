@@ -538,8 +538,10 @@ const docTemplate = `{
         },
         "/refresh": {
             "post": {
-                "consumes": [
-                    "multipart/form-data"
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
                 ],
                 "produces": [
                     "application/json"
@@ -548,15 +550,6 @@ const docTemplate = `{
                     "token"
                 ],
                 "summary": "Обновить токен",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "token",
-                        "name": "token",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",

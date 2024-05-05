@@ -77,10 +77,9 @@ func Token(w http.ResponseWriter, r *http.Request, q *dbmodel.Queries, client to
 
 // @Summary	Обновить токен
 // @Tags		token
-// @Accept		mpfd
 // @Produce	json
-// @Param token query string true "token"
 // @Success	200		{object}	tokener.RefreshTokenResponse
+// @Security ApiKeyAuth
 // @Failure	500
 // @Router		/refresh [post]
 func Refresh(writer http.ResponseWriter, request *http.Request, client tokener.TokenerClient) {

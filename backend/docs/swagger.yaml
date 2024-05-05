@@ -578,14 +578,6 @@ paths:
       - layers
   /refresh:
     post:
-      consumes:
-      - multipart/form-data
-      parameters:
-      - description: token
-        in: query
-        name: token
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -595,6 +587,8 @@ paths:
             $ref: '#/definitions/backend_internal_tokener.RefreshTokenResponse'
         "500":
           description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
       summary: Обновить токен
       tags:
       - token

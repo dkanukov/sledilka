@@ -531,8 +531,10 @@
         },
         "/refresh": {
             "post": {
-                "consumes": [
-                    "multipart/form-data"
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
                 ],
                 "produces": [
                     "application/json"
@@ -541,15 +543,6 @@
                     "token"
                 ],
                 "summary": "Обновить токен",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "token",
-                        "name": "token",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
