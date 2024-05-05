@@ -1,4 +1,3 @@
-'use client'
 import { Card, Col, Flex, Image, Row, Typography } from 'antd'
 
 import styles from './contacts.module.css'

@@ -13,7 +13,7 @@ export const useLayerEdit = (id: string) => {
 
 	useEffect(() => {
 		const fetchLayerById = async () => {
-			const { objectId } = await layerStore.fetchLayerById(id)
+			const { objectId } = await layerStore.fetchLayerById(id, '')
 			await layerStore.fetchObjectById(objectId)
 		}
 

@@ -4,11 +4,9 @@ import { fromLonLat } from 'ol/proj'
 import { Coordinate } from 'ol/coordinate'
 import { debounce } from 'lodash'
 
-import { EntityNewObject } from '../../api/generated/api'
-
 import styles from './create-objects-form.module.css'
 
-import { Location } from '@models'
+import { Location, ObjectStorage } from '@models'
 import { EmptyMessage, Map } from '@components'
 import { geosearchService } from '@api'
 
@@ -16,7 +14,7 @@ const { TextArea } = Input
 const MOSCOW_COORDINATE = [37.61905400772136, 55.750549228458084]
 
 interface FirstStepProps {
-	whenNextStepClick: (newObject: EntityNewObject) => void
+	whenNextStepClick: (newObject: ObjectStorage) => void
 }
 
 export const FirstStep = (props: FirstStepProps) => {
@@ -70,7 +68,7 @@ export const FirstStep = (props: FirstStepProps) => {
 
 	const handleSendForm = () => {
 		//TODO: добавить передачу координат
-		props.whenNextStepClick(form)
+		// props.whenNextStepClick(form)
 	}
 
 	return (

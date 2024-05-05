@@ -1,6 +1,6 @@
 import { Button, Drawer, Input, InputNumber, Select, Typography } from 'antd'
 
-import { EntityDeviceType } from '../../api/generated/api'
+import { BackendInternalEntityDeviceType } from '../../api/generated/api'
 
 import styles from './device-drawer.module.css'
 
@@ -18,15 +18,15 @@ const { Text } = Typography
 const DEVICE_TYPES = [
 	{
 		label: <span>компьютер</span>,
-		value: EntityDeviceType.Computer,
+		value: BackendInternalEntityDeviceType.Computer,
 	},
 	{
 		label: <span>камера</span>,
-		value: EntityDeviceType.Camera,
+		value: BackendInternalEntityDeviceType.Camera,
 	},
 	{
 		label: <span>принтер</span>,
-		value: EntityDeviceType.Printer,
+		value: BackendInternalEntityDeviceType.Printer,
 	},
 ]
 

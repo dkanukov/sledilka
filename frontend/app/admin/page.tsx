@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 import styles from './admin.module.css'
 
@@ -13,14 +13,15 @@ export default function Admin() {
 	const { customRouter, query } = useCustomRouter()
 
 	useEffect(() => {
-		objectsStore.fetchObjects()
-			.then(() => {
-				const id = query.get('layerId')
-				if (id) {
-					objectsStore.handleSelectedLayerChange(id)
-				}
-			})
-			.catch(() => console.error('cant get objects'))
+		const fetchObjects = async () => {
+			await objectsStore.fetchObjects()
+			const id = query.get('layerId')
+			if (id) {
+				objectsStore.handleSelectedLayerChange(id)
+			}
+		}
+
+		fetchObjects()
 	}, [])
 
 	const handleSelectLayer = (key: string) => {

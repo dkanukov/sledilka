@@ -1,4 +1,4 @@
-import { EntityNewObject } from '../generated/api'
+import { BackendInternalDbmodelDeviceType, BackendInternalEntityObject } from '../generated/api'
 import CustomedApi from '../generated/customed-api'
 
 import { Device, ObjectLayer, ObjectStorage } from '@models'
@@ -9,7 +9,7 @@ export const getObjects = async () => {
 	return data.map((object) => new ObjectStorage(object))
 }
 
-export const createObject = async (newObject: EntityNewObject) => {
+export const createObject = async (newObject: BackendInternalEntityObject) => {
 	const { data } = await CustomedApi.objects.objectsCreate(newObject)
 	return new ObjectStorage(data)
 }
@@ -48,8 +48,8 @@ export const createDevice = async (device: Device) => {
 		location_y: device.coordinates[0],
 		location_x: device.coordinates[1],
 		name: device.name,
-		type: device.type,
-		//TODO: remove hardcode будет выбор ip + mac address из списка
+		type: device.type as unknown as BackendInternalDbmodelDeviceType,
+		//TODO: remove hardcode будет выбор ip + mac address из списка + типы мб поправят
 		mac_address: '7c:50:4e:62:88:1e',
 	})
 
@@ -70,8 +70,8 @@ export const updateLayer = async (layer: ObjectLayer) => {
 	return response.status === 200
 }
 
-export const getLayerById = async (id: string) => {
-	const { data } = await CustomedApi.layers.layersDetail(id)
+export const getLayerById = async (layerId: string, objectId: string) => {
+	const { data } = await CustomedApi.objects.layersDetail(layerId, objectId)
 
 	return new ObjectLayer(data)
 }

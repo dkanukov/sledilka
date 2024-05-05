@@ -1,6 +1,6 @@
-import { EntityDeviceType } from '../api/generated/api'
+import { BackendInternalEntityDeviceType } from '../api/generated/api'
 
-export const DeviceRuByType: Record<EntityDeviceType, string> = {
+export const DeviceRuByType: Record<BackendInternalEntityDeviceType, string> = {
 	'camera': 'Камера',
 	'printer': 'Принтер',
 	'computer': 'Компьютер',
@@ -8,15 +8,15 @@ export const DeviceRuByType: Record<EntityDeviceType, string> = {
 
 export const DevicesLavelValue = [
 	{
-		value: EntityDeviceType.Camera,
+		value: BackendInternalEntityDeviceType.Camera,
 		text: 'Камера',
 	},
 	{
-		value: EntityDeviceType.Printer,
+		value: BackendInternalEntityDeviceType.Printer,
 		text: 'Принтер',
 	},
 	{
-		value: EntityDeviceType.Computer,
+		value: BackendInternalEntityDeviceType.Computer,
 		text: 'Компьютер',
 	},
 ]

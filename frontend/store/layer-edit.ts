@@ -25,7 +25,7 @@ interface LayerEdit{
 	selectDevice: (id: string | null) => void
 	createNewLayer: () => void
 	removeNewLayer: () => void
-	fetchLayerById: (id: string) => Promise<ObjectLayer>
+	fetchLayerById: (layerId: string, objectId: string) => Promise<ObjectLayer>
 	fetchObjectById: (objectId: string) => Promise<void>
 }
 
@@ -331,8 +331,8 @@ export const useLayerEditStore = create<LayerEdit>()((set) => ({
 		})
 	},
 
-	fetchLayerById: async (id) => {
-		const layer = await objectService.getLayerById(id)
+	fetchLayerById: async (layerId, objectId) => {
+		const layer = await objectService.getLayerById(layerId, objectId)
 
 		set(() => ({
 			layer,

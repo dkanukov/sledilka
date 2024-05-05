@@ -9,22 +9,34 @@
  * ---------------------------------------------------------------
  */
 
-export interface EntityAnnouncement {
-  createdAt?: string;
-  description?: string;
-  id?: string;
-  title?: string;
-}
-
-export interface EntityCoordinate {
+export interface BackendInternalDbmodelCoordinate {
   lat?: number;
   long?: number;
 }
 
-export interface EntityDevice {
+export enum BackendInternalDbmodelDeviceType {
+  DeviceTypeComputer = "computer",
+  DeviceTypeCamera = "camera",
+  DeviceTypePrinter = "printer",
+}
+
+export interface BackendInternalEntityCreateDevice {
+  angle?: number;
+  camera_connection_url?: string;
+  ip_address?: string;
+  layer_id?: string;
+  location_x?: number;
+  location_y?: number;
+  mac_address?: string;
+  name?: string;
+  type?: BackendInternalDbmodelDeviceType;
+}
+
+export interface BackendInternalEntityDevice {
+  angle?: number;
+  camera_connection_url?: string;
   created_at?: string;
   id?: string;
-  /** для подключения к камерам и мб для других нужд, хз */
   ip?: string;
   is_active?: boolean;
   /** ?? */
@@ -33,21 +45,28 @@ export interface EntityDevice {
   location_y?: number;
   mac_address?: string;
   name?: string;
-  type?: EntityDeviceType;
+  type?: BackendInternalEntityDeviceType;
   updated_at?: string;
 }
 
-export enum EntityDeviceType {
+export interface BackendInternalEntityDeviceStatus {
+  ipAddress?: string;
+  isActive?: boolean;
+  is_busy?: boolean;
+  macAddress?: string;
+}
+
+export enum BackendInternalEntityDeviceType {
   Computer = "computer",
   Camera = "camera",
   Printer = "printer",
 }
 
-export interface EntityLayer {
+export interface BackendInternalEntityLayer {
   angle?: number;
-  angles_coordinates?: EntityCoordinate[];
+  angles_coordinates?: BackendInternalDbmodelCoordinate[];
   created_at?: string;
-  devices?: EntityDevice[];
+  devices?: BackendInternalEntityDevice[];
   floor_name?: string;
   id?: string;
   image?: string;
@@ -55,18 +74,14 @@ export interface EntityLayer {
   updated_at?: string;
 }
 
-export interface EntityLoginInfo {
+export interface BackendInternalEntityLoginInfo {
   password?: string;
   username?: string;
 }
 
-export interface EntityNewAnnouncement {
-  description?: string;
-  title?: string;
-}
-
-export interface EntityNewDevice {
-  /** для подключения к камерам и мб для других нужд, хз */
+export interface BackendInternalEntityNewDevice {
+  angle?: number;
+  camera_connection_url?: string;
   ip?: string;
   /** ?? */
   layer_id?: string;
@@ -74,54 +89,58 @@ export interface EntityNewDevice {
   location_y?: number;
   mac_address?: string;
   name?: string;
-  type?: EntityDeviceType;
+  type?: BackendInternalEntityDeviceType;
 }
 
-export interface EntityNewLayer {
+export interface BackendInternalEntityNewLayer {
   angle?: number;
-  angles_coordinates?: EntityCoordinate[];
+  angles_coordinates?: BackendInternalDbmodelCoordinate[];
   floor_name?: string;
   image?: string;
 }
 
-export interface EntityNewObject {
+export interface BackendInternalEntityNewObject {
   address?: string;
   description?: string;
+  lat?: number;
+  long?: number;
   name?: string;
 }
 
-export interface EntityNewReview {
-  comment?: string;
-  name?: string;
-  rating?: number;
-}
-
-export interface EntityNewUser {
+export interface BackendInternalEntityNewUser {
+  is_admin?: boolean;
   password?: string;
   username?: string;
 }
 
-export interface EntityObject {
+export interface BackendInternalEntityObject {
   address?: string;
   created_at?: string;
   description?: string;
   id?: string;
-  layers?: EntityLayer[];
+  lat?: number;
+  layers?: BackendInternalEntityLayer[];
+  long?: number;
   name?: string;
   updated_at?: string;
 }
 
-export interface EntityReview {
-  comment?: string;
-  createdAt?: string;
+export interface BackendInternalEntityUserInfo {
   id?: string;
-  name?: string;
-  rating?: number;
+  is_admin?: boolean;
+  username?: string;
 }
 
-export interface EntityUserInfo {
-  id?: number;
-  username?: string;
+export interface BackendInternalTokenerCreateTokenResponse {
+  access_token?: string;
+  expires_at?: TimestamppbTimestamp;
+  refresh_token?: string;
+}
+
+export interface BackendInternalTokenerRefreshTokenResponse {
+  access_token?: string;
+  expires_at?: TimestamppbTimestamp;
+  refresh_token?: string;
 }
 
 export interface TimestamppbTimestamp {
@@ -138,18 +157,6 @@ export interface TimestamppbTimestamp {
    * 9999-12-31T23:59:59Z inclusive.
    */
   seconds?: number;
-}
-
-export interface TokenerCreateTokenResponse {
-  access_token?: string;
-  expires_at?: TimestamppbTimestamp;
-  refresh_token?: string;
-}
-
-export interface TokenerRefreshTokenResponse {
-  access_token?: string;
-  expires_at?: TimestamppbTimestamp;
-  refresh_token?: string;
 }
 
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
@@ -293,119 +300,6 @@ export class HttpClient<SecurityDataType = unknown> {
  * API for Sledilka service
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
-  announcement = {
-    /**
-     * No description
-     *
-     * @tags announcements
-     * @name AnnouncementList
-     * @summary Возвращает анонсы
-     * @request GET:/announcement
-     */
-    announcementList: (params: RequestParams = {}) =>
-      this.request<EntityAnnouncement[], void>({
-        path: `/announcement`,
-        method: "GET",
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags announcements
-     * @name AnnouncementCreate
-     * @summary Создает анонс
-     * @request POST:/announcement
-     */
-    announcementCreate: (request: EntityNewAnnouncement, params: RequestParams = {}) =>
-      this.request<EntityAnnouncement, void>({
-        path: `/announcement`,
-        method: "POST",
-        body: request,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags announcements
-     * @name AnnouncementDetail
-     * @summary Анонс по id
-     * @request GET:/announcement/{id}
-     * @secure
-     */
-    announcementDetail: (id: string, params: RequestParams = {}) =>
-      this.request<EntityAnnouncement, void>({
-        path: `/announcement/${id}`,
-        method: "GET",
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags announcements
-     * @name AnnouncementUpdate
-     * @summary Изменить анонс
-     * @request PUT:/announcement/{id}
-     * @secure
-     */
-    announcementUpdate: (id: string, request: EntityNewAnnouncement, params: RequestParams = {}) =>
-      this.request<EntityAnnouncement, void>({
-        path: `/announcement/${id}`,
-        method: "PUT",
-        body: request,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags announcements
-     * @name AnnouncementDelete
-     * @summary Удаляет анонс
-     * @request DELETE:/announcement/{id}
-     * @secure
-     */
-    announcementDelete: (id: string, params: RequestParams = {}) =>
-      this.request<void, void>({
-        path: `/announcement/${id}`,
-        method: "DELETE",
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags announcements
-     * @name AnnouncementPartialUpdate
-     * @summary Изменить анонс
-     * @request PATCH:/announcement/{id}
-     * @secure
-     */
-    announcementPartialUpdate: (id: string, request: EntityNewAnnouncement, params: RequestParams = {}) =>
-      this.request<EntityAnnouncement, void>({
-        path: `/announcement/${id}`,
-        method: "PATCH",
-        body: request,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-  };
   devices = {
     /**
      * No description
@@ -414,12 +308,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name DevicesCreate
      * @summary Создать девайс
      * @request POST:/devices
+     * @secure
      */
-    devicesCreate: (request: EntityNewDevice, params: RequestParams = {}) =>
-      this.request<EntityDevice, void>({
+    devicesCreate: (request: BackendInternalEntityCreateDevice, params: RequestParams = {}) =>
+      this.request<BackendInternalEntityDevice, void>({
         path: `/devices`,
         method: "POST",
         body: request,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -432,12 +328,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name DevicesPartialUpdate
      * @summary Изменить девайс
      * @request PATCH:/devices/{id}
+     * @secure
      */
-    devicesPartialUpdate: (id: string, request: EntityNewDevice, params: RequestParams = {}) =>
-      this.request<EntityDevice, void>({
+    devicesPartialUpdate: (id: string, request: BackendInternalEntityNewDevice, params: RequestParams = {}) =>
+      this.request<BackendInternalEntityDevice, void>({
         path: `/devices/${id}`,
         method: "PATCH",
         body: request,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -503,35 +401,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
   };
-  layers = {
+  network = {
     /**
      * No description
      *
-     * @tags layers
-     * @name LayersDetail
-     * @summary Получить слой
-     * @request GET:/layers/{id}
+     * @tags networking
+     * @name NetworkList
+     * @summary Получить список адресов в сети
+     * @request GET:/network
+     * @secure
      */
-    layersDetail: (id: string, params: RequestParams = {}) =>
-      this.request<EntityLayer, void>({
-        path: `/layers/${id}`,
+    networkList: (params: RequestParams = {}) =>
+      this.request<BackendInternalEntityDeviceStatus[], void>({
+        path: `/network`,
         method: "GET",
+        secure: true,
         format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags new
-     * @name NewDevicesCreate
-     * @summary Новые девайсы для слоя
-     * @request POST:/layers/{id}/newDevices
-     */
-    newDevicesCreate: (id: string, params: RequestParams = {}) =>
-      this.request<void, void>({
-        path: `/layers/${id}/newDevices`,
-        method: "POST",
         ...params,
       }),
   };
@@ -559,11 +444,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name ObjectsList
      * @summary Возвращает все объекты
      * @request GET:/objects
+     * @secure
      */
     objectsList: (params: RequestParams = {}) =>
-      this.request<EntityObject[], void>({
+      this.request<BackendInternalEntityObject[], void>({
         path: `/objects`,
         method: "GET",
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -576,12 +463,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name ObjectsCreate
      * @summary Создать объект
      * @request POST:/objects
+     * @secure
      */
-    objectsCreate: (request: EntityNewObject, params: RequestParams = {}) =>
-      this.request<EntityObject, void>({
+    objectsCreate: (request: BackendInternalEntityNewObject, params: RequestParams = {}) =>
+      this.request<BackendInternalEntityObject, void>({
         path: `/objects`,
         method: "POST",
         body: request,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -594,11 +483,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name ObjectsDetail
      * @summary Объект по id
      * @request GET:/objects/{id}
+     * @secure
      */
     objectsDetail: (id: string, params: RequestParams = {}) =>
-      this.request<EntityObject, void>({
+      this.request<BackendInternalEntityObject, void>({
         path: `/objects/${id}`,
         method: "GET",
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -611,12 +502,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name ObjectsPartialUpdate
      * @summary Изменить объект
      * @request PATCH:/objects/{id}
+     * @secure
      */
-    objectsPartialUpdate: (id: string, request: EntityNewObject, params: RequestParams = {}) =>
-      this.request<EntityObject, void>({
+    objectsPartialUpdate: (id: string, request: BackendInternalEntityNewObject, params: RequestParams = {}) =>
+      this.request<BackendInternalEntityObject, void>({
         path: `/objects/${id}`,
         method: "PATCH",
         body: request,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -629,12 +522,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name LayersCreate
      * @summary Создать слой
      * @request POST:/objects/{id}/layers
+     * @secure
      */
-    layersCreate: (id: string, request: EntityNewLayer, params: RequestParams = {}) =>
-      this.request<EntityLayer, void>({
+    layersCreate: (id: string, request: BackendInternalEntityNewLayer, params: RequestParams = {}) =>
+      this.request<BackendInternalEntityLayer, void>({
         path: `/objects/${id}/layers`,
         method: "POST",
         body: request,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -644,15 +539,40 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags layers
-     * @name LayersPartialUpdate
-     * @summary Изменить объект
-     * @request PATCH:/objects/{object_id}/layers/{layer_id}
+     * @name LayersDetail
+     * @summary Получить слой
+     * @request GET:/objects/{object_id}/layers/{id}
+     * @secure
      */
-    layersPartialUpdate: (objectId: string, layerId: string, request: EntityNewLayer, params: RequestParams = {}) =>
-      this.request<EntityLayer, void>({
-        path: `/objects/${objectId}/layers/${layerId}`,
+    layersDetail: (id: string, objectId: string, params: RequestParams = {}) =>
+      this.request<BackendInternalEntityLayer, void>({
+        path: `/objects/${objectId}/layers/${id}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags layers
+     * @name LayersPartialUpdate
+     * @summary Изменить слой
+     * @request PATCH:/objects/{object_id}/layers/{id}
+     * @secure
+     */
+    layersPartialUpdate: (
+      objectId: string,
+      id: string,
+      request: BackendInternalEntityNewLayer,
+      params: RequestParams = {},
+    ) =>
+      this.request<BackendInternalEntityLayer, void>({
+        path: `/objects/${objectId}/layers/${id}`,
         method: "PATCH",
         body: request,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -675,125 +595,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       data?: any,
       params: RequestParams = {},
     ) =>
-      this.request<TokenerRefreshTokenResponse, void>({
+      this.request<BackendInternalTokenerRefreshTokenResponse, void>({
         path: `/refresh`,
         method: "POST",
         query: query,
         body: data,
         type: ContentType.FormData,
-        format: "json",
-        ...params,
-      }),
-  };
-  review = {
-    /**
-     * No description
-     *
-     * @tags reviews
-     * @name ReviewList
-     * @summary Возвращает все отзывы
-     * @request GET:/review
-     */
-    reviewList: (params: RequestParams = {}) =>
-      this.request<EntityReview[], void>({
-        path: `/review`,
-        method: "GET",
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags reviews
-     * @name ReviewCreate
-     * @summary Создать отзыв
-     * @request POST:/review
-     */
-    reviewCreate: (request: EntityNewReview, params: RequestParams = {}) =>
-      this.request<EntityReview, void>({
-        path: `/review`,
-        method: "POST",
-        body: request,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags reviews
-     * @name ReviewDetail
-     * @summary Отзыв по id
-     * @request GET:/review/{id}
-     * @secure
-     */
-    reviewDetail: (id: string, params: RequestParams = {}) =>
-      this.request<EntityReview, void>({
-        path: `/review/${id}`,
-        method: "GET",
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags reviews
-     * @name ReviewUpdate
-     * @summary Изменить отзыв
-     * @request PUT:/review/{id}
-     * @secure
-     */
-    reviewUpdate: (id: string, request: EntityNewReview, params: RequestParams = {}) =>
-      this.request<EntityReview, void>({
-        path: `/review/${id}`,
-        method: "PUT",
-        body: request,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags reviews
-     * @name ReviewDelete
-     * @summary Удалить отзыв
-     * @request DELETE:/review/{id}
-     * @secure
-     */
-    reviewDelete: (id: string, params: RequestParams = {}) =>
-      this.request<void, void>({
-        path: `/review/${id}`,
-        method: "DELETE",
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags reviews
-     * @name ReviewPartialUpdate
-     * @summary Изменить отзыв
-     * @request PATCH:/review/{id}
-     * @secure
-     */
-    reviewPartialUpdate: (id: string, request: EntityNewReview, params: RequestParams = {}) =>
-      this.request<EntityReview, void>({
-        path: `/review/${id}`,
-        method: "PATCH",
-        body: request,
-        secure: true,
-        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -815,6 +622,25 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
   };
+  subscribeNetwork = {
+    /**
+     * No description
+     *
+     * @tags networking
+     * @name SubscribeNetworkList
+     * @summary Подписаться на обновления из сети. WebSocket
+     * @request GET:/subscribe-network
+     * @secure
+     */
+    subscribeNetworkList: (params: RequestParams = {}) =>
+      this.request<BackendInternalEntityDevice, void>({
+        path: `/subscribe-network`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
   token = {
     /**
      * No description
@@ -824,8 +650,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @summary Авторизоваться
      * @request POST:/token
      */
-    tokenCreate: (request: EntityLoginInfo, params: RequestParams = {}) =>
-      this.request<TokenerCreateTokenResponse, void>({
+    tokenCreate: (request: BackendInternalEntityLoginInfo, params: RequestParams = {}) =>
+      this.request<BackendInternalTokenerCreateTokenResponse, void>({
         path: `/token`,
         method: "POST",
         body: request,
@@ -844,7 +670,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/user
      */
     userList: (params: RequestParams = {}) =>
-      this.request<EntityUserInfo[], void>({
+      this.request<BackendInternalEntityUserInfo[], void>({
         path: `/user`,
         method: "GET",
         format: "json",
@@ -859,8 +685,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @summary Зарегистрировать
      * @request POST:/user
      */
-    userCreate: (request: EntityNewUser, params: RequestParams = {}) =>
-      this.request<EntityUserInfo, void>({
+    userCreate: (request: BackendInternalEntityNewUser, params: RequestParams = {}) =>
+      this.request<BackendInternalEntityUserInfo, void>({
         path: `/user`,
         method: "POST",
         body: request,
@@ -878,7 +704,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/user/{id}
      */
     userDetail: (id: number, params: RequestParams = {}) =>
-      this.request<EntityUserInfo, void>({
+      this.request<BackendInternalEntityUserInfo, void>({
         path: `/user/${id}`,
         method: "GET",
         format: "json",

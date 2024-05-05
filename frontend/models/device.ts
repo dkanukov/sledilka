@@ -1,4 +1,4 @@
-import { EntityDevice, EntityDeviceType } from '../api/generated/api'
+import { BackendInternalEntityDevice, BackendInternalEntityDeviceType } from '../api/generated/api'
 
 export class Device {
 	id!: string
@@ -8,17 +8,17 @@ export class Device {
 	macAddress?: string
 	coordinates!: [number, number]
 	layerId!: string
-	type!: EntityDeviceType
+	type!: BackendInternalEntityDeviceType
 	angle!: number
 
-	constructor (dto: EntityDevice) {
+	constructor (dto: BackendInternalEntityDevice) {
 		this.id = dto.id || ''
 		this.name = dto.name || 'no name'
 		this.isActive = Boolean(dto.is_active)
 		this.ip = dto.ip
 		this.macAddress = dto.mac_address
 		this.layerId = dto.layer_id || 'no-layer-id-device'
-		this.type = dto.type || EntityDeviceType.Computer
+		this.type = dto.type || BackendInternalEntityDeviceType.Computer
 		this.coordinates = [dto.location_y || 0, dto.location_x || 0]
 		this.angle = 0
 	}

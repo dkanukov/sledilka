@@ -2,7 +2,7 @@ import { Input, Table, TableProps, Tag } from 'antd'
 import Link from 'next/link'
 import { VideoCameraOutlined } from '@ant-design/icons'
 
-import { EntityDeviceType } from '../../api/generated/api'
+import { BackendInternalEntityDeviceType } from '../../api/generated/api'
 
 import styles from './devices-table.module.css'
 
@@ -22,7 +22,7 @@ export const DevicesTable = (props: Props) => {
 			render: (name, device) => (
 				<div>
 					{name}
-					{device.type === EntityDeviceType.Camera && (
+					{device.type === BackendInternalEntityDeviceType.Camera && (
 						<Link
 							href={`/admin/devices/camera?cameraId=${device.id}`}
 						>
@@ -90,7 +90,7 @@ export const DevicesTable = (props: Props) => {
 			title: 'Тип',
 			dataIndex: 'type',
 			key: 'type',
-			render: (type: EntityDeviceType) => {
+			render: (type: BackendInternalEntityDeviceType) => {
 				return DeviceRuByType[type]
 			},
 			filters: DevicesLavelValue,
