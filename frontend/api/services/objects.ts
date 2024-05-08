@@ -1,4 +1,4 @@
-import { BackendInternalDbmodelDeviceType, BackendInternalEntityObject } from '../generated/api'
+import { BackendInternalDbmodelDeviceType, BackendInternalEntityNewObject, BackendInternalEntityObject } from '../generated/api'
 import CustomedApi from '../generated/customed-api'
 
 import { Device, ObjectLayer, ObjectStorage } from '@models'
@@ -9,13 +9,13 @@ export const getObjects = async () => {
 	return data.map((object) => new ObjectStorage(object))
 }
 
-export const createObject = async (newObject: BackendInternalEntityObject) => {
+export const createObject = async (newObject: BackendInternalEntityNewObject) => {
 	const { data } = await CustomedApi.objects.objectsCreate(newObject)
 	return new ObjectStorage(data)
 }
 
-export const createLayer = async (objectId: string, newLayer: ObjectLayer) => {
-	const { data } = await CustomedApi.objects.layersCreate(objectId, {
+export const createLayer = async (newLayer: ObjectLayer) => {
+	const { data } = await CustomedApi.objects.layersCreate(newLayer.objectId, {
 		angles_coordinates: newLayer.coordinates.map((coord) => ({
 			long: coord[0],
 			lat: coord[1],

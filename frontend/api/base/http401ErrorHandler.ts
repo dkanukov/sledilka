@@ -54,7 +54,7 @@ export const http401ErrorHandler = (axios: AxiosInstance) => {
 					console.warn(`${warningPrefix} Будут выполнены обновление access-токена и повторный запрос. Осталось попыток: ${retriesLeft}.`)
 					const oldTokens = lsGetItem<UserTokenInfo>('user-credential')
 
-					await refreshToken(oldTokens!.refreshToken)
+					// await refreshToken(oldTokens!.refreshToken)
 
 					error.config!.needsTokenRefresh = true
 					retriesInProgress.set(retryGroupId, new RetryGroupMetadata(retriesLeft - 1))

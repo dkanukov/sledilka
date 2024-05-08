@@ -1,1 +1,1 @@
-export { useDevices } from './use-devices'
+export { useDevicesList } from './use-devices-list'

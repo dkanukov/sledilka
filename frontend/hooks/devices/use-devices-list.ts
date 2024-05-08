@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { objectService } from '@api'
 import { DeviceExtendedInfo, DeviceFilter, DeviceFilterKeys } from '@typos'
 
-export const useDevices = () => {
+export const useDevicesList = () => {
 	const [objectNameById, setObjectNameById] = useState<Record<string, string>>({})
 	const [layerByObjectId, setlayerByObjectId] = useState<Record<string, {
 		layerId: string

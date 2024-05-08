@@ -22,10 +22,11 @@ export const login = async (userCredential: UserCredentials) => {
 	}
 }
 
-export const refreshToken = async (token: string) => {
-	const api = new Api()
-	const { data } = await api.refresh.refreshCreate({
-		token,
+export const refreshToken = async (refreshToken: string) => {
+	const { data } = await CustomedApi.refresh.refreshCreate({
+		headers: {
+			'X-Auth-Token': refreshToken,
+		},
 	})
 
 	const userCredential = new UserTokenInfo(data)

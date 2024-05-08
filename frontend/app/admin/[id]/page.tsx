@@ -5,22 +5,30 @@ import { Button, Drawer, Input, message } from 'antd'
 import styles from './id.module.css'
 
 import { DeviceDrawer, EditSidebar, FileUpload, LayerDrawer, Map } from '@components'
-import { useLayerEdit, useCreateNewLayer, useDrawer } from '@hooks'
+import { useObjectEdit, useDrawer, useCreateNewLayer } from '@hooks'
 
 export default function Id({ params } : { params: { id: string } }) {
 	const [showLayerDrawer, openLayerDrawer, closeLayerDrawer] = useDrawer()
 	const [mode, setMode] = useState<'edit-layer' | 'edit-devices' | 'add-layer'>('edit-devices')
 	const {
-		layerStore,
-		handleLayerChange,
-		handleAddDevice,
-	} = useLayerEdit(params.id ?? '')
-	const {
+		object,
 		layer,
-		removeNewLayer,
+		device,
+		handleLayerSelect,
+		handleLayerTranslate,
+		handleDeviceSelect,
+		handleDeviceChange,
+		handleDeviceTranslate,
+		flushDevice,
+	} = useObjectEdit(params.id)
+
+	const {
+		newLayer,
+		initNewLayer,
+		flushNewLayer,
+		handleSaveNewLayer,
 		handleLayerNameChange,
 		handleFileUpload,
-		createLayer,
 	} = useCreateNewLayer()
 
 	const handleModeToggle = () => {
@@ -33,53 +41,20 @@ export default function Id({ params } : { params: { id: string } }) {
 	}
 
 	const handleCreateNewLayer = () => {
-		layerStore.createNewLayer()
+		initNewLayer(params.id)
 		openLayerDrawer()
 		setMode('add-layer')
 	}
 
 	const handleCreateNewLayerDrawerClose = () => {
-		removeNewLayer(),
+		flushNewLayer()
 		closeLayerDrawer()
 	}
 
 	const handleLayerCreate = async () => {
-		await createLayer()
+		await handleSaveNewLayer()
 		closeLayerDrawer()
 		setMode('edit-devices')
-	}
-
-	const handleDeviceClick = (id: string) => {
-		layerStore.selectDevice(id)
-	}
-
-	const handleDeviceSave = async () => {
-		if (!layerStore.device) {
-			return
-		}
-
-		const response = await layerStore.updateDevice(layerStore.device)
-
-		if (response) {
-			await message.success({ content: 'Устройство обновлено' })
-			return
-		}
-
-		await message.error({ content: 'Устройство не обновлено' })
-	}
-
-	const handleLayerUpdate = async () => {
-		if (!layerStore.layer) {
-			return
-		}
-
-		const response = await layerStore.handleLayerUpdate(layerStore.layer)
-		if (response) {
-			await message.success({ content: 'Слой обновлен' })
-			return
-		}
-
-		await message.error({ content: 'Слой не был обновлен' })
 	}
 
 	const renderAddLayerDrawer = () => (
@@ -97,7 +72,7 @@ export default function Id({ params } : { params: { id: string } }) {
 			>
 				<Input
 					placeholder={'Названте слоя'}
-					value={layer?.floorName}
+					value={newLayer?.floorName}
 					onChange={(e) => handleLayerNameChange(e.target.value)}
 				/>
 				<FileUpload
@@ -112,15 +87,15 @@ export default function Id({ params } : { params: { id: string } }) {
 		<div
 			className={styles.root}
 		>
-			{layerStore.object && (
+			{object && (
 				<EditSidebar
-					object={layerStore.object}
-					selectedItem={layerStore.layer?.id ?? ''}
-					whenClick={handleLayerChange}
+					layers={object.layers}
+					selectedItem={layer?.id || ''}
+					whenClick={handleLayerSelect}
 					whenCreateNewLayerClick={handleCreateNewLayer}
 				/>
 			)}
-			{layerStore.layer && (
+			{layer && (
 				<div
 					className={styles.mapWrapper}
 				>
@@ -129,15 +104,16 @@ export default function Id({ params } : { params: { id: string } }) {
 						isPolygonNeed={mode === 'edit-layer' || mode === 'add-layer'}
 						isClickOnDeviceNeeded={mode === 'edit-devices'}
 						isDevicesTranslateNeeded={mode === 'edit-devices'}
-						angle={layerStore.layer.angle}
-						image={layerStore.layer.image}
-						devices={layerStore.layer.devices}
-						coordinates={layerStore.layer.coordinates}
-						whenPolygonChange={layerStore.handlePolygonChange}
+						angle={layer.angle}
+						image={layer.image}
+						devices={layer.devices}
+						coordinates={layer.coordinates}
+						whenPolygonChange={handleLayerTranslate}
 						whenAddNewDevice={handleAddDevice}
-						whenFeatureSelect={handleDeviceClick}
-						whenDeviceTranslating={layerStore.handleSelectedDeviceTranslate}
-						whenDeviceRotating={layerStore.handleDeviceRotating}
+						whenFeatureSelect={handleDeviceSelect}
+						whenDeviceTranslating={handleDeviceTranslate}
+						//TODO: поворот не работает
+						// whenDeviceRotating={layerStore.handleDeviceRotating}
 					/>
 					<div className={styles.editModeController}>
 						<Button
@@ -150,19 +126,19 @@ export default function Id({ params } : { params: { id: string } }) {
 				</div>
 			)}
 			{renderAddLayerDrawer()}
-			{layerStore.device && (
+			{device && (
 				<DeviceDrawer
 					whenSave={handleDeviceSave}
-					whenChange={layerStore.handleSelectedDeviceChange}
-					whenClose={() => layerStore.selectDevice(null)}
-					device={layerStore.device}
+					whenChange={handleDeviceChange}
+					whenClose={flushDevice}
+					device={device}
 				/>
 			)}
-			{layerStore.layer && mode === 'edit-layer' && (
+			{layer && mode === 'edit-layer' && (
 				<LayerDrawer
-					layer={layerStore.layer}
+					layer={layer}
 					whenClose={() => setMode('edit-devices')}
-					whenChange={layerStore.handleLayerChange}
+					whenChange={handleLayerSelect}
 					whenSave={handleLayerUpdate}
 					whenFileUpload={layerStore.handleFileUpload}
 				/>

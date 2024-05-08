@@ -9,13 +9,11 @@ interface LayerEdit{
 	layer: ObjectLayer | null
 	object: ObjectStorage | null
 	device: Device | null
-	uploadFile: (file: File) => Promise<void>
 	handlePolygonChange: (coordinates: Area, angle: number) => void
 	handleLayerUpdate: (layer: ObjectLayer) => Promise<boolean>
 	handleSelectedLayerChange: (layerId: string) => void
 	handleLayerNameChange: (value: string) => void
 	handleLayerCreate: (objectId: string, layer: ObjectLayer) => Promise<void>
-	handleSelectedDeviceChange: (key: DeviceKeys, value: string) => void
 	handleSelectedDeviceTranslate: (newCoords: { coords: Coordinate; deviceId: string }) => void
 	handleDeviceRotating: (newRotation: { rotation: number; deviceId: string }) => void
 	handleLayerChange: (key: LayerKeys, value: string) => void
@@ -34,22 +32,7 @@ export const useLayerEditStore = create<LayerEdit>()((set) => ({
 	object: null,
 	device: null,
 
-	uploadFile: async (file: File) => {
-		await imageService.uploadImage(file)
 
-		set((state) => {
-			if (!state.layer) {
-				return {}
-			}
-
-			return {
-				layer: {
-					...state.layer,
-					image: file.name,
-				},
-			}
-		})
-	},
 
 	handleSelectedLayerUpdate: async (layer: ObjectLayer) => {
 		const response = await objectService.updateLayer(layer)
@@ -159,39 +142,6 @@ export const useLayerEditStore = create<LayerEdit>()((set) => ({
 				device: {
 					...state.device,
 					angle: rotation,
-				},
-			}
-		})
-	},
-
-	handleSelectedDeviceChange: (key, value) => {
-		set((state) => {
-			if (!state.device || !state.layer) {
-				return {}
-			}
-
-			let device = state.device
-			const devices = state.layer.devices
-
-			if (key === 'lon') {
-				device.coordinates[0] = Number(value)
-			} else if (key === 'lat') {
-				device.coordinates[1] = Number(value)
-			} else {
-				device = {
-					...device,
-					[key]: value,
-				}
-			}
-
-			const deviceIndex = devices.findIndex((d) => d.id === device.id)
-			devices[deviceIndex] = device
-
-			return {
-				device,
-				layer: {
-					...state.layer,
-					devices: [...devices],
 				},
 			}
 		})

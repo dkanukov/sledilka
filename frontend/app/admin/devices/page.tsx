@@ -4,7 +4,7 @@ import { useEffect, useMemo } from 'react'
 
 import styles from './devices.module.css'
 
-import { useDevices } from '@hooks'
+import { useDevicesList } from '@hooks'
 import { DevicesFilters, DevicesTable } from '@components'
 
 const { Title } = Typography
@@ -17,7 +17,7 @@ export default function Devices() {
 		objectNameById,
 		handleFilterChange,
 		fetchObjects,
-	} = useDevices()
+	} = useDevicesList()
 
 	useEffect(() => {
 		const fetchInitialData = async () => {

@@ -1,23 +1,28 @@
-import { Button, Input, AutoComplete, Empty } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { Button, Input, AutoComplete } from 'antd'
+import { useCallback, useState } from 'react'
 import { fromLonLat } from 'ol/proj'
 import { Coordinate } from 'ol/coordinate'
 import { debounce } from 'lodash'
 
 import styles from './create-objects-form.module.css'
 
-import { Location, ObjectStorage } from '@models'
+import { Location } from '@models'
 import { EmptyMessage, Map } from '@components'
 import { geosearchService } from '@api'
 
 const { TextArea } = Input
 const MOSCOW_COORDINATE = [37.61905400772136, 55.750549228458084]
 
-interface FirstStepProps {
-	whenNextStepClick: (newObject: ObjectStorage) => void
+interface Props {
+	whenCreateObject: (newObject: {
+		address: string
+		description: string
+		coord: Coordinate
+		name: string
+	}) => void
 }
 
-export const FirstStep = (props: FirstStepProps) => {
+export const FirstStep = (props: Props) => {
 	const [form, setForm] = useState({
 		name: '',
 		address: '',
@@ -67,8 +72,10 @@ export const FirstStep = (props: FirstStepProps) => {
 	}
 
 	const handleSendForm = () => {
-		//TODO: добавить передачу координат
-		// props.whenNextStepClick(form)
+		props.whenCreateObject({
+			...form,
+			coord: markerCoordiante,
+		})
 	}
 
 	return (

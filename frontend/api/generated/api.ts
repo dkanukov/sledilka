@@ -586,21 +586,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name RefreshCreate
      * @summary Обновить токен
      * @request POST:/refresh
+     * @secure
      */
-    refreshCreate: (
-      query: {
-        /** token */
-        token: string;
-      },
-      data?: any,
-      params: RequestParams = {},
-    ) =>
+    refreshCreate: (params: RequestParams = {}) =>
       this.request<BackendInternalTokenerRefreshTokenResponse, void>({
         path: `/refresh`,
         method: "POST",
-        query: query,
-        body: data,
-        type: ContentType.FormData,
+        secure: true,
         format: "json",
         ...params,
       }),

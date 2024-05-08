@@ -40,20 +40,12 @@ export default function Admin() {
 		}
 
 		customRouter.push({
-			path: `/admin/${objectsStore.selectedLayer.id}`,
+			path: `/admin/${objectsStore.selectedLayer.objectId}`,
 		})
 	}
 
 	const handleFeatureSelect = (id: string) => {
 		objectsStore.handleDeviceSelect(id)
-	}
-
-	const handleDeviceSave = () => {
-		if (!objectsStore.selectedDevice) {
-			return
-		}
-
-		objectsStore.updateDevice(objectsStore.selectedDevice)
 	}
 
 	return (
