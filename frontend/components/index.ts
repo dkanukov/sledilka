@@ -16,4 +16,6 @@ export { EditSidebar } from './edit-sidebar/edit-sidebar'
 export { FileUpload } from './file-upload/file-upload'
 export { DeviceDrawer } from './device-drawer/device-drawer'
 export { LayerDrawer } from './layer-drawer/layer-drawer'
-
+export { EmptyMessage } from './empty-message/empty-message'
+export { DevicesFilters } from './devices-filters/devices-filters'
+export { DevicesTable } from './devices-table/devices-table'

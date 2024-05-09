@@ -1,2 +1,2 @@
-export * from './use-layer-edit'
-export * from './use-create-layer'
+export { useCreateObject } from './use-create-object'
+export { useObjectEdit } from './use-object-edit'

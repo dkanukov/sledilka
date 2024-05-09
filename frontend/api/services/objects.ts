@@ -1,4 +1,4 @@
-import { EntityNewObject } from '../generated/api'
+import { BackendInternalDbmodelDeviceType, BackendInternalEntityNewObject, BackendInternalEntityObject } from '../generated/api'
 import CustomedApi from '../generated/customed-api'
 
 import { Device, ObjectLayer, ObjectStorage } from '@models'
@@ -9,13 +9,17 @@ export const getObjects = async () => {
 	return data.map((object) => new ObjectStorage(object))
 }
 
-export const createObject = async (newObject: EntityNewObject) => {
-	const { data } = await CustomedApi.objects.objectsCreate(newObject)
-	return new ObjectStorage(data)
+export const createObject = async (newObject: BackendInternalEntityNewObject) => {
+	try {
+		const { data } = await CustomedApi.objects.objectsCreate(newObject)
+		return new ObjectStorage(data)
+	} catch (e) {
+		return undefined
+	}
 }
 
-export const createLayer = async (objectId: string, newLayer: ObjectLayer) => {
-	const { data } = await CustomedApi.objects.layersCreate(objectId, {
+export const createLayer = async (newLayer: ObjectLayer) => {
+	const { data } = await CustomedApi.objects.layersCreate(newLayer.objectId, {
 		angles_coordinates: newLayer.coordinates.map((coord) => ({
 			long: coord[0],
 			lat: coord[1],
@@ -29,31 +33,40 @@ export const createLayer = async (objectId: string, newLayer: ObjectLayer) => {
 }
 
 export const updateDevice = async (device: Device) => {
-	const response = await CustomedApi.devices.devicesPartialUpdate(device.id, {
-		ip: device.ip,
-		location_y: device.coordinates[0],
-		location_x: device.coordinates[1],
-		layer_id: device.layerId,
-		mac_address: device.macAddress,
-		name: device.name,
-		type: device.type,
-	})
+	try {
+		await CustomedApi.devices.devicesPartialUpdate(device.id, {
+			ip: device.ip,
+			location_y: device.coordinates[0],
+			location_x: device.coordinates[1],
+			layer_id: device.layerId,
+			mac_address: device.macAddress,
+			name: device.name,
+			type: device.type,
+		})
+		return true
+	} catch (e) {
+		return false
+	}
 
-	return response.status === 200
 }
 
 export const createDevice = async (device: Device) => {
-	const { data } = await CustomedApi.devices.devicesCreate({
-		layer_id: device.layerId,
-		location_y: device.coordinates[0],
-		location_x: device.coordinates[1],
-		name: device.name,
-		type: device.type,
-		//TODO: remove hardcode
-		mac_address: '7c:50:4e:62:88:1e',
-	})
+	try {
+		const { data } = await CustomedApi.devices.devicesCreate({
+			layer_id: device.layerId,
+			location_y: device.coordinates[0],
+			location_x: device.coordinates[1],
+			name: device.name,
+			type: device.type as unknown as BackendInternalDbmodelDeviceType,
+			//TODO: remove hardcode будет выбор ip + mac address из списка + типы мб поправят
+			mac_address: '7c:50:4e:62:88:1e',
+		})
+		return new Device(data)
+	} catch (e) {
+		console.error(e)
+		return undefined
+	}
 
-	return new Device(data)
 }
 
 export const updateLayer = async (layer: ObjectLayer) => {
@@ -70,8 +83,8 @@ export const updateLayer = async (layer: ObjectLayer) => {
 	return response.status === 200
 }
 
-export const getLayerById = async (id: string) => {
-	const { data } = await CustomedApi.layers.layersDetail(id)
+export const getLayerById = async (layerId: string, objectId: string) => {
+	const { data } = await CustomedApi.objects.layersDetail(layerId, objectId)
 
 	return new ObjectLayer(data)
 }

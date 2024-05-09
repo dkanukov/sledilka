@@ -1,7 +1,7 @@
 import { FeatureLike } from 'ol/Feature'
 import { Style, Icon, Text, Fill } from 'ol/style'
 
-import { EntityDeviceType } from '../api/generated/api'
+import { BackendInternalEntityDeviceType } from '../api/generated/api'
 
 import { Device } from '@models'
 
@@ -50,7 +50,6 @@ export const pointStyleDefault = (cluster: FeatureLike) => {
 		return style
 	} */
 
-	console.log(rotation)
 	const createdStyle = new Style({
 		image: new Icon({
 			src,
@@ -110,9 +109,9 @@ export const pointStyleSelected = (cluster: FeatureLike) => {
 	let src = ''
 
 	switch (type) {
-	case EntityDeviceType.Camera: src = ICONS.cameraSelected; break
-	case EntityDeviceType.Printer: src = ICONS.printerSelected; break
-	case EntityDeviceType.Computer: src = ICONS.computerSelected; break
+	case BackendInternalEntityDeviceType.Camera: src = ICONS.cameraSelected; break
+	case BackendInternalEntityDeviceType.Printer: src = ICONS.printerSelected; break
+	case BackendInternalEntityDeviceType.Computer: src = ICONS.computerSelected; break
 	}
 
 	const createdStyle = new Style({

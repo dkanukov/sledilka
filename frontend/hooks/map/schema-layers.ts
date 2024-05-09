@@ -1,4 +1,6 @@
+// @ts-expect-error no types
 import GeoLayer from 'ol-ext/layer/GeoImage'
+// @ts-expect-error no types
 import GeoImage from 'ol-ext/source/GeoImage'
 
 import { Point } from '@typos'

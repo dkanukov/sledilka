@@ -1,4 +1,4 @@
-import { EntityLayer, EntityObject } from '../api/generated/api'
+import { BackendInternalEntityLayer, BackendInternalEntityObject } from '../api/generated/api'
 
 import { Device } from '@models'
 import { Area } from '@typos'
@@ -9,16 +9,18 @@ export class ObjectStorage {
 	address!: string
 	description!: string
 	layers!: ObjectLayer[]
+	center!: [number, number]
 	updatedAt!: string
 	createdAt!: string
 
-	constructor(dto: EntityObject) {
+	constructor(dto: BackendInternalEntityObject) {
 		this.id = dto.id || ''
 		this.name = dto.name || ''
 		this.address = dto.address || ''
 		this.description = dto.description || ''
 		this.createdAt = dto.created_at || ''
 		this.updatedAt = dto.updated_at || ''
+		this.center = dto.long && dto.lat ? [dto.long, dto.lat] : [0, 0]
 		this.layers = dto.layers?.map((dtoLayer) => new ObjectLayer(dtoLayer)) ?? []
 	}
 }
@@ -34,7 +36,7 @@ export class ObjectLayer {
 	devices!: Device[]
 	coordinates!: Area
 
-	constructor(dto: EntityLayer) {
+	constructor(dto: BackendInternalEntityLayer) {
 		this.id = dto.id || ''
 		this.objectId = dto.object_id || ''
 		this.floorName = dto.floor_name || ''

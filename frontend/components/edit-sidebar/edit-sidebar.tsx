@@ -3,11 +3,11 @@ import { PlusOutlined } from '@ant-design/icons'
 
 import styles from './edit-sidebar.module.css'
 
-import { ObjectStorage } from '@models'
+import { ObjectLayer } from '@models'
 import { getMenuItem } from '@helpers'
 
 interface Props {
-	object: ObjectStorage
+	layers: ObjectLayer[]
 	selectedItem: string
 	whenClick: (item: string) => void
 	whenCreateNewLayerClick: () => void
@@ -15,7 +15,7 @@ interface Props {
 
 export const EditSidebar = (props: Props) => {
 	const menuItems = [
-		...props.object.layers.map((layer) => (
+		...props.layers.map((layer) => (
 			getMenuItem({
 				key: layer.id,
 				label: layer.floorName,

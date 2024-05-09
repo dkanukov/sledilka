@@ -1,37 +1,81 @@
-import { Button, Input, Upload, UploadProps, message, UploadFile } from 'antd'
-import { useState } from 'react'
-import { InboxOutlined } from '@ant-design/icons'
+import { Button, Input, AutoComplete } from 'antd'
+import { useCallback, useState } from 'react'
 import { fromLonLat } from 'ol/proj'
 import { Coordinate } from 'ol/coordinate'
-
-import { EntityNewObject } from '../../api/generated/api'
+import { debounce } from 'lodash'
 
 import styles from './create-objects-form.module.css'
 
-import { Map } from '@components'
+import { Location } from '@models'
+import { EmptyMessage, Map } from '@components'
+import { geosearchService } from '@api'
 
 const { TextArea } = Input
 const MOSCOW_COORDINATE = [37.61905400772136, 55.750549228458084]
 
-interface FirstStepProps {
-	whenNextStepClick: (newObject: EntityNewObject) => void
+interface Props {
+	whenCreateObject: (newObject: {
+		address: string
+		description: string
+		coord: Coordinate
+		name: string
+	}) => void
 }
 
-export const FirstStep = (props: FirstStepProps) => {
+export const FirstStep = (props: Props) => {
 	const [form, setForm] = useState({
 		name: '',
 		address: '',
 		description: '',
 	})
+	const [locations, setLocationts] = useState<Location[]>([])
+	const [markerCoordiante, setMarkerCoordinate] = useState(fromLonLat(MOSCOW_COORDINATE))
+
+	const debouncedGeosearchRequest = useCallback(
+		debounce(async (value: string) => {
+			const locations = await geosearchService.search(value)
+			setLocationts(locations)
+		}, 500),
+		[],
+	)
 
 	const isButtonDisabled = Boolean(!form.name || !form.address || !form.description)
 
 	const handleMarkerMove = (coordinate: Coordinate) => {
-		console.log(coordinate)
+		setMarkerCoordinate(coordinate)
+	}
+
+	const handleAddressSelect = (id: string) => {
+		const selectedLocation = locations.find((loc) => loc.id === id)
+
+		if (!selectedLocation) {
+			return
+		}
+
+		setMarkerCoordinate(fromLonLat(selectedLocation.coordinates))
+		setForm({
+			...form,
+			address: selectedLocation.address,
+		})
+	}
+
+	const handleAddressChange = (value: string) => {
+		setForm({
+			...form,
+			address: value,
+		})
+
+		if (!value) {
+			return
+		}
+		debouncedGeosearchRequest(value)
 	}
 
 	const handleSendForm = () => {
-		props.whenNextStepClick(form)
+		props.whenCreateObject({
+			...form,
+			coord: markerCoordiante,
+		})
 	}
 
 	return (
@@ -52,21 +96,38 @@ export const FirstStep = (props: FirstStepProps) => {
 					description: e.target.value,
 				})}
 			/>
-			<Input
+			<AutoComplete
 				placeholder={'Адрес'}
 				value={form.address}
-				onChange={(e) => setForm({
-					...form,
-					address: e.target.value,
-				})}
-			/>
+				onChange={(value: string) => handleAddressChange(value)}
+				onSelect={(id) => handleAddressSelect(id)}
+			>
+				{locations.length > 0 ? (
+					locations.map((loc) => (
+						<AutoComplete.Option
+							key={loc.id}
+							value={loc.id}
+						>
+							{`${loc.address}-${loc.description}`}
+						</AutoComplete.Option>
+					))
+				) : (
+					<AutoComplete.Option
+						value={null}
+					>
+						<EmptyMessage
+							message={form.address.length < 3 ? 'Начните вводить адрес' : 'Ничего не найдено'}
+						/>
+					</AutoComplete.Option>
+				)}
+			</AutoComplete>
 			<div
 				className={styles.mapWrapper}
 			>
 				<Map
 					hideControls
-					center={fromLonLat(MOSCOW_COORDINATE)}
-					markerCoordiante={fromLonLat(MOSCOW_COORDINATE)}
+					center={markerCoordiante}
+					markerCoordiante={markerCoordiante}
 					whenMarkerMove={handleMarkerMove}
 				/>
 			</div>
