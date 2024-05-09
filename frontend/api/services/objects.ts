@@ -42,6 +42,7 @@ export const updateDevice = async (device: Device) => {
 			mac_address: device.macAddress,
 			name: device.name,
 			type: device.type,
+			camera_connection_url: device.connectionURL,
 		})
 		return true
 	} catch (e) {

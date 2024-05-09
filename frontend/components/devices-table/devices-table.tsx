@@ -20,7 +20,7 @@ export const DevicesTable = (props: Props) => {
 			dataIndex: 'name',
 			key: 'name',
 			render: (name, device) => (
-				<div>
+				<div className={styles.nameCell}>
 					{name}
 					{device.type === BackendInternalEntityDeviceType.Camera && (
 						<Link

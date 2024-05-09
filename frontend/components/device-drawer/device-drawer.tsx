@@ -31,6 +31,8 @@ const DEVICE_TYPES = [
 ]
 
 export const DeviceDrawer = (props: Props) => {
+	const isCamera = props.device.type === BackendInternalEntityDeviceType.Camera
+
 	const handleDeviceChange = (key: DeviceKeys, value: string) => {
 		if (!props.whenChange) {
 			return
@@ -38,6 +40,7 @@ export const DeviceDrawer = (props: Props) => {
 
 		props.whenChange(key, value)
 	}
+
 	return (
 		<Drawer
 			title={`Устройство ${props.device.name}`}
@@ -59,7 +62,7 @@ export const DeviceDrawer = (props: Props) => {
 							readOnly={!props.whenChange}
 						/>
 					</div>
-					 <div className={styles.inputWithLabel}>
+					<div className={styles.inputWithLabel}>
 						<Text>Долгота</Text>
 						<InputNumber
 							className={styles.inputNumber}
@@ -93,6 +96,16 @@ export const DeviceDrawer = (props: Props) => {
 							readOnly={!props.whenChange}
 						/>
 					</div>
+					{isCamera && (
+						<div className={styles.inputWithLabel}>
+							<Text>URL</Text>
+							<Input
+								value={props.device.connectionURL}
+								onChange={({ target }) => handleDeviceChange('connectionURL', target.value)}
+								readOnly={!props.whenChange}
+							/>
+						</div>
+					)}
 					<div className={styles.inputWithLabel}>
 						<Text>Тип устройства</Text>
 						<Select

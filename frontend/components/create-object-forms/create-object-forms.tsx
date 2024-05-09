@@ -2,7 +2,7 @@ import { Button, Input, AutoComplete } from 'antd'
 import { useCallback, useState } from 'react'
 import { fromLonLat } from 'ol/proj'
 import { Coordinate } from 'ol/coordinate'
-import { debounce } from 'lodash'
+import debounce from 'lodash/debounce'
 
 import styles from './create-objects-form.module.css'
 

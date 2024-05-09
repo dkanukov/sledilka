@@ -1,3 +1,9 @@
 .dropdown {
 	padding: 8px;
 }
+
+.nameCell {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+}

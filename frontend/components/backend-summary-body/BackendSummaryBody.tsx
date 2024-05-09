@@ -1,8 +1,9 @@
 'use client'
 import Image from 'next/image'
 import React from 'react'
-import AboutBackGround from "@public/about-background.png"
-import Backend from "@public/backend-image.png"
+
+import AboutBackGround from '@public/about-background.png'
+import Backend from '@public/backend-image.png'
 
 export const BackendSummaryBody = () => {
 	return (
