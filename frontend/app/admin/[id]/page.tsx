@@ -1,11 +1,12 @@
 'use client'
 import { useState } from 'react'
-import { Button, Drawer, Input, message } from 'antd'
+import { Button, Drawer, Input } from 'antd'
 
 import styles from './id.module.css'
 
 import { DeviceDrawer, EditSidebar, FileUpload, LayerDrawer, Map } from '@components'
 import { useObjectEdit, useDrawer, useCreateNewLayer } from '@hooks'
+import { Area } from '@typos'
 
 export default function Id({ params } : { params: { id: string } }) {
 	const [showLayerDrawer, openLayerDrawer, closeLayerDrawer] = useDrawer()
@@ -16,10 +17,15 @@ export default function Id({ params } : { params: { id: string } }) {
 		device,
 		handleLayerSelect,
 		handleLayerTranslate,
+		handleLayerUpdate,
 		handleDeviceSelect,
 		handleDeviceChange,
 		handleDeviceTranslate,
+		handleAddNewDevice,
+		handleDeviceSave,
+		handleFileUpload: handleFileUploadExistingLayer,
 		flushDevice,
+		addLayer,
 	} = useObjectEdit(params.id)
 
 	const {
@@ -29,7 +35,19 @@ export default function Id({ params } : { params: { id: string } }) {
 		handleSaveNewLayer,
 		handleLayerNameChange,
 		handleFileUpload,
+		handleLayerTranslate: handleNewLayerTranslate,
 	} = useCreateNewLayer()
+
+	const selectedLayer = mode === 'add-layer' && newLayer ? newLayer : layer
+
+	const handleSelectedLayerTranslate = (coordinates: Area, angle: number) => {
+		if (mode === 'add-layer') {
+			handleNewLayerTranslate(coordinates, angle)
+			return
+		}
+
+		handleLayerTranslate(coordinates, angle)
+	}
 
 	const handleModeToggle = () => {
 		if (mode === 'edit-layer') {
@@ -52,9 +70,12 @@ export default function Id({ params } : { params: { id: string } }) {
 	}
 
 	const handleLayerCreate = async () => {
-		await handleSaveNewLayer()
-		closeLayerDrawer()
-		setMode('edit-devices')
+		const layer = await handleSaveNewLayer()
+		if (layer) {
+			addLayer(layer)
+			closeLayerDrawer()
+			setMode('edit-devices')
+		}
 	}
 
 	const renderAddLayerDrawer = () => (
@@ -95,7 +116,7 @@ export default function Id({ params } : { params: { id: string } }) {
 					whenCreateNewLayerClick={handleCreateNewLayer}
 				/>
 			)}
-			{layer && (
+			{selectedLayer && (
 				<div
 					className={styles.mapWrapper}
 				>
@@ -104,12 +125,12 @@ export default function Id({ params } : { params: { id: string } }) {
 						isPolygonNeed={mode === 'edit-layer' || mode === 'add-layer'}
 						isClickOnDeviceNeeded={mode === 'edit-devices'}
 						isDevicesTranslateNeeded={mode === 'edit-devices'}
-						angle={layer.angle}
-						image={layer.image}
-						devices={layer.devices}
-						coordinates={layer.coordinates}
-						whenPolygonChange={handleLayerTranslate}
-						whenAddNewDevice={handleAddDevice}
+						angle={selectedLayer.angle}
+						image={selectedLayer.image}
+						devices={selectedLayer.devices}
+						coordinates={selectedLayer.coordinates}
+						whenPolygonChange={handleSelectedLayerTranslate}
+						whenAddNewDevice={handleAddNewDevice}
 						whenFeatureSelect={handleDeviceSelect}
 						whenDeviceTranslating={handleDeviceTranslate}
 						//TODO: поворот не работает
@@ -140,7 +161,7 @@ export default function Id({ params } : { params: { id: string } }) {
 					whenClose={() => setMode('edit-devices')}
 					whenChange={handleLayerSelect}
 					whenSave={handleLayerUpdate}
-					whenFileUpload={layerStore.handleFileUpload}
+					whenFileUpload={handleFileUploadExistingLayer}
 				/>
 			)}
 		</div>

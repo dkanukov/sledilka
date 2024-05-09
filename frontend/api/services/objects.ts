@@ -10,8 +10,12 @@ export const getObjects = async () => {
 }
 
 export const createObject = async (newObject: BackendInternalEntityNewObject) => {
-	const { data } = await CustomedApi.objects.objectsCreate(newObject)
-	return new ObjectStorage(data)
+	try {
+		const { data } = await CustomedApi.objects.objectsCreate(newObject)
+		return new ObjectStorage(data)
+	} catch (e) {
+		return undefined
+	}
 }
 
 export const createLayer = async (newLayer: ObjectLayer) => {
@@ -29,31 +33,40 @@ export const createLayer = async (newLayer: ObjectLayer) => {
 }
 
 export const updateDevice = async (device: Device) => {
-	const response = await CustomedApi.devices.devicesPartialUpdate(device.id, {
-		ip: device.ip,
-		location_y: device.coordinates[0],
-		location_x: device.coordinates[1],
-		layer_id: device.layerId,
-		mac_address: device.macAddress,
-		name: device.name,
-		type: device.type,
-	})
+	try {
+		await CustomedApi.devices.devicesPartialUpdate(device.id, {
+			ip: device.ip,
+			location_y: device.coordinates[0],
+			location_x: device.coordinates[1],
+			layer_id: device.layerId,
+			mac_address: device.macAddress,
+			name: device.name,
+			type: device.type,
+		})
+		return true
+	} catch (e) {
+		return false
+	}
 
-	return response.status === 200
 }
 
 export const createDevice = async (device: Device) => {
-	const { data } = await CustomedApi.devices.devicesCreate({
-		layer_id: device.layerId,
-		location_y: device.coordinates[0],
-		location_x: device.coordinates[1],
-		name: device.name,
-		type: device.type as unknown as BackendInternalDbmodelDeviceType,
-		//TODO: remove hardcode будет выбор ip + mac address из списка + типы мб поправят
-		mac_address: '7c:50:4e:62:88:1e',
-	})
+	try {
+		const { data } = await CustomedApi.devices.devicesCreate({
+			layer_id: device.layerId,
+			location_y: device.coordinates[0],
+			location_x: device.coordinates[1],
+			name: device.name,
+			type: device.type as unknown as BackendInternalDbmodelDeviceType,
+			//TODO: remove hardcode будет выбор ip + mac address из списка + типы мб поправят
+			mac_address: '7c:50:4e:62:88:1e',
+		})
+		return new Device(data)
+	} catch (e) {
+		console.error(e)
+		return undefined
+	}
 
-	return new Device(data)
 }
 
 export const updateLayer = async (layer: ObjectLayer) => {

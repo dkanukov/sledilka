@@ -22,7 +22,6 @@ const generateRandomId = (): string => {
 }
 
 const getFormattedEndpoint = (config: AxiosRequestConfig): string => {
-	console.log(config)
 	const { method, url, baseURL } = config
 	const fullUrl = url ? new URL(url, baseURL).href : ''
 	return `${method?.toUpperCase()} ${fullUrl}`

@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 import { ObjectLayer } from '@models'
 import { imageService, objectService } from '@api'
+import { Area } from '@typos'
 
 export const useCreateNewLayer = () => {
 	const [newLayer, setNewLayer] = useState<ObjectLayer | null>(null)
@@ -61,7 +62,19 @@ export const useCreateNewLayer = () => {
 			return
 		}
 
-		await objectService.createLayer(newLayer)
+		return await objectService.createLayer(newLayer)
+	}
+
+	const handleLayerTranslate = (coordinates: Area, angle: number) => {
+		if (!newLayer) {
+			return
+		}
+
+		setNewLayer({
+			...newLayer,
+			angle,
+			coordinates,
+		})
 	}
 
 	const flushNewLayer = () => {
@@ -75,5 +88,6 @@ export const useCreateNewLayer = () => {
 		flushNewLayer,
 		handleLayerNameChange,
 		handleFileUpload,
+		handleLayerTranslate,
 	}
 }

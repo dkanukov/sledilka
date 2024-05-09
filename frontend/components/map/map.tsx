@@ -10,6 +10,7 @@ import styles from './map.module.css'
 import { useMap, usePersistState } from '@hooks'
 import { Area, Marker } from '@typos'
 import { Device } from '@models'
+import { fromLonLat, toLonLat } from 'ol/proj'
 
 interface Props {
 	isPolygonNeed?: boolean
@@ -121,7 +122,8 @@ export const Map = (props: Props) => {
 	}
 
 	useEffect(() => {
-		initializeMap(props.center)
+		console.log(props.center)
+		initializeMap(props.center ? props.center : undefined)
 	}, [])
 
 	useEffect(() => {

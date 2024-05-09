@@ -9,6 +9,7 @@ export class ObjectStorage {
 	address!: string
 	description!: string
 	layers!: ObjectLayer[]
+	center!: [number, number]
 	updatedAt!: string
 	createdAt!: string
 
@@ -19,6 +20,7 @@ export class ObjectStorage {
 		this.description = dto.description || ''
 		this.createdAt = dto.created_at || ''
 		this.updatedAt = dto.updated_at || ''
+		this.center = dto.long && dto.lat ? [dto.long, dto.lat] : [0, 0]
 		this.layers = dto.layers?.map((dtoLayer) => new ObjectLayer(dtoLayer)) ?? []
 	}
 }

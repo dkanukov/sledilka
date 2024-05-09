@@ -1,8 +1,11 @@
 import { Coordinate } from 'ol/coordinate'
+import { useRouter } from 'next/navigation'
 
 import { objectService } from '@api'
 
 export const useCreateObject = () => {
+	const router = useRouter()
+
 	const handleCreateObject = async ({ address, description, coord, name } : {
 		address: string
 		description: string
@@ -17,6 +20,9 @@ export const useCreateObject = () => {
 			name,
 		})
 
+		if (object) {
+			router.push(`/admin/${object.id}`)
+		}
 	}
 
 	return {
