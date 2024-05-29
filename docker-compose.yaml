@@ -21,8 +21,8 @@ services:
   backend:
     build: backend/.
     network_mode: "host"
-    ports:
-      - "8081:8081"
+#    ports:
+#      - "8081:8081"
     volumes:
       - ./docker-compose.yaml:/app/docker-compose.yaml
     depends_on: 

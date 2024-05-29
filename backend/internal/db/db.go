@@ -17,9 +17,10 @@ const (
 
 func StartupDB(ctx context.Context, info types.ServiceConfig) (*pgx.Conn, error) {
 	dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=disable",
-		//"0.0.0.0",
-		info.Name,
-		user, password, dbname, info.Ports[0].Published)
+		"0.0.0.0",
+		//info.Name,
+		user, password, dbname,
+		info.Ports[0].Published)
 	db, err := goose.OpenDBWithDriver("pgx", dsn)
 	if err != nil {
 		return nil, err
