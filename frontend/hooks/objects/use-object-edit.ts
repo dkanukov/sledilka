@@ -96,7 +96,6 @@ export const useObjectEdit = (objectId: string) => {
 		const deviceIndex = devices.findIndex((d) => d.id === device.id)
 		devices[deviceIndex] = newDevice
 
-		console.log(newDevice)
 		setLayer({
 			...layer,
 			devices: [...devices],
@@ -114,7 +113,7 @@ export const useObjectEdit = (objectId: string) => {
 
 		newDevice.coordinates = newCoords.coords as [number, number]
 		const deviceIndex = devices.findIndex((d) => d.id === device.id)
-		devices[deviceIndex] = newDevice
+		devices[deviceIndex] = { ...newDevice }
 
 		setLayer({
 			...layer,
