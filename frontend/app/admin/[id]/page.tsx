@@ -92,7 +92,7 @@ export default function Id({ params } : { params: { id: string } }) {
 				className={styles.drawerContent}
 			>
 				<Input
-					placeholder={'Названте слоя'}
+					placeholder={'Название слоя'}
 					value={newLayer?.floorName}
 					onChange={(e) => handleLayerNameChange(e.target.value)}
 				/>

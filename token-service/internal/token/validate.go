@@ -19,7 +19,7 @@ func validate(inputToken string, isRefresh bool) (userId string, err error) {
 
 	})
 	if err != nil {
-		return userId, err
+		return userId, fmt.Errorf("jwt.Parse: %w", err)
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {

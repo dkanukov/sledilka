@@ -7,6 +7,7 @@ export class Device {
 	ip?: string
 	macAddress?: string
 	coordinates!: [number, number]
+	connectionURL?: string
 	layerId!: string
 	type!: BackendInternalEntityDeviceType
 	angle!: number
@@ -17,6 +18,7 @@ export class Device {
 		this.isActive = Boolean(dto.is_active)
 		this.ip = dto.ip
 		this.macAddress = dto.mac_address
+		this.connectionURL = dto.camera_connection_url
 		this.layerId = dto.layer_id || 'no-layer-id-device'
 		this.type = dto.type || BackendInternalEntityDeviceType.Computer
 		this.coordinates = [dto.location_y || 0, dto.location_x || 0]
