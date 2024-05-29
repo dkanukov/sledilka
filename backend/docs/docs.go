@@ -762,12 +762,26 @@ const docTemplate = `{
             "enum": [
                 "computer",
                 "camera",
-                "printer"
+                "printer",
+                "scanner",
+                "phone",
+                "smart_bulb",
+                "smart_fridge",
+                "custom",
+                "raspberry_pi",
+                "machine_tool"
             ],
             "x-enum-varnames": [
                 "DeviceTypeComputer",
                 "DeviceTypeCamera",
-                "DeviceTypePrinter"
+                "DeviceTypePrinter",
+                "DeviceTypeScanner",
+                "DeviceTypePhone",
+                "DeviceTypeSmartBulb",
+                "DeviceTypeSmartFridge",
+                "DeviceTypeCustom",
+                "DeviceTypeRaspberryPi",
+                "DeviceTypeMachineTool"
             ]
         },
         "backend_internal_entity.CreateDevice": {

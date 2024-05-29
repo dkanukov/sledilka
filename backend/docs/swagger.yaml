@@ -11,11 +11,25 @@ definitions:
     - computer
     - camera
     - printer
+    - scanner
+    - phone
+    - smart_bulb
+    - smart_fridge
+    - custom
+    - raspberry_pi
+    - machine_tool
     type: string
     x-enum-varnames:
     - DeviceTypeComputer
     - DeviceTypeCamera
     - DeviceTypePrinter
+    - DeviceTypeScanner
+    - DeviceTypePhone
+    - DeviceTypeSmartBulb
+    - DeviceTypeSmartFridge
+    - DeviceTypeCustom
+    - DeviceTypeRaspberryPi
+    - DeviceTypeMachineTool
   backend_internal_entity.CreateDevice:
     properties:
       angle:

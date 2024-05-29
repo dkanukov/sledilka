@@ -15,9 +15,16 @@ import (
 type DeviceType string
 
 const (
-	DeviceTypeComputer DeviceType = "computer"
-	DeviceTypeCamera   DeviceType = "camera"
-	DeviceTypePrinter  DeviceType = "printer"
+	DeviceTypeComputer    DeviceType = "computer"
+	DeviceTypeCamera      DeviceType = "camera"
+	DeviceTypePrinter     DeviceType = "printer"
+	DeviceTypeScanner     DeviceType = "scanner"
+	DeviceTypePhone       DeviceType = "phone"
+	DeviceTypeSmartBulb   DeviceType = "smart_bulb"
+	DeviceTypeSmartFridge DeviceType = "smart_fridge"
+	DeviceTypeCustom      DeviceType = "custom"
+	DeviceTypeRaspberryPi DeviceType = "raspberry_pi"
+	DeviceTypeMachineTool DeviceType = "machine_tool"
 )
 
 func (e *DeviceType) Scan(src interface{}) error {
@@ -59,7 +66,14 @@ func (e DeviceType) Valid() bool {
 	switch e {
 	case DeviceTypeComputer,
 		DeviceTypeCamera,
-		DeviceTypePrinter:
+		DeviceTypePrinter,
+		DeviceTypeScanner,
+		DeviceTypePhone,
+		DeviceTypeSmartBulb,
+		DeviceTypeSmartFridge,
+		DeviceTypeCustom,
+		DeviceTypeRaspberryPi,
+		DeviceTypeMachineTool:
 		return true
 	}
 	return false
