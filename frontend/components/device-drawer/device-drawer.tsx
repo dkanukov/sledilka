@@ -6,6 +6,7 @@ import styles from './device-drawer.module.css'
 
 import { Device } from '@models'
 import { DeviceKeys } from '@typos'
+import { useNetwork } from '@hooks'
 
 interface Props {
 	device: Device
@@ -31,7 +32,18 @@ const DEVICE_TYPES = [
 ]
 
 export const DeviceDrawer = (props: Props) => {
+	const { networkItems } = useNetwork()
+
 	const isCamera = props.device.type === BackendInternalEntityDeviceType.Camera
+	const macAddresses = networkItems.map((item) => ({
+		label: item.macAddress,
+		value: item.macAddress,
+		isBusy: item.isBusy,
+	}))
+	const ipAddresses = networkItems.map((item) => ({
+		label: item.ipAddress,
+		value: item.ipAddress,
+	}))
 
 	const handleDeviceChange = (key: DeviceKeys, value: string) => {
 		if (!props.whenChange) {
@@ -82,19 +94,33 @@ export const DeviceDrawer = (props: Props) => {
 					</div>
 					<div className={styles.inputWithLabel}>
 						<Text>IP</Text>
-						<Input
+						<Select
+							showSearch
 							value={props.device.ip}
-							onChange={({ target }) => handleDeviceChange('ip', target.value)}
-							readOnly={!props.whenChange}
+							options={ipAddresses}
+							onChange={(value) => handleDeviceChange('ip', value)}
+							disabled={!props.whenChange}
 						/>
 					</div>
 					<div className={styles.inputWithLabel}>
 						<Text>MAC address</Text>
-						<Input
+						<Select
+							showSearch
 							value={props.device.macAddress}
-							onChange={({ target }) => handleDeviceChange('ip', target.value)}
-							readOnly={!props.whenChange}
-						/>
+							options={macAddresses}
+							onSelect={(value) => handleDeviceChange('macAddress', value)}
+							disabled={!props.whenChange}
+						>
+							{macAddresses.map((item) => (
+								<Select.Option
+									disables={item.isBusy}
+									key={item.value}
+									value={item.value}
+								>
+									{item.label}
+								</Select.Option>
+							))}
+						</Select>
 					</div>
 					{isCamera && (
 						<div className={styles.inputWithLabel}>
