@@ -139,21 +139,13 @@ func main() {
 					IpAddress:  conv.StringToStringp("127.0.0.1"),
 				})
 			}
-			resp.Devices = append(resp.Devices, &network.DeviceStatus{
-				MacAddress: GenerateMac().String(),
-				IsActive:   true,
-				IpAddress:  conv.StringToStringp("127.0.0.1"),
-			})
-			resp.Devices = append(resp.Devices, &network.DeviceStatus{
-				MacAddress: GenerateMac().String(),
-				IsActive:   true,
-				IpAddress:  conv.StringToStringp("127.0.0.1"),
-			})
-			resp.Devices = append(resp.Devices, &network.DeviceStatus{
-				MacAddress: GenerateMac().String(),
-				IsActive:   true,
-				IpAddress:  conv.StringToStringp("127.0.0.1"),
-			})
+			for i := 0; i < 7-len(macs); i++ {
+				resp.Devices = append(resp.Devices, &network.DeviceStatus{
+					MacAddress: GenerateMac().String(),
+					IsActive:   true,
+					IpAddress:  conv.StringToStringp("127.0.0.1"),
+				})
+			}
 			return resp, nil
 		},
 	).AnyTimes()
