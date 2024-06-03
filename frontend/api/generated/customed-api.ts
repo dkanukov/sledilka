@@ -1,13 +1,14 @@
 import { http401ErrorHandler } from '../base'
 
 import { Api } from './api'
+import { BASE_URL } from './base-url'
 
 import { lsGetItem } from '@helpers'
 import { UserTokenInfo } from '@models'
 
 const createApi = () => {
 	const api = new Api({
-		baseURL: 'http://localhost:8081',
+		baseURL: BASE_URL,
 	})
 
 	api.instance.interceptors.request.use((config) => {

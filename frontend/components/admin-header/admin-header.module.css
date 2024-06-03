@@ -1,3 +1,22 @@
 .header {
+	display: flex;
+	gap: 12px;
+	align-items: center;
 	padding: 0 !important;
+}
+
+.logo {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.headerText {
+	margin-bottom: 0 !important;
+}
+
+.tabs {
+	background-color: inherit !important;
+	flex-grow: 1;
+	flex-shrink: 0;
 }

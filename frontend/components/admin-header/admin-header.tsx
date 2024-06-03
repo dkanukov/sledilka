@@ -1,14 +1,17 @@
 'use client'
 
-import { Layout, Menu } from 'antd'
+import { Layout, Menu, Typography } from 'antd'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 
 import styles from './admin-header.module.css'
 
 import { MenuItem } from '@typos'
 
 const { Header } = Layout
+const { Title } = Typography
+
 export const AdminHeader = () => {
 	const path = usePathname()
 
@@ -31,7 +34,22 @@ export const AdminHeader = () => {
 		<Header
 			className={styles.header}
 		>
+			<div className={styles.logo}>
+				<Image
+					src={'/logo.png'}
+					alt={'logo'}
+					width={50}
+					height={50}
+				/>
+				<Title
+					className={styles.headerText}
+					level={3}
+				>
+					Sledilka
+				</Title>
+			</div>
 			<Menu
+				className={styles.tabs}
 				mode={'horizontal'}
 				items={menuItems}
 				activeKey={path}

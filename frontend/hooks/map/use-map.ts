@@ -14,6 +14,8 @@ import { fromExtent } from 'ol/geom/Polygon'
 import VectorSource from 'ol/source/Vector'
 import VectorLayer from 'ol/layer/Vector'
 
+import { BASE_URL } from '../../api/generated/base-url'
+
 import { MapLayer, PointsLayer, PolygonLayer, SchemeLayer } from '.'
 
 import { degreeToRadian, getImgParams, getMarkerStyle, getRectCenter, getScaleByResolution, loadImage, pointStyleHovered, pointStyleSelected, radianToDegree } from '@helpers'
@@ -114,7 +116,7 @@ export const useMap = ({
 		let img: HTMLImageElement | null = null
 
 		try {
-			img = await loadImage(`http://localhost:8081/images/${imgUrl}`)
+			img = await loadImage(`${BASE_URL}/images/${imgUrl}`)
 		} catch {
 			await message.error('Не удалось загрузить схему слоя')
 			return false
@@ -129,7 +131,7 @@ export const useMap = ({
 		)
 
 		const schemeLayer = new SchemeLayer({
-			url: `http://localhost:8081/images/${imgUrl}`,
+			url: `${BASE_URL}/images/${imgUrl}`,
 			center,
 			rotation,
 			scale,

@@ -5,6 +5,7 @@ import styles from './layer-drawer.module.css'
 import { ObjectLayer } from '@models'
 import { LayerKeys } from '@typos'
 import { useState } from 'react'
+import { BASE_URL } from '../../api/generated/base-url'
 
 interface Props {
 	layer: ObjectLayer
@@ -61,7 +62,7 @@ export const LayerDrawer = (props: Props) => {
 					fileList={[{
 						name: `${props.layer.image}`,
 						uid: '-1',
-						url: `http://localhost:8081/images/${props.layer.image}`,
+						url: `${BASE_URL}/images/${props.layer.image}`,
 					}]}
 				>
 					<Button>Изменить схему</Button>
