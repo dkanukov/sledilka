@@ -1,6 +1,9 @@
 'use client'
 import { Typography } from 'antd'
 import { useSearchParams } from 'next/navigation'
+import Image from 'next/image'
+
+import { BASE_URL } from '../../../../api/generated/base-url'
 
 import styles from './camera.module.css'
 
@@ -13,8 +16,9 @@ export default function Camera() {
 		<div className={styles.root}>
 			<Title>Просмотр камеры</Title>
 			<img
+				alt={'video player'}
 				className={styles.video}
-				src={`http://localhost:8081/stream/${searchParams.get('cameraId')}`}
+				src={`${BASE_URL}/stream/${searchParams.get('cameraId')}`}
 			/>
 			{/*<video>*/}
 			{/*	<source src={`http://localhost:8081/stream/${searchParams.get('cameraId')}`}/>*/}
